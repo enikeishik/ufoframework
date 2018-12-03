@@ -1,5 +1,5 @@
 <?php
-require_once '../vendor/autoload.php';
+require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
 use \Ufo\Tools;
  
@@ -15,36 +15,14 @@ class ToolsTest extends \Codeception\Test\Unit
      */
     protected $tools;
     
-    /**
-     * @var int
-     */
-    protected $phpVer;
-    
     protected function _before()
     {
-        $arr = explode('.', PHP_VERSION);
-        $this->phpVer = (int) ($arr[0] . $arr[1]);
-        $config = new Config();
-        $params = null;
-        $db = null;
-        $this->tools = new Tools($config, $params, $db);
+        $this->tools = new Tools();
     }
     
     protected function _after()
     {
         $this->tools = null;
-    }
-    
-    protected function fixPhp70(array $arr)
-    {
-        foreach ($arr as &$v) {
-            if ('PHP_INT_MAX' === $v) {
-                $v = $this->phpVer > 70 ? PHP_INT_MAX : 9;
-            } elseif ('-PHP_INT_MAX' === $v) {
-                $v = $this->phpVer > 70 ? (PHP_INT_MAX * -1 - 1) : -9;
-            }
-        }
-        return $arr;
     }
     
     // tests
@@ -133,9 +111,9 @@ class ToolsTest extends \Codeception\Test\Unit
             [['0', ' 1', '2'], [0, 1, 2]], 
             [['0', ' 1 ', '2'], [0, 1, 2]], 
             [[0, PHP_INT_MAX], [0, PHP_INT_MAX]], 
-            [[0, PHP_INT_MAX + 1], [0, 'PHP_INT_MAX']], // (string) (PHP_INT_MAX + 1) -> PHP_INT_MAX
+            [[0, PHP_INT_MAX + 1], [0, PHP_INT_MAX]], 
             [[0, PHP_INT_MAX * -1 - 1], [0, PHP_INT_MAX * -1 - 1]], 
-            [[0, PHP_INT_MAX * -1 - 2], [0, '-PHP_INT_MAX']], //(string) (PHP_INT_MAX * -1 - 2) -> PHP_INT_MAX * -1 - 1
+            [[0, PHP_INT_MAX * -1 - 2], [0, PHP_INT_MAX * -1 - 1]], 
         ];
     }
     
@@ -145,7 +123,7 @@ class ToolsTest extends \Codeception\Test\Unit
     public function testGetArrayOfIntegers($val, $expected)
     {
         $arr = $this->tools->getArrayOfIntegers($val);
-        $this->assertEquals($this->fixPhp70($expected), $arr);
+        $this->assertEquals($expected, $arr);
     }
     
     public function isStringOfIntegersDataProvider()
@@ -186,8 +164,8 @@ class ToolsTest extends \Codeception\Test\Unit
             ['0, 1.0, 2', ',', [0, 1, 2]], 
             ['0, 1.1, 2', ',', [0, 1, 2]], 
             ['0, 1a, 2', ',', [0, 1, 2]], 
-            ['0, 1, 2, ' . (PHP_INT_MAX + 1), ',', [0, 1, 2, 'PHP_INT_MAX']], 
-            [(PHP_INT_MAX * -1 - 2) . ', -1, 0, 1', ',', ['-PHP_INT_MAX', -1, 0, 1]], 
+            ['0, 1, 2, ' . (PHP_INT_MAX + 1), ',', [0, 1, 2, PHP_INT_MAX]], 
+            [(PHP_INT_MAX * -1 - 2) . ', -1, 0, 1', ',', [PHP_INT_MAX * -1 - 1, -1, 0, 1]], 
             ['0, a, 2', ',', [0, 0, 2]], 
             ['0, , 2', ',', [0, 0, 2]], 
             ['0,,2', ',', [0, 0, 2]], 
@@ -202,7 +180,7 @@ class ToolsTest extends \Codeception\Test\Unit
     public function testGetArrayOfIntegersFromString($val, $sep, $expected)
     {
         $arr = $this->tools->getArrayOfIntegersFromString($val, $sep);
-        $this->assertEquals($this->fixPhp70($expected), $arr);
+        $this->assertEquals($expected, $arr);
     }
     
     public function isEmailDataProvider()
