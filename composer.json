@@ -1,0 +1,25 @@
+{
+    "name": "enikeishik/ufoframework",
+    "type": "project",
+    "description": "UFO Framework.",
+    "homepage": "https://github.com/enikeishik/ufoframework",
+    "license": "GPL-3",
+    "authors": [
+        {
+            "name": "Enikeishik",
+            "email": "enikeishik@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.2"
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ufo\\": "src/Ufo/"
+        }
+    }
+}
