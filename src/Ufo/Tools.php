@@ -2,7 +2,7 @@
 /**
  * UFO Framework.
  * 
- * @copyright   Copyright (C) 2017 - 2018 Enikeishik <enikeishik@gmail.com>. All rights reserved.
+ * @copyright   Copyright (C) 2018 - 2019 Enikeishik <enikeishik@gmail.com>. All rights reserved.
  * @author      Enikeishik <enikeishik@gmail.com>
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
@@ -19,7 +19,7 @@ class Tools
      * @param bool $unsigned = false
      * @return bool
      */
-    public static function isInt($str, bool $unsigned = false) : bool
+    public static function isInt($str, bool $unsigned = false): bool
     {
         if (!$unsigned) {
             return (string) (int) $str === (string) $str;
@@ -32,7 +32,7 @@ class Tools
      * @param array $arr
      * @return bool
      */
-    public static function isArrayOfIntegers(array $arr) : bool
+    public static function isArrayOfIntegers(array $arr): bool
     {
         foreach ($arr as $val) {
             if (!self::isInt($val)) {
@@ -46,7 +46,7 @@ class Tools
      * @param array $arr
      * @return array<int>
      */
-    public static function getArrayOfIntegers(array $arr) : array
+    public static function getArrayOfIntegers(array $arr): array
     {
         return array_map(
             function($str) { return (int) trim($str); }, 
@@ -59,7 +59,7 @@ class Tools
      * @param string $sep
      * @return boolean
      */
-    public static function isStringOfIntegers(string $str, string $sep = ',') : bool
+    public static function isStringOfIntegers(string $str, string $sep = ','): bool
     {
         return self::isArrayOfIntegers(
             array_map(
@@ -74,7 +74,7 @@ class Tools
      * @param string $sep
      * @return array<int>
      */
-    public static function getArrayOfIntegersFromString(string $str, string $sep = ',') : array
+    public static function getArrayOfIntegersFromString(string $str, string $sep = ','): array
     {
         return self::getArrayOfIntegers(explode($sep, $str));
     }
@@ -83,7 +83,7 @@ class Tools
      * @param string $str
      * @return boolean
      */
-    public static function isEmail(string $str) : bool
+    public static function isEmail(string $str): bool
     {
         if (0 == strlen($str)) {
             return false;
@@ -96,7 +96,7 @@ class Tools
      * @param bool $rawHtml = false
      * @return string
      */
-    public static function getSafeJsString(string $str, bool $rawHtml = false) : string
+    public static function getSafeJsString(string $str, bool $rawHtml = false): string
     {
         if (!$rawHtml) {
             return htmlspecialchars(addcslashes($str, "\0..\37\"\'\\"), ENT_NOQUOTES);
