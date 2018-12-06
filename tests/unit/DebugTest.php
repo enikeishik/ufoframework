@@ -2,6 +2,7 @@
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
 use \Ufo\Debug;
+use \Ufo\DebugIndexNotExistsException;
  
 class DebugTest extends \Codeception\Test\Unit
 {
@@ -26,32 +27,57 @@ class DebugTest extends \Codeception\Test\Unit
         );
     }
     
+    /**
+     * @param string $expectedExceptionClass
+     * @param callable $call = null
+     */
+    protected function expectedException(string $expectedExceptionClass, callable $call = null)
+    {
+        try {
+            $call();
+        } catch (\Exception $e) {
+            $this->assertEquals($expectedExceptionClass, get_class($e));
+        }
+    }
+    
     public function testTrace()
     {
         $debug = new Debug();
         
-        $this->assertEquals(-1, $debug->trace());
+        // not work correctly
+        // $this->expectException(
+            // DebugIndexNotExistsException::class, 
+            // function() use($debug) {
+                // $debug->traceClose();
+            // }
+        // );
+        $this->expectedException(
+            DebugIndexNotExistsException::class, 
+            function() use($debug) {
+                $debug->traceClose();
+            }
+        );
         $this->assertEquals(0, $debug->trace('first trace'));
-        $this->assertEquals(-1, $debug->trace(0));
+        $this->assertNull($debug->traceClose(0));
         $this->assertEquals(1, $debug->trace('second trace'));
-        $this->assertEquals(-1, $debug->trace(1));
-        $this->assertEquals(2, $debug->getTraceCounter());
+        $this->assertNull($debug->traceClose(1));
+        $this->assertEquals(2, $debug->getTraceCount());
         
         $this->assertEquals(2, $debug->trace('third trace'));
-        $this->assertEquals(3, $debug->getTraceCounter());
+        $this->assertEquals(3, $debug->getTraceCount());
         
         $trace = $debug->getTrace();
         $this->assertTrue(is_array($trace));
         $traceCount = count($trace);
         $traceFirstItem = $trace[0];
         $traceLastItem = $trace[$traceCount - 1];
-        $this->assertEquals($debug->getTraceCounter(), $traceCount);
+        $this->assertEquals($debug->getTraceCount(), $traceCount);
         $this->assertTrue(array_key_exists('result', $traceFirstItem));
         $this->assertTrue(array_key_exists('result', $traceLastItem));
         $this->assertEquals('OK', $traceFirstItem['result']);
         $this->assertEquals('', $traceLastItem['result']);
         
-        $debug->traceEnd();
+        $this->assertNull($debug->traceEnd());
         $trace = $debug->getTrace();
         $this->assertTrue(is_array($trace));
         $this->assertEquals($traceCount, count($trace));

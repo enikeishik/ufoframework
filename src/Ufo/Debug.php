@@ -12,7 +12,7 @@ namespace Ufo;
 /**
  * Dubug application class.
  */
-class Debug
+class Debug implements DebugInterface
 {
     /**
      * @var int
@@ -49,38 +49,45 @@ class Debug
     }
     
     /**
-     * @param string|int $operation
-     * @param mixed $errCode
-     * @param string $errMessage
+     * Create new trace item.
+     * @param string $operation
      * @return int
      */
-    public function trace($operation = null, $errCode = null, $errMessage = null): int
+    public function trace(string $operation): int
     {
-        if (is_string($operation)) {
-            $this->buffTrace[] = [
-                'operation' => $operation, 
-                'time'      => microtime(true), 
-                'result'    => '', 
-                'stack'     => 9 == self::C_DEBUG_LEVEL ? debug_backtrace(): null, 
-            ];
-            return count($this->buffTrace) - 1;
-        } else {
-            if (is_int($operation)) {
-                $idx = $operation;
-            } else {
-                $idx = count($this->buffTrace) - 1;
-            }
-            if ($idx < 0) {
-                return -1;
-            }
-            $this->buffTrace[$idx]['time'] = round(microtime(true) - $this->buffTrace[$idx]['time'], 4);
-            $this->buffTrace[$idx]['result'] = (null === $errCode ? 'OK' : '(' . $errCode . ') ' . $errMessage);
-            return -1;
+        $this->buffTrace[] = [
+            'operation' => $operation, 
+            'time'      => microtime(true), 
+            'result'    => '', 
+            'stack'     => 9 == self::C_DEBUG_LEVEL ? debug_backtrace(): null, 
+        ];
+        return count($this->buffTrace) - 1;
+    }
+    
+    /**
+     * Close trace item by its index.
+     * @param int $idx = null
+     * @param int $errCode = null
+     * @param string $errMessage = null
+     * @return void
+     */
+    public function traceClose(int $idx = null, int $errCode = null, string $errMessage = null): void
+    {
+        if (null === $idx) {
+            $idx = count($this->buffTrace) - 1;
         }
+        
+        if (!array_key_exists($idx, $this->buffTrace)) {
+            throw new DebugIndexNotExistsException();
+        }
+        
+        $this->buffTrace[$idx]['time'] = round(microtime(true) - $this->buffTrace[$idx]['time'], 4);
+        $this->buffTrace[$idx]['result'] = (null === $errCode ? 'OK' : '(' . $errCode . ') ' . $errMessage);
     }
     
     /**
      * Set time to now-time for each unclosed trace items.
+     * @return void
      */
     public function traceEnd(): void
     {
@@ -95,9 +102,9 @@ class Debug
     }
     
     /**
-     * return int
+     * @return int
      */
-    public function getTraceCounter(): int
+    public function getTraceCount(): int
     {
         return count($this->buffTrace);
     }
@@ -110,9 +117,16 @@ class Debug
         return $this->buffTrace;
     }
     
-    public static function errorHandler($errno, $errmsg, $file, $line): void
+    /**
+     * @param int $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param string $errline
+     * @return bool
+     */
+    public static function errorHandler(int $errno, string $errstr, string $errfile, string $errline): bool
     {
-        self::$buffErr[] = $errno . "\t" . $file . "\t" . $line . "\t" . $errmsg;
+        self::$buffErr[] = $errno . "\t" . $errfile . "\t" . $errline . "\t" . $errstr;
     }
     
     /**
@@ -129,6 +143,7 @@ class Debug
      * @param bool $dump = true
      * @param bool $exit = true
      * @param bool $float = false
+     * @return void
      */
     public static function varDump($var, bool $dump = true, bool $exit = true, bool $float = false): void
     {
