@@ -26,7 +26,7 @@ class StructTest extends \Codeception\Test\Unit
         $this->assertEquals($data['fArr'], $struct->fArr);
         $this->assertEquals($data['fObj'], $struct->fObj);
         $this->assertEquals(json_encode((object) $data), (string) $struct);
-        $this->assertEquals($data, $struct->getValues());
+        $this->assertEquals($data, $struct->getArray());
         $this->assertEquals(array_keys($data), $struct->getFields());
     }
 }

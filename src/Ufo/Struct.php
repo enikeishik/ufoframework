@@ -12,7 +12,7 @@ namespace Ufo;
 /**
  * Abstract implementation of structure.
  */
-abstract class Struct
+abstract class Struct implements StructInterface
 {
     /**
      * Load data into class fields from array|object|JSON.
@@ -23,15 +23,15 @@ abstract class Struct
     public function __construct($vars = null, bool $cast = true)
     {
         if (is_array($vars)) {
-            $this->setValues($vars, $cast);
+            $this->setFromArray($vars, $cast);
         } elseif (is_object($vars)) {
             if (is_a($vars, __CLASS__)) {
-                $this->setFields($vars);
+                $this->set($vars);
             } else {
-                $this->setValues(get_object_vars($vars), $cast);
+                $this->setFromArray(get_object_vars($vars), $cast);
             }
         } elseif (is_string($vars)) {
-            $this->setValues(json_decode($vars, true), $cast);
+            $this->setFromArray(json_decode($vars, true), $cast);
         }
     }
     
@@ -40,15 +40,17 @@ abstract class Struct
      * 
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return json_encode($this);
     }
     
     /**
-     * @param Struct $struct
+     * Sets $this fields values from the same $struct fields values.
+     * 
+     * @param StructInterface $struct
      */
-    public function setFields(Struct $struct): void
+    public function set(StructInterface $struct): void
     {
         $vars = get_object_vars($struct);
         foreach ($vars as $key => $val) {
@@ -59,10 +61,12 @@ abstract class Struct
     }
     
     /**
+     * Sets $this fields values from $vars associated array.
+     * 
      * @param array $vars
      * @param bool $cast = true
      */
-    public function setValues(array $vars, bool $cast = true): void
+    public function setFromArray(array $vars, bool $cast = true): void
     {
         if ($cast) {
             foreach ($vars as $key => $val) {
@@ -90,18 +94,22 @@ abstract class Struct
     }
     
     /**
+     * Gets all public fields and its values as associated array.
+     * 
      * @return array<string $key => mixed $value>
      */
-    public function getValues(): array
+    public function getArray(): array
     {
         return get_object_vars($this);
     }
     
     /**
+     * Gets array of public fields (names).
+     * 
      * @return array
      */
     public function getFields(): array
     {
-        return array_keys($this->getValues());
+        return array_keys($this->getArray());
     }
 }
