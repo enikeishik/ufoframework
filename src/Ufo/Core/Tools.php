@@ -7,13 +7,28 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Ufo;
+namespace Ufo\Core;
 
 /**
  * Tools.
  */
 class Tools
 {
+    /**
+     * @param string $str
+     * @param bool $closingSlashRequired = false
+     * @return bool
+     */
+    public static function isPath(string $str, bool $closingSlashRequired = false): bool
+    {
+        if ($closingSlashRequired) {
+            return (1 == preg_match('/^\/[a-z0-9~_\/\-\.]+\/$/i', $str)
+                    && 0 == preg_match('/(\/{2})|(\.{2})/i', $str));
+        }
+        return (1 == preg_match('/^\/[a-z0-9~_\/\-\.]+$/i', $str)
+                && 0 == preg_match('/(\/{2})|(\.{2})/i', $str));
+    }
+    
     /**
      * @param mixed $str
      * @param bool $unsigned = false

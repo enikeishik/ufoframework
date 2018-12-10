@@ -7,13 +7,34 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Ufo;
+namespace Ufo\Core;
 
 /**
  * Класс конфигурации.
  */
 class Config extends Struct implements ConfigInterface
 {
+    public const STORAGE_TYPE_ARRAY = 'array';
+    public const STORAGE_TYPE_DB = 'db';
+    
+    /**
+     * Type of routes storage.
+     * @var array|db
+     */
+    public $routeStorageType = 'array';
+    
+    /**
+     * Path to file with array of routes (for array type storage).
+     * @var string
+     */
+    public $routeStoragePath = '';
+    
+    /**
+     * Array of routes (for array type storage).
+     * @var array
+     */
+    public $routeStorageData = [];
+    
     /**
      * Path to site root.
      * @var string

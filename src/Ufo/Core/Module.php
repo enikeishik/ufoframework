@@ -7,11 +7,13 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Ufo;
+namespace Ufo\Core;
 
-class Section extends Struct
+class Module extends Struct
 {
-    public $path = '';
-    public $params = [];
-    public $module = null;
+    public $id = 0;
+    public $name = '';
+    public $callback = null;
+    public $dbless = false;
+    public $disabled = false;
 }

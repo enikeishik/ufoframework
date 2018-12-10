@@ -7,16 +7,11 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Ufo;
+namespace Ufo\Core;
 
-class Module extends Struct
+use Exception;
+
+class DebugIndexNotExistsException extends Exception
 {
-    public $id = 0;
-    public $name = '';
-    public $controller = null;
-    public $model = null;
-    public $view = null;
-    public $system = false;
-    public $disabled = false;
-    public $error = null;
+    //
 }
