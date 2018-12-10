@@ -61,6 +61,8 @@ class Db extends \mysqli
      */
     public function query($query, $resultmode = null)
     {
+        $query = str_replace('#__', C_DB_TABLE_PREFIX, $query);
+        
         if (C_DB_READONLY 
         && 0 !== stripos($query, 'SELECT ') 
         && 0 !== stripos($query, 'SET NAMES ')) {
