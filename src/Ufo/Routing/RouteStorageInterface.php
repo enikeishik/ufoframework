@@ -9,7 +9,7 @@
 
 namespace Ufo\Routing;
 
-use Ufo\Section;
+use Ufo\Core\Section;
 
 interface RouteStorageInterface
 {

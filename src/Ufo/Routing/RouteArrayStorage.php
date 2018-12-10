@@ -9,7 +9,7 @@
 
 namespace Ufo\Routing;
 
-use Ufo\Section;
+use Ufo\Core\Section;
 
 class RouteArrayStorage extends RouteStorage
 {
@@ -41,6 +41,7 @@ class RouteArrayStorage extends RouteStorage
     public function get(string $path): ?Section
     {
         if (array_key_exists($path, $this->storage)) {
+            $this->storage[$path]['module'] = $this->getModule($this->storage[$path]['module']);
             return new Section(
                 array_merge(
                     ['path' => $path], 

@@ -9,6 +9,8 @@
 
 namespace Ufo\Routing;
 
+use Ufo\Core\Module;
+
 abstract class RouteStorage implements RouteStorageInterface
 {
     /**
@@ -35,5 +37,10 @@ abstract class RouteStorage implements RouteStorageInterface
         rsort($paths, SORT_STRING);
         
         return $paths;
+    }
+    
+    protected function getModule(array $moduleData): Module
+    {
+        return new Module($moduleData);
     }
 }
