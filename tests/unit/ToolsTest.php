@@ -1,7 +1,7 @@
 <?php
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
-use \Ufo\Tools;
+use \Ufo\Core\Tools;
  
 class ToolsTest extends \Codeception\Test\Unit
 {

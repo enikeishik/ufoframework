@@ -1,8 +1,8 @@
 <?php
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
-use \Ufo\Debug;
-use \Ufo\DebugIndexNotExistsException;
+use \Ufo\Core\Debug;
+use \Ufo\Core\DebugIndexNotExistsException;
  
 class DebugTest extends \Codeception\Test\Unit
 {
