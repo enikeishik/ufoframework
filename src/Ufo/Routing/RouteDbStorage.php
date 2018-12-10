@@ -9,12 +9,13 @@
 
 namespace Ufo\Routing;
 
+use Ufo\Core\Db;
 use Ufo\Core\Section;
 
 class RouteDbStorage extends RouteStorage
 {
     /**
-     * @var Ufo\Db
+     * @var Db
      */
     protected $db;
     
@@ -30,7 +31,11 @@ class RouteDbStorage extends RouteStorage
                " WHERE s.path IN('" . implode("','", $paths) . "')" . 
                ' ORDER BY s.path DESC' . 
                ' LIMIT 1';
-        return $this->db->getItem($sql);
+        $item = $this->db->getItem($sql);
+        if (null === $item) {
+            return null;
+        }
+        return $this->getSection($path, $item);
     }
     
     public function get(string $path): ?Section
@@ -38,6 +43,18 @@ class RouteDbStorage extends RouteStorage
         $sql = 'SELECT m.id, m.disabled, m.name FROM #__sections AS s' . 
                ' INNER JOIN #__modules AS m ON s.module_id = m.id' . 
                " WHERE s.path ='" . $path . "'";
-        return $this->db->getItem($sql);
+        $item = $this->db->getItem($sql);
+        if (null === $item) {
+            return null;
+        }
+        return $this->getSection($path, $item);
+    }
+    
+    protected function getSection(string $path, array $item): Section
+    {
+        $item['dbless'] => false;
+        $item['callback'] = ''; //to prevent hack by SQL injection
+        
+        return new Section(array_merge(['path' => $path], $item));
     }
 }
