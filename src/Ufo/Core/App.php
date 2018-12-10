@@ -58,12 +58,12 @@ class App
      */
     public function execute(): void
     {
-        $result = $this->compose();
+        $result = $this->compose($this->parse());
         //$this->sendHeaders($result->getHeaders());
         $this->render($result->getContent());
     }
     
-    public function compose(): Result
+    public function parse(): Section
     {
         $path = $this->getPath();
         if (null === $path) {
@@ -71,16 +71,19 @@ class App
         }
         
         //cache
+        if (false) {
+            //return chache->getResult ?
+        }
         
         if ($this->config->routeStorageType == $this->config::STORAGE_TYPE_DB) {
             $this->setDb();
         }
-        $routeStorage = $this->getRouteStorage();
-        if (null === $routeStorage) {
-            return $this->getError(500, 'Routes empty');
-        }
         
-        $section = Route::parse($path, $routeStorage);
+        return Route::parse($path, $this->getRouteStorage());
+    }
+    
+    public function compose(Section $section): Result
+    {
         if (null === $section) {
             return $this->getError(404, 'Sections not exists');
         }
@@ -97,27 +100,13 @@ class App
         
         //some middleware can change request params here
         
-        $di = [
-            'debug'     => $this->debug, 
-            'config'    => $this->config, 
-            'section'   => $section, 
-        ];
-        if (!$section->module->dbless) {
-            $di['db'] = $this->db;
-        }
-        $container = new Container($di);
-        
         $callback = $section->module->callback;
         if (is_callable($callback)) {
-            return $callback($container);
+            return $callback($this->getContainer($section));
         }
         
         $controller = $this->getModuleController($section->module);
-        if (null === $controller) {
-            return $this->getError(500, 'Controller not exists');
-        }
-        
-        $controller->inject($container);
+        $controller->inject($this->getContainer($section));
         
         return $controller->execute();
     }
@@ -130,6 +119,8 @@ class App
         echo $content;
         
         echo PHP_EOL; //to display output in codeception tests
+        
+        //cache
     }
     
     /**
@@ -168,9 +159,10 @@ class App
     }
     
     /**
-     * @return RouteStorageInterface|null
+     * @return RouteStorageInterface
+     * @throws RouteStorageNotSetException
      */
-    protected function getRouteStorage(): ?RouteStorageInterface
+    protected function getRouteStorage(): RouteStorageInterface
     {
         switch ($this->config->routeStorageType) {
             case $this->config::STORAGE_TYPE_DB:
@@ -185,7 +177,7 @@ class App
                 return new RouteArrayStorage($routeStorageData);
         }
         
-        return null;
+        throw new RouteStorageNotSetException();
     }
     
     /**
@@ -200,10 +192,28 @@ class App
     }
     
     /**
-     * @param Moule $module
-     * @return Controller|null
+     * @param Section $section
+     * @return ContainerInterface
      */
-    protected function getModuleController(Module $module): ?Controller
+    protected function getContainer(Section $section): ContainerInterface
+    {
+        $di = [
+            'debug'     => $this->debug, 
+            'config'    => $this->config, 
+            'section'   => $section, 
+        ];
+        if (!$section->module->dbless) {
+            $di['db'] = $this->db;
+        }
+        return new Container($di);
+    }
+    
+    /**
+     * @param Moule $module
+     * @return Controller
+     * @throws RouteStorageNotSetException
+     */
+    protected function getModuleController(Module $module): Controller
     {
         $controllerClass = $module->callback;
         if (empty($controllerClass) || false === strpos($controllerClass, '\\')) {
@@ -217,6 +227,6 @@ class App
             return new $controllerClass();
         }
         
-        return null;
+        throw new ControllerNotSetException();
     }
 }
