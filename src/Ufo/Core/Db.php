@@ -40,7 +40,7 @@ class Db extends \mysqli
     
     /**
      * @param Debug &$debug = null
-     * @throws \Exception
+     * @throws DbConnectException
      */
     protected function __construct(DebugInterface $debug = null)
     {
@@ -49,7 +49,7 @@ class Db extends \mysqli
         //подавляем вывод ошибок, т.к. иначе (даже при try-catch) выдается Warning
         @parent::__construct(C_DB_SERVER, C_DB_USER, C_DB_PASSWD, C_DB_NAME);
         if (0 != $this->connect_errno) {
-            throw new \Exception(preg_replace('/[^a-z0-1\s\.\-;:,_~]+/i', '', $this->connect_error));
+            throw new DbConnectException(preg_replace('/[^a-z0-1\s\.\-;:,_~]+/i', '', $this->connect_error));
         }
         if ('' != C_DB_CHARSET) {
             $this->query('SET NAMES ' . C_DB_CHARSET);
