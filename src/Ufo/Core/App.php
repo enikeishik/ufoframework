@@ -58,16 +58,39 @@ class App
      */
     public function execute(): void
     {
-        $result = $this->compose($this->parse());
-        //$this->sendHeaders($result->getHeaders());
+        try {
+            $result = $this->compose($this->parse());
+        } catch (BadPathException $e) {
+            $result = $this->getError(500, 'Bad path');
+        } catch (DbConnectException $e) {
+            //cache
+            $result = $this->getError(500, 'DataBase connection error');
+        } catch (SectionNotExistsException $e) {
+            $result = $this->getError(404, 'Section not exists');
+        } catch (SectionDisabledException $e) {
+            $result = $this->getError(403, 'Section disabled');
+        } catch (ModuleDisabledException $e) {
+            $result = $this->getError(403, 'Section module disabled');
+        } catch (Exception $e) {
+            $result = $this->getError(500, 'Unexpected exception');
+        }
+        
+        $this->sendHeaders($result->getHeaders());
+        
         $this->render($result->getContent());
     }
     
+    /**
+     * @return Section
+     * @throws BadPathException
+     * @throws DbConnectException
+     * @throws SectionNotExistsException
+     */
     public function parse(): Section
     {
         $path = $this->getPath();
         if (null === $path) {
-            return $this->getError(1, 'Bad path');
+            throw new BadPathException();
         }
         
         //cache
@@ -79,19 +102,27 @@ class App
             $this->setDb();
         }
         
-        return Route::parse($path, $this->getRouteStorage());
+        $section = Route::parse($path, $this->getRouteStorage());
+        if (null === $section) {
+            throw new SectionNotExistsException();
+        }
+        
+        return $section;
     }
     
+    /**
+     * @return Result
+     * @throws SectionDisabledException
+     * @throws ModuleDisabledException
+     * @throws DbConnectException
+     */
     public function compose(Section $section): Result
     {
-        if (null === $section) {
-            return $this->getError(404, 'Sections not exists');
-        }
         if ($section->disabled) {
-            return $this->getError(403, 'Section disabled');
+            throw new SectionDisabledException();
         }
         if ($section->module->disabled) {
-            return $this->getError(403, 'Section module disabled');
+            throw new ModuleDisabledException();
         }
         
         if (!$section->module->dbless) {
@@ -111,10 +142,24 @@ class App
         return $controller->execute();
     }
     
+    /**
+     * @param array $headers
+     * @return void
+     */
+    public function sendHeaders(array $headers): void
+    {
+        foreach ($headers as $header) {
+            header($header);
+        }
+    }
+    
+    /**
+     * @return void
+     */
     public function render(string $content): void
     {
         //some middleware can change response here
-        ob_end_clean(); echo PHP_EOL; //to display output in codeception tests
+        @ob_end_clean(); echo PHP_EOL; //to display output in codeception tests
         
         echo $content;
         
@@ -136,6 +181,9 @@ class App
         }
         
         $headers = [];
+        
+        //TODO: HTTP version -> config, errMessage -> HTTP message (Http::CODE | $this->http[code])
+        $headers[] = 'HTTP/1.0 ' . $errCode . ' ' . $errMessage;
         
         if ((301 == $errCode || 302 == $errCode) && !empty($options['location'])) {
             $headers[] = 'Location: ' . $options['location'];
@@ -182,6 +230,7 @@ class App
     
     /**
      * @return void
+     * @throws DbConnectException
      */
     protected function setDb(): void
     {
@@ -200,6 +249,7 @@ class App
         $di = [
             'debug'     => $this->debug, 
             'config'    => $this->config, 
+            'app'       => $this, 
             'section'   => $section, 
         ];
         if (!$section->module->dbless) {
@@ -211,7 +261,7 @@ class App
     /**
      * @param Moule $module
      * @return Controller
-     * @throws RouteStorageNotSetException
+     * @throws ControllerNotSetException
      */
     protected function getModuleController(Module $module): Controller
     {
