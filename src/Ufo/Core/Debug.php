@@ -81,7 +81,7 @@ class Debug implements DebugInterface
             throw new DebugIndexNotExistsException();
         }
         
-        $this->buffTrace[$idx]['time'] = round(microtime(true) - $this->buffTrace[$idx]['time'], 4);
+        $this->buffTrace[$idx]['time'] = microtime(true) - $this->buffTrace[$idx]['time'];
         $this->buffTrace[$idx]['result'] = (null === $errCode ? 'OK' : '(' . $errCode . ') ' . $errMessage);
     }
     
@@ -94,7 +94,7 @@ class Debug implements DebugInterface
         $now = microtime(true);
         foreach ($this->buffTrace as &$traceItem) {
             if ('' === $traceItem['result']) {
-                $traceItem['time'] = round($now - $traceItem['time'], 4);
+                $traceItem['time'] = $now - $traceItem['time'];
                 $traceItem['result'] = 'Trace end';
             }
         }
