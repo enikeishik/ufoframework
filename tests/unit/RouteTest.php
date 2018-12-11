@@ -10,6 +10,9 @@ class RouteTest extends \Codeception\Test\Unit
     public function testRouteParse()
     {
         $routeStorageData = require 'RouteStorageData.php';
-        var_dump(Route::parse('/qwe/asd', new RouteArrayStorage($routeStorageData))); exit();
+        $section = Route::parse('/qwe/asd', new RouteArrayStorage($routeStorageData));
+        $this->assertNotNull($section);
+        $this->assertEquals('/qwe/asd', $section->path);
+        $this->assertEquals('ASD qwe', $section->module->name);
     }
 }

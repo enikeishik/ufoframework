@@ -13,13 +13,17 @@ return [
             'id' => 1, 
             'name' => 'Documents', 
             'callback' => '', 
+            'dbless' => true, 
         ], 
+        'disabled' => true, 
     ], 
     '/asd/qwe' => [
         'module' => [
             'id' => 2, 
             'name' => 'Documents', 
             'callback' => '', 
+            'dbless' => true, 
+            'disabled' => true, 
         ], 
     ], 
     '/qwe' => [
@@ -37,7 +41,9 @@ return [
                 return new \Ufo\Core\Result('content of callback for section ' . $container->section->path);
             }, 
             'dbless' => true, 
+            'disabled' => false, 
         ], 
+        'disabled' => false, 
     ], 
     '/qwe/asd/zxc' => [
         'module' => [
