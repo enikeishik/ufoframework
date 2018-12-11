@@ -13,13 +13,12 @@ use Ufo\Core\Config;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
 use Ufo\Core\ContainerInterface;
-use Ufo\Core\Result;
 use Ufo\Core\Section;
 
 /**
- * Module level controller base class.
+ * Module level model base class.
  */
-class Controller extends DIObject implements ControllerInterface
+class Model extends DIObject //implements ModelInterface
 {
     /**
      * @var Config
@@ -46,25 +45,16 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * Main controller method.
-     * @return Result
+     * Some model method.
+     * @return array
      */
-    public function execute(): Result
+    public function getItems(): array
     {
-        $content = __METHOD__ . PHP_EOL . print_r($this->section, true);
-        
-        $model = new Model();
-        $model->inject($this->container);
-        
-        $context = [
-            'items' => $model->getItems(), 
-            'info' => __METHOD__ . PHP_EOL . print_r($this->section, true), 
+        return [
+            ['id' => 1, 'title' => 'first item title', 'text' => 'first item text'], 
+            ['id' => 2, 'title' => 'second item title', 'text' => 'second item text', 'disabled' => true], 
+            ['id' => 3, 'title' => 'third item title', 'text' => 'third item text'], 
+            ['id' => 4, 'title' => 'fourth item title', 'text' => 'fourth item text'], 
         ];
-        
-        $view = new View();
-        $this->container->set('model', $model);
-        $view->inject($this->container);
-        
-        return new Result($view->render('template.php', $context));
     }
 }

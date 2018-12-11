@@ -13,13 +13,12 @@ use Ufo\Core\Config;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
 use Ufo\Core\ContainerInterface;
-use Ufo\Core\Result;
 use Ufo\Core\Section;
 
 /**
- * Module level controller base class.
+ * Module level view base class.
  */
-class Controller extends DIObject implements ControllerInterface
+class View extends DIObject //implements ViewInterface
 {
     /**
      * @var Config
@@ -46,25 +45,38 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * Main controller method.
-     * @return Result
+     * Generate output.
+     * @param array $context
+     * @return string
      */
-    public function execute(): Result
+    public function render(string $template, array $context): string
     {
-        $content = __METHOD__ . PHP_EOL . print_r($this->section, true);
+        $obLevel = ob_get_level();
+        ob_start();
         
-        $model = new Model();
-        $model->inject($this->container);
+        extract($context);
         
-        $context = [
-            'items' => $model->getItems(), 
-            'info' => __METHOD__ . PHP_EOL . print_r($this->section, true), 
-        ];
+        try {
+            include $template;
+        } catch (Exception $e) {
+            $this->handleRenderException($e, $obLevel);
+        }
         
-        $view = new View();
-        $this->container->set('model', $model);
-        $view->inject($this->container);
+        return ob_get_clean();
+    }
+
+    /**
+     * @param Exception  $e
+     * @param int $obLevel
+     * @return void
+     * @throws Exception
+     */
+    protected function handleRenderException(Exception $e, $obLevel)
+    {
+        while (ob_get_level() > $obLevel) {
+            ob_end_clean();
+        }
         
-        return new Result($view->render('template.php', $context));
+        throw $e;
     }
 }
