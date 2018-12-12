@@ -109,4 +109,29 @@ class Config extends Struct implements ConfigInterface
             $this->$name = $value;
         }
     }
+    
+    /**
+     * Loads configuration from INI file.
+     * @param string $iniPath
+     * @param bool $overwrite = false
+     */
+    public function loadFromIni(string $iniPath, bool $overwrite = false): void
+    {
+        if (!file_exists($iniPath)) {
+            return;
+        }
+        
+        $iniArr = parse_ini_file($iniPath);
+        if (!is_array($iniArr)) {
+            return;
+        }
+        $iniArr = array_change_key_case($iniArr, CASE_LOWER);
+        
+        $arr = [];
+        foreach ($iniArr as $name => $value) {
+            $arr[lcfirst(str_replace('_', '', ucwords(str_replace('.', '_', $name), '_')))] = $value;
+        }
+        
+        $this->loadArray($arr, $overwrite);
+    }
 }

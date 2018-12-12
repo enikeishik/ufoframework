@@ -34,4 +34,11 @@ interface ConfigInterface extends StructInterface
      * @param bool $overwrite = false
      */
     public function loadArray(array $config, bool $overwrite = false): void;
+    
+    /**
+     * Loads configuration from INI file.
+     * @param string $iniPath
+     * @param bool $overwrite = false
+     */
+    public function loadFromIni(string $iniPath, bool $overwrite = false): void;
 }
