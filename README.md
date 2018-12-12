@@ -1,5 +1,7 @@
 # UFO Framework
 
+[![Software License][ico-license]](LICENSE.txt)
+
 
 ## Requirements
 * PHP >= 7.2
