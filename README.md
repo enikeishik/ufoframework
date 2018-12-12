@@ -8,4 +8,6 @@
 * MySQL >= 5.5 / MariaDB >= 10
 
 ## Tests
-    vendor\bin\codecept run
+```bash
+vendor\bin\codecept run
+```

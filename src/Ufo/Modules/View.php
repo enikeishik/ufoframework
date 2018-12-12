@@ -36,6 +36,11 @@ class View extends DIObject //implements ViewInterface
     protected $section;
     
     /**
+     * @var string
+     */
+    protected $extension = '.php';
+    
+    /**
      * @param ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
@@ -46,6 +51,7 @@ class View extends DIObject //implements ViewInterface
     
     /**
      * Generate output.
+     * @param string $template
      * @param array $context
      * @return string
      */
@@ -64,9 +70,37 @@ class View extends DIObject //implements ViewInterface
         
         return ob_get_clean();
     }
-
+    
     /**
-     * @param Exception  $e
+     * Find full path for requested template. Returned path may not exists.
+     * @param string $templatesPath
+     * @param string $moduleName
+     * @param string $templateName
+     * @return string
+     */
+    protected function findTemplate(string $templatesPath, string $moduleName, string $templateName): string
+    {
+        if (!empty($moduleName)) {
+            // /templates/module/template.php
+            $template = 
+                $templatesPath . 
+                '/' . strtolower($moduleName) . 
+                str_replace('.', '/', $templateName) . $this->extension;
+            if (file_exists($template)) {
+                return $template;
+            }
+        }
+        
+        // /templates/default/template.php
+        $template = 
+            $templatesPath . 
+            $this->config->templatesDefault . 
+            str_replace('.', '/', $templateName) . $this->extension;
+        return $template;
+    }
+    
+    /**
+     * @param Exception $e
      * @param int $obLevel
      * @return void
      * @throws Exception

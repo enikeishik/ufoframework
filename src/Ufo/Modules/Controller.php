@@ -47,6 +47,8 @@ class Controller extends DIObject implements ControllerInterface
      */
     public function compose(Section $section): Result
     {
+        $this->container->set('section', $section);
+        
         $model = new Model();
         $model->inject($this->container);
         
@@ -60,7 +62,7 @@ class Controller extends DIObject implements ControllerInterface
         $this->container->set('model', $model);
         $view->inject($this->container);
         
-        return new Result($view->render('template.php', $context));
+        return new Result($view->render('template', $context));
     }
     
     /**
