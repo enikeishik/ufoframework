@@ -51,11 +51,11 @@ class View extends DIObject //implements ViewInterface
     
     /**
      * Generate output.
-     * @param string $template
+     * @param string $view
      * @param array $context
      * @return string
      */
-    public function render(string $template, array $context): string
+    public function render(string $view, array $context): string
     {
         $obLevel = ob_get_level();
         ob_start();
@@ -63,7 +63,11 @@ class View extends DIObject //implements ViewInterface
         extract($context);
         
         try {
-            include $template;
+            include $this->findView(
+                $this->config->rootPath . $this->config->viewsPath, 
+                $this->section->module->name, 
+                $view
+            );
         } catch (Exception $e) {
             $this->handleRenderException($e, $obLevel);
         }
@@ -72,31 +76,31 @@ class View extends DIObject //implements ViewInterface
     }
     
     /**
-     * Find full path for requested template. Returned path may not exists.
-     * @param string $templatesPath
+     * Find full path for requested view. Returned path may not exists.
+     * @param string $viewsPath
      * @param string $moduleName
-     * @param string $templateName
+     * @param string $viewName
      * @return string
      */
-    protected function findTemplate(string $templatesPath, string $moduleName, string $templateName): string
+    protected function findView(string $viewsPath, string $moduleName, string $viewName): string
     {
         if (!empty($moduleName)) {
-            // /templates/module/template.php
-            $template = 
-                $templatesPath . 
+            // /views/module/views.php
+            $view = 
+                $viewsPath . 
                 '/' . strtolower($moduleName) . 
-                str_replace('.', '/', $templateName) . $this->extension;
-            if (file_exists($template)) {
-                return $template;
+                '/' . str_replace('.', '/', $viewName) . $this->extension;
+            if (file_exists($view)) {
+                return $view;
             }
         }
         
-        // /templates/default/template.php
-        $template = 
-            $templatesPath . 
-            $this->config->templatesDefault . 
-            str_replace('.', '/', $templateName) . $this->extension;
-        return $template;
+        // /views/default/views.php
+        $view = 
+            $viewsPath . 
+            $this->config->viewsDefault . 
+            '/' . str_replace('.', '/', $viewName) . $this->extension;
+        return $view;
     }
     
     /**

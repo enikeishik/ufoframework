@@ -5,6 +5,8 @@ use \Ufo\Core\Config;
 use \Ufo\Core\Debug;
 use \Ufo\Core\App;
 
+$_SERVER['DOCUMENT_ROOT'] = __DIR__ . '/../..';
+var_dump($_SERVER['DOCUMENT_ROOT']);
 $config = new Config();
 $debug = new Debug();
 $app = new App($config, $debug);

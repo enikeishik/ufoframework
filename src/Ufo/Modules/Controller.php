@@ -62,7 +62,7 @@ class Controller extends DIObject implements ControllerInterface
         $this->container->set('model', $model);
         $view->inject($this->container);
         
-        return new Result($view->render('template', $context));
+        return new Result($view->render('view', $context));
     }
     
     /**

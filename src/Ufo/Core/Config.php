@@ -48,6 +48,18 @@ class Config extends Struct implements ConfigInterface
     public $rootUrl = '';
     
     /**
+     * Path to views root.
+     * @var string
+     */
+    public $viewsPath = '/resources/views';
+    
+    /**
+     * Path to default views.
+     * @var string
+     */
+    public $viewsDefault = '/default';
+    
+    /**
      * @see parent
      */
     public function __construct($vars = null, bool $cast = true)
