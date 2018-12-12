@@ -133,13 +133,13 @@ class App
         
         $callback = $section->module->callback;
         if (is_callable($callback)) {
-            return $callback($this->getContainer($section));
+            return $callback($this->getContainer(['section' => $section]));
         }
         
         $controller = $this->getModuleController($section->module);
-        $controller->inject($this->getContainer($section));
+        $controller->inject($this->getContainer());
         
-        return $controller->execute();
+        return $controller->compose($section);
     }
     
     /**
@@ -241,21 +241,18 @@ class App
     }
     
     /**
-     * @param Section $section
+     * @param array $options = []
      * @return ContainerInterface
      */
-    protected function getContainer(Section $section): ContainerInterface
+    protected function getContainer(array $options = []): ContainerInterface
     {
         $di = [
             'debug'     => $this->debug, 
             'config'    => $this->config, 
+            'db'        => $this->db, 
             'app'       => $this, 
-            'section'   => $section, 
         ];
-        if (!$section->module->dbless) {
-            $di['db'] = $this->db;
-        }
-        return new Container($di);
+        return new Container(array_merge($di, $options));
     }
     
     /**

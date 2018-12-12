@@ -10,6 +10,7 @@
 namespace Ufo\Modules;
 
 use Ufo\Core\Result;
+use Ufo\Core\Section;
 
 /**
  * Module level controller base class interface
@@ -18,7 +19,8 @@ interface ControllerInterface
 {
     /**
      * Main controller method.
+     * @param Section $section
      * @return Result
      */
-    public function execute(): Result;
+    public function compose(Section $section): Result;
 }

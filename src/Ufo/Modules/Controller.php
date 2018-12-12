@@ -32,11 +32,6 @@ class Controller extends DIObject implements ControllerInterface
     protected $debug;
     
     /**
-     * @var Section
-     */
-    protected $section;
-    
-    /**
      * @param ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
@@ -46,19 +41,19 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * Main controller method.
+     * Main controller method, compose all content.
+     * @param Section $section
      * @return Result
      */
-    public function execute(): Result
+    public function compose(Section $section): Result
     {
-        $content = __METHOD__ . PHP_EOL . print_r($this->section, true);
-        
         $model = new Model();
         $model->inject($this->container);
         
         $context = [
-            'items' => $model->getItems(), 
-            'info' => __METHOD__ . PHP_EOL . print_r($this->section, true), 
+            'items'     => $model->getItems(), 
+            'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
+            'widgets'   => $this->composeWidgets($section), 
         ];
         
         $view = new View();
@@ -66,5 +61,23 @@ class Controller extends DIObject implements ControllerInterface
         $view->inject($this->container);
         
         return new Result($view->render('template.php', $context));
+    }
+    
+    /**
+     * Compose widgets data.
+     * @param Section $section
+     * @return array
+     */
+    public function composeWidgets(Section $section): array
+    {
+        return [
+            'left col top' => [
+                ['title' => '1 first wdg title', 'text' => '1 first wdg text'], 
+                ['title' => '1 second wdg title', 'text' => '1 second wdg text'], 
+            ], 
+            'right colbottom' => [
+                ['title' => '2 first wdg title', 'text' => '2 first wdg text'], 
+            ], 
+        ];
     }
 }
