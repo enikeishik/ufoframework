@@ -19,7 +19,7 @@ class Config extends Struct implements ConfigInterface
     
     /**
      * Type of routes storage.
-     * @var array|db
+     * @var string 'array', 'db'
      */
     public $routeStorageType = 'array';
     

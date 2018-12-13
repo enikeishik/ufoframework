@@ -15,12 +15,12 @@ namespace Ufo\Core;
 abstract class DIObject implements DIObjectInterface
 {
     /**
-     * @var ContainerInterface
+     * @var \Ufo\Core\ContainerInterface
      */
     protected $container = null;
     
     /**
-     * @param ContainerInterface $container
+     * @param \Ufo\Core\ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
     {

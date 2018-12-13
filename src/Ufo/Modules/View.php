@@ -21,17 +21,17 @@ use Ufo\Core\Section;
 class View extends DIObject //implements ViewInterface
 {
     /**
-     * @var Config
+     * @var \Ufo\Core\Config
      */
     protected $config;
     
     /**
-     * @var DebugInterface
+     * @var \Ufo\Core\DebugInterface
      */
     protected $debug;
     
     /**
-     * @var Section
+     * @var \Ufo\Core\Section
      */
     protected $section;
     
@@ -41,7 +41,7 @@ class View extends DIObject //implements ViewInterface
     protected $extension = '.php';
     
     /**
-     * @param ContainerInterface $container
+     * @param \Ufo\Core\ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
     {
@@ -104,10 +104,10 @@ class View extends DIObject //implements ViewInterface
     }
     
     /**
-     * @param Exception $e
+     * @param \Exception $e
      * @param int $obLevel
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     protected function handleRenderException(Exception $e, $obLevel)
     {

@@ -15,7 +15,7 @@ namespace Ufo\Core;
 interface DIObjectInterface
 {
     /**
-     * @param ContainerInterface $container
+     * @param \Ufo\Core\ContainerInterface $container
      * @return void
      */
     public function inject(ContainerInterface $container): void;

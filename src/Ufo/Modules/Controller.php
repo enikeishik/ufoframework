@@ -22,17 +22,17 @@ use Ufo\Core\Section;
 class Controller extends DIObject implements ControllerInterface
 {
     /**
-     * @var Config
+     * @var \Ufo\Core\Config
      */
     protected $config;
     
     /**
-     * @var DebugInterface
+     * @var \Ufo\Core\DebugInterface
      */
     protected $debug;
     
     /**
-     * @param ContainerInterface $container
+     * @param \Ufo\Core\ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
     {
@@ -42,8 +42,8 @@ class Controller extends DIObject implements ControllerInterface
     
     /**
      * Main controller method, compose all content.
-     * @param Section $section
-     * @return Result
+     * @param \Ufo\Core\Section $section
+     * @return \Ufo\Core\Result
      */
     public function compose(Section $section): Result
     {
@@ -52,22 +52,22 @@ class Controller extends DIObject implements ControllerInterface
         $model = new Model();
         $model->inject($this->container);
         
-        $context = [
-            'items'     => $model->getItems(), 
-            'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
-            'widgets'   => $this->composeWidgets($section), 
-        ];
-        
         $view = new View();
         $this->container->set('model', $model);
         $view->inject($this->container);
+        
+        $context = [
+            'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
+            'items'     => $model->getItems(), 
+            'widgets'   => $this->composeWidgets($section), 
+        ];
         
         return new Result($view->render('view', $context));
     }
     
     /**
      * Compose widgets data.
-     * @param Section $section
+     * @param \Ufo\Core\Section $section
      * @return array
      */
     public function composeWidgets(Section $section): array

@@ -21,22 +21,22 @@ use Ufo\Core\Section;
 class Model extends DIObject //implements ModelInterface
 {
     /**
-     * @var Config
+     * @var \Ufo\Core\Config
      */
     protected $config;
     
     /**
-     * @var DebugInterface
+     * @var \Ufo\Core\DebugInterface
      */
     protected $debug;
     
     /**
-     * @var Section
+     * @var \Ufo\Core\Section
      */
     protected $section;
     
     /**
-     * @param ContainerInterface $container
+     * @param \Ufo\Core\ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
     {

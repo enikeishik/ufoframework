@@ -39,8 +39,8 @@ class Db extends \mysqli
     }
     
     /**
-     * @param Debug &$debug = null
-     * @throws DbConnectException
+     * @param \Ufo\Core\Debug &$debug = null
+     * @throws \Ufo\Core\DbConnectException
      */
     protected function __construct(DebugInterface $debug = null)
     {

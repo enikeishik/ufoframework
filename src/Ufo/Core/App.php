@@ -29,23 +29,23 @@ use Ufo\Modules\Controller;
 class App
 {
     /**
-     * @var ConfigInterface
+     * @var \Ufo\Core\ConfigInterface
      */
     protected $config = null;
     
     /**
-     * @var DebugInterface
+     * @var \Ufo\Core\DebugInterface
      */
     protected $debug = null;
     
     /**
-     * @var Db
+     * @var \Ufo\Core\Db
      */
     protected $db = null;
     
     /**
-     * @param ConfigInterface $config
-     * @param DebugInterface $debug = null
+     * @param \Ufo\Core\ConfigInterface $config
+     * @param \Ufo\Core\DebugInterface $debug = null
      */
     public function __construct(ConfigInterface $config, DebugInterface $debug = null)
     {
@@ -81,10 +81,10 @@ class App
     }
     
     /**
-     * @return Section
-     * @throws BadPathException
-     * @throws DbConnectException
-     * @throws SectionNotExistsException
+     * @return \Ufo\Core\Section
+     * @throws \Ufo\Core\BadPathException
+     * @throws \Ufo\Core\DbConnectException
+     * @throws \Ufo\Core\SectionNotExistsException
      */
     public function parse(): Section
     {
@@ -111,10 +111,10 @@ class App
     }
     
     /**
-     * @return Result
-     * @throws SectionDisabledException
-     * @throws ModuleDisabledException
-     * @throws DbConnectException
+     * @return \Ufo\Core\Result
+     * @throws \Ufo\Core\SectionDisabledException
+     * @throws \Ufo\Core\ModuleDisabledException
+     * @throws \Ufo\Core\DbConnectException
      */
     public function compose(Section $section): Result
     {
@@ -172,7 +172,7 @@ class App
      * @param int $errCode = 200
      * @param string $errMessage = 'OK'
      * @param array $options = []
-     * @return Result
+     * @return \Ufo\Core\Result
      */
     public function getError(int $errCode = 200, string $errMessage = 'OK', array $options = []): Result
     {
@@ -207,8 +207,8 @@ class App
     }
     
     /**
-     * @return RouteStorageInterface
-     * @throws RouteStorageNotSetException
+     * @return \Ufo\Core\RouteStorageInterface
+     * @throws \Ufo\Core\RouteStorageNotSetException
      */
     protected function getRouteStorage(): RouteStorageInterface
     {
@@ -230,7 +230,7 @@ class App
     
     /**
      * @return void
-     * @throws DbConnectException
+     * @throws \Ufo\Core\DbConnectException
      */
     protected function setDb(): void
     {
@@ -242,7 +242,7 @@ class App
     
     /**
      * @param array $options = []
-     * @return ContainerInterface
+     * @return \Ufo\Core\ContainerInterface
      */
     protected function getContainer(array $options = []): ContainerInterface
     {
@@ -256,9 +256,9 @@ class App
     }
     
     /**
-     * @param Moule $module
-     * @return Controller
-     * @throws ControllerNotSetException
+     * @param \Ufo\Core\Moule $module
+     * @return \Ufo\Modules\Controller
+     * @throws \Ufo\Core\ControllerNotSetException
      */
     protected function getModuleController(Module $module): Controller
     {
