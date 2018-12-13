@@ -94,7 +94,11 @@ class View extends DIObject //implements ViewInterface
     
     protected function renderWidget($widget): string
     {
-        return $this->render('widget', $widget);
+        if (is_array($widget)) {
+            return $this->render('widget', $widget);
+        }
+        
+        return $widget;
     }
     
     /**
