@@ -41,7 +41,7 @@ class Container implements ContainerInterface
      * @param string $property
      * @param object $reference
      */
-    public function setByRef($property, &$reference): void
+    public function setByRef(string $property, &$reference): void
     {
         $this->$property =& $reference;
     }
@@ -61,7 +61,7 @@ class Container implements ContainerInterface
      * @param string $property
      * @param mixed $value
      */
-    public function set($property, $value): void
+    public function set(string $property, $value): void
     {
         $this->$property = $value;
     }
@@ -71,7 +71,7 @@ class Container implements ContainerInterface
      * @param string $property
      * @return mixed
      */
-    public function get($property)
+    public function get(string $property)
     {
         // if (!property_exists($this, $property)) {
             // throw new NotFoundException();
@@ -85,7 +85,7 @@ class Container implements ContainerInterface
      * @param string $property
      * @return bool
      */
-    public function has($property): bool
+    public function has(string $property): bool
     {
         return property_exists($this, $property);
     }
