@@ -14,6 +14,7 @@ use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
 use Ufo\Core\ContainerInterface;
 use Ufo\Core\Section;
+use Ufo\Core\Result;
 
 /**
  * Module level view base class.
@@ -70,7 +71,7 @@ class View extends DIObject //implements ViewInterface
         try {
             include $this->findView(
                 $this->config->rootPath . $this->config->viewsPath, 
-                $this->section->module->name, 
+                $this->section->module->name ?? '', 
                 $view
             );
         } catch (Exception $e) {
@@ -96,9 +97,11 @@ class View extends DIObject //implements ViewInterface
     {
         if (is_array($widget)) {
             return $this->render('widget', $widget);
+        } elseif (is_a($widget, Result::class)) {
+            return $widget->getContent();
         }
         
-        return $widget;
+        return '';
     }
     
     /**

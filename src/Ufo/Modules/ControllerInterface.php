@@ -19,8 +19,8 @@ interface ControllerInterface
 {
     /**
      * Main controller method.
-     * @param Section $section
+     * @param Section $section = null
      * @return Result
      */
-    public function compose(Section $section): Result;
+    public function compose(Section $section = null): Result;
 }

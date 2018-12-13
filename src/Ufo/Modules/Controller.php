@@ -42,10 +42,10 @@ class Controller extends DIObject implements ControllerInterface
     
     /**
      * Main controller method, compose all content.
-     * @param \Ufo\Core\Section $section
+     * @param \Ufo\Core\Section $section = null
      * @return \Ufo\Core\Result
      */
-    public function compose(Section $section): Result
+    public function compose(Section $section = null): Result
     {
         $this->container->set('section', $section);
         
@@ -54,10 +54,12 @@ class Controller extends DIObject implements ControllerInterface
         
         $view = new View();
         $this->container->set('model', $model);
-        //lazy render
-        //$this->container->set('widgets', $this->getWidgets($section));
-        //prerender
-        $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
+        if (null !== $section) {
+            //lazy render
+            //$this->container->set('widgets', $this->getWidgets($section));
+            //prerender
+            $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
+        }
         $view->inject($this->container);
         
         $context = [
@@ -113,7 +115,12 @@ class Controller extends DIObject implements ControllerInterface
                 if (class_exists($class)) {
                     $wdt = new $class();
                     $wdt->inject($container);
-                    $widgetsResults[$place] = $wdt->compose($widgetSection);
+                    $widgetsResults[$place][] = $wdt->compose($widgetSection);
+                } else {
+                    $class = '\Ufo\Modules\Controller'; //defaultController
+                    $wdt = new $class();
+                    $wdt->inject($container);
+                    $widgetsResults[$place][] = $wdt->compose();
                 }
             }
         }
