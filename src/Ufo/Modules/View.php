@@ -36,6 +36,11 @@ class View extends DIObject //implements ViewInterface
     protected $section;
     
     /**
+     * @var array
+     */
+    protected $widgets = [];
+    
+    /**
      * @var string
      */
     protected $extension = '.php';
@@ -73,6 +78,23 @@ class View extends DIObject //implements ViewInterface
         }
         
         return ob_get_clean();
+    }
+    
+    protected function renderWidgets(string $place): string
+    {
+        if (!array_key_exists($place, $this->widgets)) {
+            return '';
+        }
+        
+        return $this->render(
+            'widgets', 
+            ['widgets' => $this->widgets[$place]]
+        );
+    }
+    
+    protected function renderWidget($widget): string
+    {
+        return $this->render('widget', $widget);
     }
     
     /**

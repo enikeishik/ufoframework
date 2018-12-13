@@ -54,12 +54,12 @@ class Controller extends DIObject implements ControllerInterface
         
         $view = new View();
         $this->container->set('model', $model);
+        $this->container->set('widgets', $this->composeWidgets($section));
         $view->inject($this->container);
         
         $context = [
             'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
             'items'     => $model->getItems(), 
-            'widgets'   => $this->composeWidgets($section), 
         ];
         
         return new Result($view->render('view', $context));
@@ -77,7 +77,7 @@ class Controller extends DIObject implements ControllerInterface
                 ['title' => '1 first wdg title', 'text' => '1 first wdg text'], 
                 ['title' => '1 second wdg title', 'text' => '1 second wdg text'], 
             ], 
-            'right colbottom' => [
+            'right col bottom' => [
                 ['title' => '2 first wdg title', 'text' => '2 first wdg text'], 
             ], 
         ];
