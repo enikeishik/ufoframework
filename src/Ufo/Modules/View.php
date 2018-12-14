@@ -135,14 +135,11 @@ class View extends DIObject implements ViewInterface
     
     protected function renderWidgets(string $place): string
     {
-        if (!array_key_exists($place, $this->widgets)) {
-            return '';
+        if (array_key_exists($place, $this->widgets)) {
+            return $this->widgets[$place]->render();
         }
         
-        //TODO: move it into controller
-        $view = new View('widgets', ['widgets' => $this->widgets[$place]]);
-        $view->inject($this->container);
-        return $view->render();
+        return '';
     }
     
     protected function renderWidget(Result $widget): string

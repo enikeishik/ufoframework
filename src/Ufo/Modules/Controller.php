@@ -33,6 +33,11 @@ class Controller extends DIObject implements ControllerInterface
     protected $debug;
     
     /**
+     * @var array
+     */
+    protected $data = [];
+    
+    /**
      * @param \Ufo\Core\ContainerInterface $container
      */
     public function inject(ContainerInterface $container): void
@@ -50,26 +55,22 @@ class Controller extends DIObject implements ControllerInterface
     {
         $this->container->set('section', $section);
         
-        $model = new Model();
-        $model->inject($this->container);
-        
-        $this->container->set('model', $model);
-        if (null !== $section) {
-            /*
-            TODO: make smthng like this
-            foreach (places)
-                $widgets[place] = new View('widgets', ...)
-            $this->container->set('widgets', $widgets);
-            */
-            $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
+        if (0 == count($this->data)) {
+            $model = new Model();
+            $model->inject($this->container);
+            
+            $this->container->set('model', $model);
+            if (null !== $section) {
+                $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
+            }
+            
+            $this->data = [
+                'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
+                'items'     => $model->getItems(), 
+            ];
         }
         
-        $data = [
-            'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
-            'items'     => $model->getItems(), 
-        ];
-        
-        $view = new View('view', $data);
+        $view = new View('view', $this->data);
         $view->inject($this->container);
         
         return new Result($view);
@@ -107,27 +108,41 @@ class Controller extends DIObject implements ControllerInterface
         $widgetsResults = [];
         
         foreach ($allWidgets as $place => $placeWidgets) {
+            $results = [];
+            
             foreach ($placeWidgets as $widget) {
+                $container->set('data', $widget);
+                
                 if (empty($widget['module'])) {
-                    $class = 
+                    $widgetControllerClass = 
                         '\Ufo\Modules\Widgets\\' . 
                         ucfirst($widget['name']) . '\Controller';
                 } else {
-                    $class = 
+                    $widgetControllerClass = 
                         '\Ufo\Modules\\' . ucfirst($widget['module']) . '\\' . 
                         'Widget' . ucfirst($widget['name']) . 'Controller';
                 }
-                if (class_exists($class)) {
-                    $wdt = new $class();
-                    $wdt->inject($container);
-                    $widgetsResults[$place][] = $wdt->compose($widgetSection);
+                
+                if (class_exists($widgetControllerClass)) {
+                    $widgetController = new $widgetControllerClass();
+                    $widgetController->inject($container);
+                    $results[] = $widgetController->compose();
+                    
                 } else {
-                    $class = '\Ufo\Modules\Controller'; //defaultController
-                    $wdt = new $class();
-                    $wdt->inject($container);
-                    $widgetsResults[$place][] = $wdt->compose();
+                    $defaultControllerClass = '\Ufo\Modules\Controller'; //defaultController
+                    
+                    $defaultController = new $defaultControllerClass();
+                    $defaultController->inject($container);
+                    $result = $defaultController->compose();
+                    
+                    $result->getView()->setView('widget'); //change default view (template)
+                    $results[] = $result;
                 }
             }
+            
+            $view = new View('widgets', ['widgets' => $results]);
+            $view->inject($this->container);
+            $widgetsResults[$place] = $view;
         }
         
         return $widgetsResults;
