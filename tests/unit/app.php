@@ -19,5 +19,9 @@ $app->execute();
 // $result->getHeaders();
 // $result->getContent();
 $debug->traceEnd();
-echo PHP_EOL . 'execution time: ' . round(100 * $debug->getExecutionTime(), 2) . ' ms' . PHP_EOL;
+echo 
+    PHP_EOL . 
+    'execution time: ' . round(100 * $debug->getExecutionTime(), 2) . ' ms; ' . 
+    'mem: ' . number_format(memory_get_peak_usage()) . 
+    PHP_EOL;
 //var_dump($debug->getTrace());
