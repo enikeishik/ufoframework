@@ -6,7 +6,7 @@ use \Ufo\Core\Debug;
 use \Ufo\Core\App;
 
 $_SERVER['DOCUMENT_ROOT'] = __DIR__ . '/../..';
-var_dump($_SERVER['DOCUMENT_ROOT']);
+//var_dump($_SERVER['DOCUMENT_ROOT']);
 $config = new Config();
 $debug = new Debug();
 $app = new App($config, $debug);
@@ -19,5 +19,5 @@ $app->execute();
 // $result->getHeaders();
 // $result->getContent();
 $debug->traceEnd();
-echo PHP_EOL . round(100 * $debug->getExecutionTime(), 2) . PHP_EOL;
-var_dump($debug->getTrace());
+echo PHP_EOL . 'execution time: ' . round(100 * $debug->getExecutionTime(), 2) . ' ms' . PHP_EOL;
+//var_dump($debug->getTrace());

@@ -31,7 +31,7 @@ class AppTest extends \Codeception\Test\Unit
         $result = $app->compose($app->parse());
         $this->assertNotNull($result);
         $this->assertEquals([], $result->getHeaders());
-        $this->assertNotEquals('', $result->getContent());
+        $this->assertNotEquals('', $result->getView()->render());
         
         $_GET['path'] = '/!qwe/asd';
         $this->expectedException(

@@ -9,23 +9,31 @@
 
 namespace Ufo\Core;
 
+use Ufo\Modules\RenderableInterface;
+
 /**
  * Describes the interface of a module execution result.
  */
 interface ResultInterface
 {
     /**
+     * @param \Ufo\Modules\RenderableInterface $view
+     * @param array $headers = []
+     */
+    public function __construct(RenderableInterface $view, array $headers = []);
+    
+    /**
      * Sets content.
-     * @param string $content
+     * @param \Ufo\Modules\RenderableInterface $view
      * @return void
      */
-    public function setContent(string $content): void;
+    public function setView(RenderableInterface $view): void;
     
     /**
      * Returns generated content.
-     * @return string
+     * @return \Ufo\Modules\RenderableInterface $view
      */
-    public function getContent(): string;
+    public function getView(): RenderableInterface;
     
     /**
      * Sets headers.
@@ -54,13 +62,6 @@ interface ResultInterface
      * @return bool
      */
     public function hasHeader(string $name): bool;
-    
-    /**
-     * Changes content using callback function.
-     * @param callable $callback
-     * @return string
-     */
-    public function changeContent(callable $callback): string;
     
     /**
      * Changes header value.

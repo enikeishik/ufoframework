@@ -19,7 +19,7 @@ use Ufo\Core\Result;
 /**
  * Module level view base class.
  */
-class View extends DIObject //implements ViewInterface
+class View extends DIObject implements ViewInterface
 {
     /**
      * @var \Ufo\Core\Config
@@ -37,6 +37,16 @@ class View extends DIObject //implements ViewInterface
     protected $section;
     
     /**
+     * @var string
+     */
+    protected $view = '';
+    
+    /**
+     * @var array
+     */
+    protected $data = [];
+    
+    /**
      * @var array
      */
     protected $widgets = [];
@@ -45,6 +55,16 @@ class View extends DIObject //implements ViewInterface
      * @var string
      */
     protected $extension = '.php';
+    
+    /**
+     * @param string $view
+     * @param array $data = []
+     */
+    public function __construct(string $view, array $data = [])
+    {
+        $this->view = $view;
+        $this->data = $data;
+    }
     
     /**
      * @param \Ufo\Core\ContainerInterface $container
@@ -56,23 +76,55 @@ class View extends DIObject //implements ViewInterface
     }
     
     /**
-     * Generate output.
      * @param string $view
-     * @param array $context
+     * @return void
+     */
+    public function setView(string $view): void
+    {
+        $this->view = $view;
+    }
+    
+    /**
      * @return string
      */
-    public function render(string $view, array $context): string
+    public function getView(): string
+    {
+        return $this->view;
+    }
+    
+    /**
+     * @param array $data
+     * @return void
+     */
+    public function setData(string $data): void
+    {
+        $this->data = $data;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+    
+    /**
+     * Generate output.
+     * @return string
+     */
+    public function render(): string
     {
         $obLevel = ob_get_level();
         ob_start();
         
-        extract($context);
+        extract($this->data);
         
         try {
             include $this->findView(
                 $this->config->rootPath . $this->config->viewsPath, 
                 $this->section->module->name ?? '', 
-                $view
+                $this->view
             );
         } catch (Exception $e) {
             $this->handleRenderException($e, $obLevel);
@@ -87,21 +139,15 @@ class View extends DIObject //implements ViewInterface
             return '';
         }
         
-        return $this->render(
-            'widgets', 
-            ['widgets' => $this->widgets[$place]]
-        );
+        //TODO: move it into controller
+        $view = new View('widgets', ['widgets' => $this->widgets[$place]]);
+        $view->inject($this->container);
+        return $view->render();
     }
     
-    protected function renderWidget($widget): string
+    protected function renderWidget(Result $widget): string
     {
-        if (is_array($widget)) {
-            return $this->render('widget', $widget);
-        } elseif (is_a($widget, Result::class)) {
-            return $widget->getContent();
-        }
-        
-        return '';
+        return $widget->getView()->render();
     }
     
     /**

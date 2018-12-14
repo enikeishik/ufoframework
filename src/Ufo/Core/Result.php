@@ -9,48 +9,50 @@
 
 namespace Ufo\Core;
 
+use Ufo\Modules\RenderableInterface;
+
 /**
  * Module execution result.
  */
 class Result implements ResultInterface
 {
     /**
+     * @var \Ufo\Modules\RenderableInterface
+     */
+    protected $view = '';
+    
+    /**
      * @var array
      */
     protected $headers = [];
     
     /**
-     * @var string
-     */
-    protected $content = '';
-    
-    /**
-     * @param string $content
+     * @param \Ufo\Modules\RenderableInterface $view
      * @param array $headers = []
      */
-    public function __construct(string $content, array $headers = [])
+    public function __construct(RenderableInterface $view, array $headers = [])
     {
-        $this->content = $content;
+        $this->view = $view;
         $this->headers = $headers;
     }
     
     /**
      * Sets content.
-     * @param string $content
+     * @param \Ufo\Modules\RenderableInterface $view
      * @return void
      */
-    public function setContent(string $content): void
+    public function setView(RenderableInterface $view): void
     {
-        $this->content = $content;
+        $this->view = $view;
     }
     
     /**
      * Returns generated content.
-     * @return string
+     * @return \Ufo\Modules\RenderableInterface $view
      */
-    public function getContent(): string
+    public function getView(): RenderableInterface
     {
-        return $this->content;
+        return $this->view;
     }
     
     /**
@@ -94,16 +96,6 @@ class Result implements ResultInterface
     public function hasHeader(string $name): bool
     {
         return array_key_exists($name, $this->headers);
-    }
-    
-    /**
-     * Changes content using callback function.
-     * @param callable $callback
-     * @return string
-     */
-    public function changeContent(callable $callback): string
-    {
-        return call_user_func($callback, $content);
     }
     
     /**

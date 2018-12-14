@@ -38,7 +38,7 @@ return [
             'id' => 333, 
             'name' => 'ASD qwe', 
             'callback' => function($container) {
-                return new \Ufo\Core\Result('content of callback for section ' . $container->section->path);
+                return 'content of callback for section ' . $container->section->path;
             }, 
             'dbless' => true, 
             'disabled' => false, 

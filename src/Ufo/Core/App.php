@@ -14,6 +14,8 @@ use Ufo\Routing\RouteArrayStorage;
 use Ufo\Routing\RouteDbStorage;
 use Ufo\Routing\RouteStorageInterface;
 use Ufo\Modules\Controller;
+use Ufo\Modules\Renderable;
+use Ufo\Modules\RenderableInterface;
 
 /**
  * Main application class.
@@ -77,7 +79,7 @@ class App
         
         $this->sendHeaders($result->getHeaders());
         
-        $this->render($result->getContent());
+        $this->render($result->getView());
     }
     
     /**
@@ -133,7 +135,7 @@ class App
         
         $callback = $section->module->callback;
         if (is_callable($callback)) {
-            return $callback($this->getContainer(['section' => $section]));
+            return new Result(new Renderable($callback($this->getContainer(['section' => $section]))));
         }
         
         $controller = $this->getModuleController($section->module);
@@ -154,14 +156,15 @@ class App
     }
     
     /**
+     * @param \Ufo\Modules\RenderableInterface $view
      * @return void
      */
-    public function render(string $content): void
+    public function render(RenderableInterface $view): void
     {
         //some middleware can change response here
         @ob_end_clean(); echo PHP_EOL; //to display output in codeception tests
         
-        echo $content;
+        echo $view->render();
         
         echo PHP_EOL; //to display output in codeception tests
         
@@ -191,7 +194,7 @@ class App
         
         $content = 'ERROR: (' . $errCode . ') ' . $errMessage . PHP_EOL;
         
-        return new Result($content, $headers);
+        return new Result(new Renderable($content), $headers);
     }
     
     /**

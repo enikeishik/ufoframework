@@ -10,11 +10,12 @@
 namespace Ufo\Modules;
 
 use Ufo\Core\Config;
+use Ufo\Core\ContainerInterface;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
-use Ufo\Core\ContainerInterface;
 use Ufo\Core\Result;
 use Ufo\Core\Section;
+use \Ufo\Modules\View;
 
 /**
  * Module level controller base class.
@@ -52,22 +53,26 @@ class Controller extends DIObject implements ControllerInterface
         $model = new Model();
         $model->inject($this->container);
         
-        $view = new View();
         $this->container->set('model', $model);
         if (null !== $section) {
-            //lazy render
-            //$this->container->set('widgets', $this->getWidgets($section));
-            //prerender
+            /*
+            TODO: make smthng like this
+            foreach (places)
+                $widgets[place] = new View('widgets', ...)
+            $this->container->set('widgets', $widgets);
+            */
             $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
         }
-        $view->inject($this->container);
         
-        $context = [
+        $data = [
             'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
             'items'     => $model->getItems(), 
         ];
         
-        return new Result($view->render('view', $context));
+        $view = new View('view', $data);
+        $view->inject($this->container);
+        
+        return new Result($view);
     }
     
     /**
