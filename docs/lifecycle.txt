@@ -1,0 +1,18 @@
+
+    \Ufo\Core\App::__construct(\Ufo\Core\Config, \Ufo\Core\Debug)
+        ::execute
+            ::parse
+                ::getPath
+                ::getRouteStorage
+                Route::parse: \Ufo\Core\Section
+            ::compose(\Ufo\Core\Section): \Ufo\Core\Result
+                ?::setDb
+                ::getModuleController
+                    \Ufo\Modules\Controller::__construct
+                \Ufo\Modules\Controller::inject(::getContainer)
+                \Ufo\Modules\Controller::compose(\Ufo\Core\Section): \Ufo\Core\Result
+                    ?\Ufo\Modules\Model::__construct
+                    \Ufo\Modules\View::__construct
+            ::sendHeaders(\Ufo\Core\Result::getHeaders)
+            ::render(\Ufo\Core\Result::getView)
+                \Ufo\Modules\View::render
