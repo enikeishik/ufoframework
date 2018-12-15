@@ -70,7 +70,7 @@ class Controller extends DIObject implements ControllerInterface
             ];
         }
         
-        $view = new View('view', $this->data);
+        $view = new View($this->config->templateDefault, $this->data);
         $view->inject($this->container);
         
         return new Result($view);
@@ -135,12 +135,12 @@ class Controller extends DIObject implements ControllerInterface
                     $defaultController->inject($container);
                     $result = $defaultController->compose();
                     
-                    $result->getView()->setView('widget'); //change default view (template)
+                    $result->getView()->setTemplate($this->config->templateWidget); //change default template
                     $results[] = $result;
                 }
             }
             
-            $view = new View('widgets', ['widgets' => $results]);
+            $view = new View($this->config->templateWidgets, ['widgets' => $results]);
             $view->inject($this->container);
             $widgetsResults[$place] = $view;
         }

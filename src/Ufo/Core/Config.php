@@ -48,16 +48,34 @@ class Config extends Struct implements ConfigInterface
     public $rootUrl = '';
     
     /**
-     * Path to views root.
+     * Path to templates root.
      * @var string
      */
-    public $viewsPath = '/resources/views';
+    public $templatesPath = '/resources/templates';
     
     /**
-     * Path to default views.
+     * Default templates dir.
      * @var string
      */
-    public $viewsDefault = '/default';
+    public $templatesDefault = '/default';
+    
+    /**
+     * Default template.
+     * @var string
+     */
+    public $templateDefault = 'index';
+    
+    /**
+     * Widgets list template.
+     * @var string
+     */
+    public $templateWidgets = 'widgets';
+    
+    /**
+     * Widget template.
+     * @var string
+     */
+    public $templateWidget = 'widget';
     
     /**
      * @see parent

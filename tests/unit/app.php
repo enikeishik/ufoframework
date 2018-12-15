@@ -13,6 +13,7 @@ $app = new App($config, $debug);
 $config->routeStorageData = require 'RouteStorageData.php';
 
 //$_GET['path'] = '/qwe/asd';
+$config->templateDefault = 'index-test';
 $debug->trace('execute');
 $app->execute();
 // $result = $app->compose($app->parse());

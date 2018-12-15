@@ -17,7 +17,7 @@ use Ufo\Core\Section;
 use Ufo\Core\Result;
 
 /**
- * Module level view base class.
+ * Module level View base class.
  */
 class View extends DIObject implements ViewInterface
 {
@@ -39,7 +39,7 @@ class View extends DIObject implements ViewInterface
     /**
      * @var string
      */
-    protected $view = '';
+    protected $template = '';
     
     /**
      * @var array
@@ -57,12 +57,12 @@ class View extends DIObject implements ViewInterface
     protected $extension = '.php';
     
     /**
-     * @param string $view
+     * @param string $template
      * @param array $data = []
      */
-    public function __construct(string $view, array $data = [])
+    public function __construct(string $template, array $data = [])
     {
-        $this->view = $view;
+        $this->template = $template;
         $this->data = $data;
     }
     
@@ -76,20 +76,20 @@ class View extends DIObject implements ViewInterface
     }
     
     /**
-     * @param string $view
+     * @param string $template
      * @return void
      */
-    public function setView(string $view): void
+    public function setTemplate(string $template): void
     {
-        $this->view = $view;
+        $this->template = $template;
     }
     
     /**
      * @return string
      */
-    public function getView(): string
+    public function getTemplate(): string
     {
-        return $this->view;
+        return $this->template;
     }
     
     /**
@@ -122,9 +122,9 @@ class View extends DIObject implements ViewInterface
         
         try {
             include $this->findView(
-                $this->config->rootPath . $this->config->viewsPath, 
+                $this->config->rootPath . $this->config->templatesPath, 
                 $this->section->module->name ?? '', 
-                $this->view
+                $this->template
             );
         } catch (Exception $e) {
             $this->handleRenderException($e, $obLevel);
@@ -148,31 +148,31 @@ class View extends DIObject implements ViewInterface
     }
     
     /**
-     * Find full path for requested view. Returned path may not exists.
-     * @param string $viewsPath
+     * Find full path for requested template. Returned path may not exists.
+     * @param string $templatesPath
      * @param string $moduleName
-     * @param string $viewName
+     * @param string $templateName
      * @return string
      */
-    protected function findView(string $viewsPath, string $moduleName, string $viewName): string
+    protected function findView(string $templatesPath, string $moduleName, string $templateName): string
     {
         if (!empty($moduleName)) {
-            // /views/module/views.php
-            $view = 
-                $viewsPath . 
+            // /templates/module/template.php
+            $templatePath = 
+                $templatesPath . 
                 '/' . strtolower($moduleName) . 
-                '/' . str_replace('.', '/', $viewName) . $this->extension;
-            if (file_exists($view)) {
-                return $view;
+                '/' . str_replace('.', '/', $templateName) . $this->extension;
+            if (file_exists($templatePath)) {
+                return $templatePath;
             }
         }
         
-        // /views/default/views.php
-        $view = 
-            $viewsPath . 
-            $this->config->viewsDefault . 
-            '/' . str_replace('.', '/', $viewName) . $this->extension;
-        return $view;
+        // /templates/default/template.php
+        $templatePath = 
+            $templatesPath . 
+            $this->config->templatesDefault . 
+            '/' . str_replace('.', '/', $templateName) . $this->extension;
+        return $templatePath;
     }
     
     /**

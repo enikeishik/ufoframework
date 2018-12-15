@@ -10,26 +10,26 @@
 namespace Ufo\Modules;
 
 /**
- * Module level view base class interface.
+ * Module level View base class interface.
  */
 interface ViewInterface extends RenderableInterface
 {
     /**
-     * @param string $view
+     * @param string $template
      * @param array $data = []
      */
-    public function __construct(string $view, array $data = []);
+    public function __construct(string $template, array $data = []);
     
     /**
-     * @param string $view
+     * @param string $template
      * @return void
      */
-    public function setView(string $view): void;
+    public function setTemplate(string $template): void;
     
     /**
      * @return string
      */
-    public function getView(): string;
+    public function getTemplate(): string;
     
     /**
      * @param array $data
