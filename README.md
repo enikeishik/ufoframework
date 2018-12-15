@@ -11,3 +11,5 @@
 ```bash
 vendor\bin\codecept run
 ```
+
+[ico-license]: https://img.shields.io/badge/license-GPL-brightgreen.svg?style=flat-square
