@@ -9,13 +9,15 @@
 
 namespace Ufo\Core;
 
+use Ufo\Modules\Controller;
+use Ufo\Modules\Renderable;
+use Ufo\Modules\RenderableInterface;
 use Ufo\Routing\Route;
 use Ufo\Routing\RouteArrayStorage;
 use Ufo\Routing\RouteDbStorage;
 use Ufo\Routing\RouteStorageInterface;
-use Ufo\Modules\Controller;
-use Ufo\Modules\Renderable;
-use Ufo\Modules\RenderableInterface;
+use Ufo\Widgets\WidgetsArrayStorage;
+use Ufo\Widgets\WidgetsDbStorage;
 
 /**
  * Main application class.
@@ -172,6 +174,37 @@ class App
     }
     
     /**
+     * Returns widgets data grouped by place (place is a key).
+     * @param \Ufo\Core\Section $section
+     * @return array
+     */
+    public function getWidgets(Section $section): array
+    {
+        switch ($this->config->widgetsStorageType) {
+            
+            case $this->config::STORAGE_TYPE_DB:
+                $storage = new WidgetsDbStorage($this->db);
+                break;
+                
+            case $this->config::STORAGE_TYPE_ARRAY:
+                if (!empty($this->config->widgetsStoragePath) 
+                && file_exists($this->config->rootPath . $this->config->widgetsStoragePath)) {
+                    $storageData = require_once $this->config->rootPath . $this->config->widgetsStoragePath;
+                } else {
+                    $storageData = $this->config->widgetsStorageData;
+                }
+                $storage = new WidgetsArrayStorage($storageData);
+                break;
+                
+            default:
+                return [];
+                
+        }
+        
+        return $storage->getWidgets($section);
+    }
+    
+    /**
      * @param int $errCode = 200
      * @param string $errMessage = 'OK'
      * @param array $options = []
@@ -221,11 +254,11 @@ class App
             case $this->config::STORAGE_TYPE_ARRAY:
                 if (!empty($this->config->routeStoragePath) 
                 && file_exists($this->config->rootPath . $this->config->routeStoragePath)) {
-                    $routeStorageData = require_once $this->config->rootPath . $this->config->routeStoragePath;
+                    $storageData = require_once $this->config->rootPath . $this->config->routeStoragePath;
                 } else {
-                    $routeStorageData = $this->config->routeStorageData;
+                    $storageData = $this->config->routeStorageData;
                 }
-                return new RouteArrayStorage($routeStorageData);
+                return new RouteArrayStorage($storageData);
         }
         
         throw new RouteStorageNotSetException();

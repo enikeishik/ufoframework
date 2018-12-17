@@ -26,6 +26,7 @@ class AppTest extends \Codeception\Test\Unit
         $config = new Config();
         $app = new App($config, new Debug());
         $config->routeStorageData = require 'RouteStorageData.php';
+        $config->widgetsStorageData = require 'WidgetsStorageData.php';
         
         $_GET['path'] = '/qwe/asd';
         $result = $app->compose($app->parse());

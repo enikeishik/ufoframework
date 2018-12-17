@@ -23,6 +23,11 @@ use \Ufo\Modules\View;
 class Controller extends DIObject implements ControllerInterface
 {
     /**
+     * @var \Ufo\Core\App
+     */
+    protected $app;
+    
+    /**
      * @var \Ufo\Core\Config
      */
     protected $config;
@@ -66,6 +71,7 @@ class Controller extends DIObject implements ControllerInterface
             
             $this->data = [
                 'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
+                'title'     => $section->title, 
                 'items'     => $model->getItems(), 
             ];
         }
@@ -83,15 +89,7 @@ class Controller extends DIObject implements ControllerInterface
      */
     public function getWidgets(Section $section): array
     {
-        return [
-            'left col top' => [
-                ['module' => '', 'name' => 'gismeteo', 'title' => '1 first wdg title', 'text' => '1 first wdg text'], 
-                ['module' => 'news', 'name' => '', 'title' => '1 second wdg title', 'text' => '1 second wdg text'], 
-            ], 
-            'right col bottom' => [
-                ['module' => 'gallery', 'name' => '', 'title' => '2 first wdg title', 'text' => '2 first wdg text'], 
-            ], 
-        ];
+        return $this->app->getWidgets($section);
     }
     
     /**

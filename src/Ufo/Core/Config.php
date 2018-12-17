@@ -36,6 +36,24 @@ class Config extends Struct implements ConfigInterface
     public $routeStorageData = [];
     
     /**
+     * Type of widgets storage.
+     * @var string 'array', 'db'
+     */
+    public $widgetsStorageType = 'array';
+    
+    /**
+     * Path to file with array of widgets (for array type storage).
+     * @var string
+     */
+    public $widgetsStoragePath = '';
+    
+    /**
+     * Array of widgets (for array type storage).
+     * @var array
+     */
+    public $widgetsStorageData = [];
+    
+    /**
      * Path to site root.
      * @var string
      */

@@ -7,14 +7,11 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Ufo\Core;
+namespace Ufo\Widgets;
 
-class Section extends Struct
+use Ufo\Core\Section;
+
+interface WidgetsStorageInterface
 {
-    public $path = '';
-    public $title = '';
-    public $params = [];
-    public $module = null;
-    public $system = false;
-    public $disabled = false;
+    public function getWidgets(Section $section): array;
 }
