@@ -164,7 +164,7 @@ class App
     public function render(RenderableInterface $view): void
     {
         //some middleware can change response here
-        @ob_end_clean(); echo PHP_EOL; //to display output in codeception tests
+        //@ob_end_clean(); echo PHP_EOL; //to display output in codeception tests
         
         echo $view->render();
         

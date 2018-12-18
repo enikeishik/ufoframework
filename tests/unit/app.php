@@ -14,7 +14,6 @@ $config->routeStorageData = require 'RouteStorageData.php';
 $config->widgetsStorageData = require 'WidgetsStorageData.php';
 
 //$_GET['path'] = '/qwe/asd';
-$config->templateDefault = 'index-test';
 $debug->trace('execute');
 $app->execute();
 // $result = $app->compose($app->parse());

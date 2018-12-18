@@ -13,6 +13,6 @@ class RouteTest extends \Codeception\Test\Unit
         $section = Route::parse('/qwe/asd', new RouteArrayStorage($routeStorageData));
         $this->assertNotNull($section);
         $this->assertEquals('/qwe/asd', $section->path);
-        $this->assertEquals('ASD qwe', $section->module->name);
+        $this->assertEquals('Simple callback', $section->module->name);
     }
 }
