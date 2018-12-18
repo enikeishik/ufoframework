@@ -17,6 +17,11 @@ class Config extends Struct implements ConfigInterface
     public const STORAGE_TYPE_ARRAY = 'array';
     public const STORAGE_TYPE_DB = 'db';
     
+    public const CACHE_TYPE_ARRAY = 'array';
+    public const CACHE_TYPE_FS = 'fs';
+    public const CACHE_TYPE_DB = 'db';
+    public const CACHE_TYPE_REDIS = 'redis';
+    
     /**
      * Type of routes storage.
      * @var string 'array', 'db'
@@ -64,6 +69,18 @@ class Config extends Struct implements ConfigInterface
      * @var string
      */
     public $rootUrl = '';
+    
+    /**
+     * Cache storage type.
+     * @var string 'array', 'fs', 'db', 'redis'
+     */
+    public $cacheType = 'fs';
+    
+    /**
+     * Path to cache dir.
+     * @var string
+     */
+    public $cacheDir = '/cache';
     
     /**
      * Path to templates root.
