@@ -86,10 +86,11 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
     /**
      * Determines whether an item is present in the cache and expired.
      * @param string $key
+     * @param int|\DateInterval $ttl
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function expired(string $key): bool;
+    public function expired(string $key, $ttl): bool;
     
     /**
      * Deletes all outdated cache items in a single operation.

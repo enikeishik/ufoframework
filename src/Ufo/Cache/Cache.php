@@ -65,6 +65,17 @@ class Cache implements CacheInterface
     }
     
     /**
+     * Determines whether an item is present in the cache.
+     * @param string $key
+     * @return bool
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    public function has(string $key): bool
+    {
+        return $this->storage->has($key);
+    }
+    
+    /**
      * Fetches a value from the cache.
      * @param string $key
      * @param mixed $default
@@ -171,39 +182,25 @@ class Cache implements CacheInterface
     }
     
     /**
-     * Determines whether an item is present in the cache.
-     * @param string $key
-     * @return bool
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function has(string $key): bool
-    {
-        return $this->storage->has($key);
-    }
-    
-    /**
      * Determines whether an item is present in the cache and expired.
      * @param string $key
-     * @param null|int|\DateInterval $ttl
+     * @param int|\DateInterval $ttl
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Ufo\Core\TypeNotSupportedException
      */
-    public function expired(string $key, $ttl = null): bool
+    public function expired(string $key, $ttl): bool
     {
         if ($ttl instanceof DateInterval) {
             throw new TypeNotSupportedException();
-        }
-        
-        if (null === $ttl) {
-            return true;
         }
         
         if (!$this->has($key)) {
             return true;
         }
         
-        return $ttl < $this->storage->getAge();
+        //var_dump($this->storage->getAge($key)); exit();
+        return $ttl < $this->storage->getAge($key);
     }
     
     /**
