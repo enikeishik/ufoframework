@@ -11,6 +11,7 @@ namespace Ufo\Cache;
 
 use Ufo\Core\Config;
 use Ufo\Core\DebugInterface;
+use Ufo\Core\TypeNotSupportedException;
 
 /**
  * Cache class.
@@ -82,9 +83,14 @@ class Cache implements CacheInterface
      * @param null|int|\DateInterval $ttl
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Ufo\Core\TypeNotSupportedException
      */
     public function set(string $key, $value, $ttl = null): bool
     {
+        if ($ttl instanceof DateInterval) {
+            throw new TypeNotSupportedException();
+        }
+        
         return $this->storage->set($key, $value);
     }
     
@@ -126,9 +132,14 @@ class Cache implements CacheInterface
      * @param null|int|\DateInterval $ttl
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Ufo\Core\TypeNotSupportedException
      */
     public function setMultiple(iterable $values, $ttl = null): bool
     {
+        if ($ttl instanceof DateInterval) {
+            throw new TypeNotSupportedException();
+        }
+        
         return true;
     }
     
@@ -157,21 +168,36 @@ class Cache implements CacheInterface
     /**
      * Determines whether an item is present in the cache and expired.
      * @param string $key
+     * @param null|int|\DateInterval $ttl
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Ufo\Core\TypeNotSupportedException
      */
-    public function expired(string $key): bool
+    public function expired(string $key, $ttl = null): bool
     {
-        return true;
+        if ($ttl instanceof DateInterval) {
+            throw new TypeNotSupportedException();
+        }
+        
+        if (null === $ttl) {
+            return true;
+        }
+        
+        if (!$this->has($key)) {
+            return true;
+        }
+        
+        return $ttl < $this->storage->getAge();
     }
     
     /**
-     * Deletes all expired cache items in a single operation.
+     * Deletes all outdated cache items in a single operation.
+     * @param int|\DateInterval $storageTime
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteExpired(): bool
+    public function deleteOutdated($storageTime): bool
     {
-        return true;
+        return $this->storage->deleteOutdated($storageTime);
     }
 }

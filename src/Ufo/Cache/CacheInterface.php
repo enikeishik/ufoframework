@@ -15,6 +15,14 @@ namespace Ufo\Cache;
 interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
 {
     /**
+     * Determines whether an item is present in the cache.
+     * @param string $key
+     * @return bool
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    public function has(string $key): bool;
+    
+    /**
      * Fetches a value from the cache.
      * @param string $key
      * @param mixed $default
@@ -25,13 +33,14 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
     
     /**
      * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
-     * @param string
-     * @param mixed
+     * @param string $key
+     * @param mixed $value
      * @param null|int|\DateInterval $ttl
+     * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function set(string $key, $value, $ttl = null): bool;
+    public function set(string $key, $value, $ttl = null, $tts = null): bool;
     
     /**
      * Delete an item from the cache by its unique key.
@@ -60,10 +69,11 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
      * Persists a set of key => value pairs in the cache, with an optional TTL.
      * @param iterable $values
      * @param null|int|\DateInterval $ttl
+     * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function setMultiple(iterable $values, $ttl = null): bool;
+    public function setMultiple(iterable $values, $ttl = null, $tts = null): bool;
     
     /**
      * Deletes multiple cache items in a single operation.
@@ -74,14 +84,6 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
     public function deleteMultiple(iterable $keys): bool;
     
     /**
-     * Determines whether an item is present in the cache.
-     * @param string $key
-     * @return bool
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    public function has(string $key): bool;
-    
-    /**
      * Determines whether an item is present in the cache and expired.
      * @param string $key
      * @return bool
@@ -90,9 +92,10 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
     public function expired(string $key): bool;
     
     /**
-     * Deletes all expired cache items in a single operation.
+     * Deletes all outdated cache items in a single operation.
+     * @param int|\DateInterval $storageTime
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteExpired(): bool;
+    public function deleteOutdated($storageTime): bool;
 }

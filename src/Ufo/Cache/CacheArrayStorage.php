@@ -15,6 +15,16 @@ namespace Ufo\Cache;
 class CacheArrayStorage implements CacheStorageInterface
 {
     /**
+     * Determines whether an item is present in the cache.
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return false;
+    }
+    
+    /**
      * Fetches a value from the cache.
      * @param string $key
      * @return mixed
@@ -29,18 +39,20 @@ class CacheArrayStorage implements CacheStorageInterface
      * @param string $key
      * @return int
      */
-    public function getAge(string $key)
+    public function getAge(string $key): int
     {
         return PHP_INT_MAX;
     }
     
     /**
      * Persists data in the cache, uniquely referenced by a key.
-     * @param string
-     * @param mixed
+     * @param string $key
+     * @param mixed $value
+     * @param null|int|\DateInterval $ttl
+     * @param null|int|\DateInterval $tts
      * @return bool
      */
-    public function set(string $key, $value): bool
+    public function set(string $key, $value, $ttl = null, $tts = null): bool
     {
         return true;
     }
@@ -56,21 +68,21 @@ class CacheArrayStorage implements CacheStorageInterface
     }
     
     /**
+     * Delete an items from the cache by condition.
+     * @param int|\DateInterval $tts
+     * @return bool
+     */
+    public function deleteOutdated($tts): bool
+    {
+        return true;
+    }
+    
+    /**
      * Wipes clean the entire cache's keys.
      * @return bool
      */
     public function clear(): bool
     {
         return true;
-    }
-    
-    /**
-     * Determines whether an item is present in the cache.
-     * @param string $key
-     * @return bool
-     */
-    public function has(string $key): bool
-    {
-        return false;
     }
 }

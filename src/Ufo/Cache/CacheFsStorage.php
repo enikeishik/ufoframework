@@ -44,6 +44,16 @@ class CacheFsStorage implements CacheStorageInterface
     }
     
     /**
+     * Determines whether an item is present in the cache.
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return file_exists($this->getCashFilePath($key));
+    }
+    
+    /**
      * Fetches a value from the cache.
      * @param string $key
      * @return mixed
@@ -62,7 +72,7 @@ class CacheFsStorage implements CacheStorageInterface
      * @param string $key
      * @return int
      */
-    public function getAge(string $key)
+    public function getAge(string $key): int
     {
         //TODO: check the need to call
         clearstatcache();
@@ -72,11 +82,13 @@ class CacheFsStorage implements CacheStorageInterface
     
     /**
      * Persists data in the cache, uniquely referenced by a key.
-     * @param string
-     * @param mixed
+     * @param string $key
+     * @param mixed $value
+     * @param null|int|\DateInterval $ttl
+     * @param null|int|\DateInterval $tts
      * @return bool
      */
-    public function set(string $key, $value): bool
+    public function set(string $key, $value, $ttl = null, $tts = null): bool
     {
         $cacheFile = $this->getCashFilePath($key);
         
@@ -122,6 +134,9 @@ class CacheFsStorage implements CacheStorageInterface
      */
     public function clear(): bool
     {
+        //TODO: check the need to call
+        clearstatcache();
+        
         $dh = opendir($this->cacheDir);
         if (false === $dh) {
             return false;
@@ -140,13 +155,41 @@ class CacheFsStorage implements CacheStorageInterface
     }
     
     /**
-     * Determines whether an item is present in the cache.
-     * @param string $key
+     * Delete an items from the cache by condition.
+     * @param int|\DateInterval $tts
      * @return bool
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws \Ufo\Core\TypeNotSupportedException
      */
-    public function has(string $key): bool
+    public function deleteOutdated($tts): bool
     {
-        return file_exists($this->getCashFilePath($key));
+        if ($tts instanceof DateInterval) {
+            throw new TypeNotSupportedException();
+        }
+        
+        //TODO: check the need to call
+        clearstatcache();
+        
+        $dh = opendir($this->cacheDir);
+        if (false === $dh) {
+            return false;
+        }
+        
+        $time = time();
+        while (false !== ($entry = readdir($dh))) {
+            $filePath = $this->cacheDir . '/' . $entry;
+            if (
+                is_file($filePath)
+                && 0 !== strpos($entry, '.') //exclude .htaccess
+                && $tts < ($time - filectime($filePath))
+            ) {
+                unlink($filePath);
+            }
+        }
+        
+        closedir($dh);
+        
+        return true;
     }
     
     /**
