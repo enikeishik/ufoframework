@@ -95,15 +95,10 @@ class Cache implements CacheInterface
      * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \Ufo\Core\TypeNotSupportedException
      */
     public function set(string $key, $value, $ttl = null, $tts = null): bool
     {
-        if ($ttl instanceof DateInterval) {
-            throw new TypeNotSupportedException();
-        }
-        
-        return $this->storage->set($key, $value);
+        return $this->storage->set($key, $value, $ttl, $tts);
     }
     
     /**
@@ -149,16 +144,11 @@ class Cache implements CacheInterface
      * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \Ufo\Core\TypeNotSupportedException
      */
     public function setMultiple(iterable $items, $ttl = null, $tts = null): bool
     {
-        if ($ttl instanceof DateInterval) {
-            throw new TypeNotSupportedException();
-        }
-        
         foreach ($items as $key => $value) {
-            if (!$this->set($key, $value, $ttl)) {
+            if (!$this->set($key, $value, $ttl, $tts)) {
                 return false;
             }
         }
