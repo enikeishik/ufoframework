@@ -43,6 +43,11 @@ class App
     protected $debug = null;
     
     /**
+     * @var \Ufo\Cache\Cache
+     */
+    protected $cache = null;
+    
+    /**
      * @var \Ufo\Core\Db
      */
     protected $db = null;
@@ -273,7 +278,7 @@ class App
         if (null !== $this->db) {
             return;
         }
-        $this->db = Db::get($this->debug);
+        $this->db = Db::getInstance($this->debug);
     }
     
     /**

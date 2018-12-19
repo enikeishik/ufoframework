@@ -25,7 +25,8 @@ class CacheTest extends \Codeception\Test\Unit
     {
         $config = new Config();
         $config->cacheType = 'array';
-        $cache = new Cache($config, new Debug());
+        $cache = Cache::getInstance($config, new Debug());
+        $cache->overrideStorage($config);
         
         $this->assertEmpty($cache->get('any-key'));
         $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
@@ -65,7 +66,8 @@ class CacheTest extends \Codeception\Test\Unit
         $config->cacheType = 'fs';
         $config->rootPath = '';
         $config->cacheDir = $cacheDir;
-        $cache = new Cache($config, new Debug());
+        $cache = Cache::getInstance($config, new Debug());
+        $cache->overrideStorage($config);
         
         $this->assertEmpty($cache->get('any-key'));
         $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));

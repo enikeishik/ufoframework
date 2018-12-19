@@ -15,12 +15,12 @@ namespace Ufo\Core;
 class Db extends \mysqli
 {
     /**
-     * @var Db
+     * @var \Ufo\Core\Db
      */
     protected static $instance = null;
     
     /**
-     * @var Debug
+     * @var \Ufo\Core\Debug
      */
     protected $debug = null;
     
@@ -29,7 +29,12 @@ class Db extends \mysqli
      */
     protected $generatedError = '';
     
-    public static function get(DebugInterface $debug = null): Db
+    /**
+     * Implementation of singleton pattern.
+     * @param \Ufo\Core\DebugInterface $debug = null
+     * @return \Ufo\Core\Db
+     */
+    public static function getInstance(DebugInterface $debug = null): Db
     {
         if (null === static::$instance) {
             static::$instance = new static($debug);

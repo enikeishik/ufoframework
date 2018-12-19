@@ -9,7 +9,7 @@ class DebugTest extends \Codeception\Test\Unit
     /**
      * @var int
      */
-    protected const TIME_PRECISION = 4;
+    protected const TIME_PRECISION = 2;
     
     // tests
     public function testGetExecutionTime()
