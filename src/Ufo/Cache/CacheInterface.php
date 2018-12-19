@@ -67,13 +67,13 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
     
     /**
      * Persists a set of key => value pairs in the cache, with an optional TTL.
-     * @param iterable $values
+     * @param iterable $items
      * @param null|int|\DateInterval $ttl
      * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function setMultiple(iterable $values, $ttl = null, $tts = null): bool;
+    public function setMultiple(iterable $items, $ttl = null, $tts = null): bool;
     
     /**
      * Deletes multiple cache items in a single operation.
@@ -93,9 +93,9 @@ interface CacheInterface //extends \Psr\SimpleCache\CacheInterface
     
     /**
      * Deletes all outdated cache items in a single operation.
-     * @param int|\DateInterval $storageTime
+     * @param int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteOutdated($storageTime): bool;
+    public function deleteOutdated($tts): bool;
 }

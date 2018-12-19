@@ -78,14 +78,15 @@ class Cache implements CacheInterface
     
     /**
      * Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time.
-     * @param string
-     * @param mixed
+     * @param string $key
+     * @param mixed $value
      * @param null|int|\DateInterval $ttl
+     * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Ufo\Core\TypeNotSupportedException
      */
-    public function set(string $key, $value, $ttl = null): bool
+    public function set(string $key, $value, $ttl = null, $tts = null): bool
     {
         if ($ttl instanceof DateInterval) {
             throw new TypeNotSupportedException();
@@ -123,23 +124,33 @@ class Cache implements CacheInterface
      */
     public function getMultiple(iterable $keys, $default = null): iterable
     {
-        return [];
+        $values = [];
+        foreach ($keys as $key) {
+            $values[] = $this->get($key, $default);
+        }
+        return $values;
     }
     
     /**
      * Persists a set of key => value pairs in the cache, with an optional TTL.
-     * @param iterable $values
+     * @param iterable $items
      * @param null|int|\DateInterval $ttl
+     * @param null|int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws \Ufo\Core\TypeNotSupportedException
      */
-    public function setMultiple(iterable $values, $ttl = null): bool
+    public function setMultiple(iterable $items, $ttl = null, $tts = null): bool
     {
         if ($ttl instanceof DateInterval) {
             throw new TypeNotSupportedException();
         }
         
+        foreach ($items as $key => $value) {
+            if (!$this->set($key, $value, $ttl)) {
+                return false;
+            }
+        }
         return true;
     }
     
@@ -151,6 +162,11 @@ class Cache implements CacheInterface
      */
     public function deleteMultiple(iterable $keys): bool
     {
+        foreach ($keys as $key) {
+            if (!$this->delete($key)) {
+                return false;
+            }
+        }
         return true;
     }
     
@@ -192,12 +208,12 @@ class Cache implements CacheInterface
     
     /**
      * Deletes all outdated cache items in a single operation.
-     * @param int|\DateInterval $storageTime
+     * @param int|\DateInterval $tts
      * @return bool
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function deleteOutdated($storageTime): bool
+    public function deleteOutdated($tts): bool
     {
-        return $this->storage->deleteOutdated($storageTime);
+        return $this->storage->deleteOutdated($tts);
     }
 }
