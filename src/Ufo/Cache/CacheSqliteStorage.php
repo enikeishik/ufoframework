@@ -16,7 +16,7 @@ use Ufo\Core\DebugInterface;
 /**
  * Cache database based storage.
  */
-class CacheMysqlStorage implements CacheStorageInterface
+class CacheSqliteStorage implements CacheStorageInterface
 {
     /**
      * @var \Ufo\Core\Config
@@ -29,9 +29,14 @@ class CacheMysqlStorage implements CacheStorageInterface
     protected $debug = null;
     
     /**
-     * @var \Ufo\Core\Db
+     * @var \SQLite3
      */
     protected $db = null;
+    
+    /**
+     * @var string
+     */
+    protected $base = 'cache.db';
     
     /**
      * @var string
@@ -51,29 +56,24 @@ class CacheMysqlStorage implements CacheStorageInterface
     /**
      * @var string
      */
-    protected $timeField = 'dtm';
+    protected $timeField = 'time';
     
     /**
      * @param \Ufo\Core\Config $config
-     * @param \Ufo\Core\Db $db
      * @param \Ufo\Core\DebugInterface $debug = null
      */
-    public function __construct(Config $config, Db $db, DebugInterface $debug = null)
+    public function __construct(Config $config, DebugInterface $debug = null)
     {
         $this->config = $config;
         $this->debug = $debug;
-        $this->db = $debug;
-        if (isset($this->config->cacheMysqlTable)) {
-            $this->table =  $this->config->cacheMysqlTable;
-        }
-        if (isset($this->config->cacheMysqlKeyField)) {
-            $this->keyField =  $this->config->cacheMysqlKeyField;
-        }
-        if (isset($this->config->cacheMysqlValueField)) {
-            $this->valueField =  $this->config->cacheMysqlValueField;
-        }
-        if (isset($this->config->cacheMysqlTimeField)) {
-            $this->timeField =  $this->config->cacheMysqlTimeField;
+        
+        $this->db = new \SQLite3($this->config->rootPath . $this->config->cacheDir . '/' . $this->base);
+    }
+    
+    public function __destruct()
+    {
+        if (null !== $this->db) {
+            $this->db->close();
         }
     }
     
@@ -84,9 +84,9 @@ class CacheMysqlStorage implements CacheStorageInterface
      */
     public function has(string $key): bool
     {
-        $sql =  'SELECT COUNT(*) AS Cnt FROM #__' . $this->table . 
-                " WHERE `" . $this->keyField . "`='" . $this->db->addEscape($key) . "'";
-        $cnt = $this->db->getValue($sql, 'Cnt');
+        $sql =  'SELECT COUNT(*) AS Cnt FROM "' . $this->table . '"' . 
+                ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
+        $cnt = $this->db->querySingle($sql);
         if (null === $cnt) {
             return false;
         }
@@ -100,9 +100,9 @@ class CacheMysqlStorage implements CacheStorageInterface
      */
     public function get(string $key)
     {
-        $sql =  'SELECT `' . $this->valueField . '` FROM #__' . $this->table . 
-                " WHERE `" . $this->keyField . "`='" . $this->db->addEscape($key) . "'";
-        return $this->db->getValue($sql, $this->valueField);
+        $sql =  'SELECT "' . $this->valueField . '" FROM "' . $this->table . '"' . 
+                ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
+        return $this->db->querySingle($sql);
     }
     
     /**
@@ -112,9 +112,9 @@ class CacheMysqlStorage implements CacheStorageInterface
      */
     public function getAge(string $key): int
     {
-        $sql =  'SELECT `' . $this->timeField . '` FROM #__' . $this->table . 
-                " WHERE `" . $this->keyField . "`='" . $this->db->addEscape($key) . "'";
-        return time() - (int) $this->db->getValue($sql, $this->timeField);
+        $sql =  'SELECT "' . $this->timeField . '" FROM "' . $this->table . '"' . 
+                ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
+        return time() - (int) $this->db->querySingle($sql);
     }
     
     /**
@@ -131,18 +131,18 @@ class CacheMysqlStorage implements CacheStorageInterface
             throw new TypeNotSupportedException();
         }
         
-        $sql =  'INSERT INTO #__' . $this->table . 
+        $sql =  'INSERT INTO "' . $this->table . '"' . 
                 '(' . 
-                    $this->keyField . ', ' . 
-                    $this->valueField . ', ' . 
-                    $this->timeField . 
+                    '"' . $this->keyField .   '", ' . 
+                    '"' . $this->valueField . '", ' . 
+                    '"' . $this->timeField .  '"' . 
                 ')' . 
                 ' VALUES(' . 
-                    "'" . $this->db->addEscape($key) . "'," . 
-                    "'" . $this->db->addEscape($value) . "'," . 
+                    "'" . $this->db->escapeString($key) . "'," . 
+                    "'" . $this->db->escapeString($value) . "'," . 
                     "'" . time() . "'" . 
                 ')';
-        return $this->db->query($sql);
+        return $this->db->exec($sql);
     }
     
     /**
@@ -152,9 +152,9 @@ class CacheMysqlStorage implements CacheStorageInterface
      */
     public function delete(string $key): bool
     {
-        $sql =  'DELETE FROM #__' . $this->table . 
-                " WHERE `" . $this->keyField . "`='" . $this->db->addEscape($key) . "'";
-        return $this->db->query($sql);
+        $sql =  'DELETE FROM "' . $this->table . '"' . 
+                ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
+        return $this->db->exec($sql);
     }
     
     /**
@@ -163,8 +163,9 @@ class CacheMysqlStorage implements CacheStorageInterface
      */
     public function clear(): bool
     {
-        $sql =  'TRUNCATE #__' . $this->table;
-        return $this->db->query($sql);
+        $sql =  'DELETE FROM "' . $this->table . '"';
+        //$sql2 =  'VACUUM'; too slow
+        return $this->db->exec($sql);
     }
     
     /**
@@ -181,8 +182,8 @@ class CacheMysqlStorage implements CacheStorageInterface
         }
         
         $minTime = time() - $tts;
-        $sql =  'DELETE FROM #__' . $this->table . 
-                " WHERE `" . $this->timeField . "`<'" . $minTime . "'";
-        return $this->db->query($sql);
+        $sql =  'DELETE FROM "' . $this->table . '"' . 
+                ' WHERE "' . $this->timeField . '"<' . "'" . $minTime . "'";
+        return $this->db->exec($sql);
     }
 }

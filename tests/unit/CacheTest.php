@@ -21,6 +21,59 @@ class CacheTest extends \Codeception\Test\Unit
     }
     
     // tests
+    protected function testCacheCases($cache)
+    {
+        $cache->clear();
+        
+        $this->assertEmpty($cache->get('any-key'));
+        $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
+        
+        $this->assertTrue($cache->set('any-key', 'any-value'));
+        $this->assertTrue($cache->has('any-key'));
+        $this->assertEquals('any-value', $cache->get('any-key'));
+        $this->assertEquals('any-value', $cache->get('any-key', 'default-value'));
+        
+        $this->assertTrue($cache->delete('any-key'));
+        $this->assertEmpty($cache->get('any-key'));
+        
+        $cache->set('any-key', 'any-value');
+        $this->assertTrue($cache->clear());
+        $this->assertEmpty($cache->get('any-key'));
+        
+        $this->assertTrue($cache->setMultiple([
+            'key1' => 'value1', 
+            'key2' => 'value2', 
+            'key3' => 'value3', 
+            'key4' => 'value4', 
+        ]));
+        $this->assertTrue($cache->has('key1'));
+        $this->assertEquals(
+            ['value3', 'value1', null], 
+            $cache->getMultiple(['key3', 'key1', 'key0'])
+        );
+        $this->assertEquals(
+            ['value2', 'default-value', 'default-value'], 
+            $cache->getMultiple(['key2', 'key-4', 'key-1'], 'default-value')
+        );
+        $this->assertTrue($cache->deleteMultiple(['key1', 'key2', 'key3', 'key4']));
+        $this->assertFalse($cache->has('key2'));
+        
+        $this->assertTrue($cache->expired('key-not-exists', 0));
+        $this->assertTrue($cache->expired('key-not-exists', PHP_INT_MAX));
+        $cache->set('key1', 'value1');
+        $this->assertFalse($cache->expired('key1', PHP_INT_MAX));
+        sleep(1);
+        $this->assertTrue($cache->expired('key1', 0));
+        $this->assertFalse($cache->expired('key1', 2));
+
+        $this->assertTrue($cache->deleteOutdated(100));
+        $this->assertTrue($cache->has('key1'));
+        $this->assertTrue($cache->deleteOutdated(0));
+        $this->assertFalse($cache->has('key1'));
+        
+        $cache->clear();
+    }
+    
     public function testCacheArrayStorage()
     {
         $config = new Config();
@@ -56,7 +109,7 @@ class CacheTest extends \Codeception\Test\Unit
         $this->assertTrue($cache->clear());
     }
     
-    public function testCacheFsStorage()
+    public function testCacheFilesStorage()
     {
         $cacheDir = 'c:/tmp/ufo-cache-test-dir';
         if (file_exists($cacheDir)) {
@@ -70,53 +123,19 @@ class CacheTest extends \Codeception\Test\Unit
         $config->cacheDir = $cacheDir;
         $cache = new Cache($config, new Debug());
         
-        $this->assertEmpty($cache->get('any-key'));
-        $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
+        $this->testCacheCases($cache);
         
-        $this->assertTrue($cache->set('any-key', 'any-value'));
-        $this->assertTrue($cache->has('any-key'));
-        $this->assertEquals('any-value', $cache->get('any-key'));
-        $this->assertEquals('any-value', $cache->get('any-key', 'default-value'));
-        
-        $this->assertTrue($cache->delete('any-key'));
-        $this->assertEmpty($cache->get('any-key'));
-        
-        $cache->set('any-key', 'any-value');
-        $this->assertTrue($cache->clear());
-        $this->assertEmpty($cache->get('any-key'));
-
-        $this->assertTrue($cache->setMultiple([
-            'key1' => 'value1', 
-            'key2' => 'value2', 
-            'key3' => 'value3', 
-            'key4' => 'value4', 
-        ]));
-        $this->assertTrue($cache->has('key1'));
-        $this->assertEquals(
-            ['value3', 'value1', null], 
-            $cache->getMultiple(['key3', 'key1', 'key0'])
-        );
-        $this->assertEquals(
-            ['value2', 'default-value', 'default-value'], 
-            $cache->getMultiple(['key2', 'key-4', 'key-1'], 'default-value')
-        );
-        $this->assertTrue($cache->deleteMultiple(['key1', 'key2', 'key3', 'key4']));
-        $this->assertFalse($cache->has('key2'));
-        
-        $this->assertTrue($cache->expired('key-not-exists', 0));
-        $this->assertTrue($cache->expired('key-not-exists', PHP_INT_MAX));
-        $cache->set('key1', 'value1');
-        $this->assertFalse($cache->expired('key1', PHP_INT_MAX));
-        sleep(1);
-        $this->assertTrue($cache->expired('key1', 0));
-        $this->assertFalse($cache->expired('key1', 2));
-
-        $this->assertTrue($cache->deleteOutdated(100));
-        $this->assertTrue($cache->has('key1'));
-        $this->assertTrue($cache->deleteOutdated(0));
-        $this->assertFalse($cache->has('key1'));
-        
-        $cache->clear();
         rmdir($cacheDir);
+    }
+    
+    public function testCacheSqliteStorage()
+    {
+        $config = new Config();
+        $config->cacheType = Config::CACHE_TYPE_SQLITE;
+        $config->rootPath = '';
+        $config->cacheDir = __DIR__;
+        $cache = new Cache($config, new Debug());
+        
+        $this->testCacheCases($cache);
     }
 }

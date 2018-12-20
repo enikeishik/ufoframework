@@ -49,15 +49,16 @@ class Cache implements CacheInterface
                 $this->storage = new CacheFilesStorage($this->config);
                 break;
             
-            // case $this->config::CACHE_TYPE_MYSQL:
-                // $this->storage = new CacheMysqlStorage($this->config);
-                // break;
+            case $this->config::CACHE_TYPE_SQLITE:
+                $this->storage = new CacheSqliteStorage($this->config);
+                break;
             
+            // case $this->config::CACHE_TYPE_MEMCACHED:
+                // break;
             // case $this->config::CACHE_TYPE_REDIS:
                 // break;
-            // case $this->config::CACHE_TYPE_SQLITE:
-                // break;
-            // case $this->config::CACHE_TYPE_MEMCACHED:
+            // case $this->config::CACHE_TYPE_MYSQL:
+                // $this->storage = new CacheMysqlStorage($this->config);
                 // break;
             
             case $this->config::CACHE_TYPE_ARRAY:
