@@ -29,7 +29,7 @@ class AppTest extends \Codeception\Test\Unit
         $config->widgetsStorageData = require 'WidgetsStorageData.php';
         
         $_GET['path'] = '/qwe/asd';
-        $result = $app->compose($app->parse());
+        $result = $app->compose($app->parse($app->getPath()));
         $this->assertNotNull($result);
         $this->assertEquals([], $result->getHeaders());
         $this->assertNotEquals('', $result->getView()->render());

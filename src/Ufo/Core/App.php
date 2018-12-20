@@ -9,6 +9,8 @@
 
 namespace Ufo\Core;
 
+use Ufo\Cache\Cache;
+use Ufo\Cache\CacheStorageNotSupportedException;
 use Ufo\Modules\Controller;
 use Ufo\Modules\Renderable;
 use Ufo\Modules\RenderableInterface;
@@ -67,21 +69,47 @@ class App
      */
     public function execute(): void
     {
+        $path = '';
+        
         try {
-            $result = $this->compose($this->parse());
+            $path = $this->getPath();
+            
+            try {
+                $this->setCache();
+            } catch (CacheStorageNotSupportedException $e) {
+                $this->cache = null;
+                $this->config->cacheType = Config::CACHE_TYPE_ARRAY;
+                $this->setCache();
+            }
+            
+            if (!$this->cache->expired($path, $this->config->cacheTtlWholePage)) {
+                $result = $this->getCacheResult($this->cache->get($path));
+            } else {
+                $result = $this->compose($this->parse($path));
+            }
+            
         } catch (BadPathException $e) {
             $result = $this->getError(500, 'Bad path');
+            
         } catch (DbConnectException $e) {
-            //cache
-            $result = $this->getError(500, 'DataBase connection error');
+            if ($this->cache->has($path)) {
+                $result = $this->getCacheResult($this->cache->get($path));
+            } else {
+                $result = $this->getError(500, 'DataBase connection error');
+            }
+            
         } catch (SectionNotExistsException $e) {
             $result = $this->getError(404, 'Section not exists');
+            
         } catch (SectionDisabledException $e) {
             $result = $this->getError(403, 'Section disabled');
+            
         } catch (ModuleDisabledException $e) {
             $result = $this->getError(403, 'Section module disabled');
+            
         } catch (Exception $e) {
             $result = $this->getError(500, 'Unexpected exception');
+            
         }
         
         $this->sendHeaders($result->getHeaders());
@@ -90,23 +118,27 @@ class App
     }
     
     /**
+     * @return string
+     * @throws BadPathException
+     */
+    public function getPath(): string
+    {
+        if (empty($_GET['path']) || '/' == $_GET['path']) {
+            return '/';
+        } elseif (Tools::isPath($_GET['path'])) {
+            return $_GET['path'];
+        }
+        throw new BadPathException();
+    }
+    
+    /**
+     * @param string $path
      * @return \Ufo\Core\Section
-     * @throws \Ufo\Core\BadPathException
      * @throws \Ufo\Core\DbConnectException
      * @throws \Ufo\Core\SectionNotExistsException
      */
-    public function parse(): Section
+    public function parse(string $path): Section
     {
-        $path = $this->getPath();
-        if (null === $path) {
-            throw new BadPathException();
-        }
-        
-        //cache
-        if (false) {
-            //return chache->getResult ?
-        }
-        
         if ($this->config->routeStorageType == $this->config::STORAGE_TYPE_DB) {
             $this->setDb();
         }
@@ -236,18 +268,6 @@ class App
     }
     
     /**
-     * @return string|null
-     */
-    protected function getPath(): ?string
-    {
-        if (empty($_GET['path']) || '/' == $_GET['path']) {
-            return '/';
-        } else {
-            return Tools::isPath($_GET['path']) ? $_GET['path'] : null;
-        }
-    }
-    
-    /**
      * @return \Ufo\Core\RouteStorageInterface
      * @throws \Ufo\Core\RouteStorageNotSetException
      */
@@ -282,6 +302,27 @@ class App
     }
     
     /**
+     * @return void
+     * @throws \Ufo\Cache\CacheStorageNotSupportedException
+     */
+    protected function setCache(): void
+    {
+        if (null !== $this->cache) {
+            return;
+        }
+        $this->cache = new Cache($this->config, $this->debug);
+    }
+    
+    /**
+     * @param string $value
+     * @return \Ufo\Core\Result
+     */
+    protected function getCacheResult(string $value): Result
+    {
+        return new Result(new Renderable($value));
+    }
+    
+    /**
      * @param array $options = []
      * @return \Ufo\Core\ContainerInterface
      */
@@ -291,6 +332,7 @@ class App
             'debug'     => $this->debug, 
             'config'    => $this->config, 
             'db'        => $this->db, 
+            'cache'     => $this->cache, 
             'app'       => $this, 
         ];
         return new Container(array_merge($di, $options));

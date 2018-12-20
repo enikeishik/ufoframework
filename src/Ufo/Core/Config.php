@@ -79,6 +79,18 @@ class Config extends Struct implements ConfigInterface
     public $cacheType = 'files';
     
     /**
+     * Cache TTL for whole page content.
+     * @var int
+     */
+    public $cacheTtlWholePage = 3;
+    
+    /**
+     * Cache TTL for widgets.
+     * @var int
+     */
+    public $cacheTtlWidget = 30;
+    
+    /**
      * Path to cache dir.
      * @var string
      */

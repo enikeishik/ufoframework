@@ -30,7 +30,7 @@ class CacheFilesStorage implements CacheStorageInterface
     /**
      * @var string
      */
-    protected $cacheDir = '';
+    protected $cacheDir = '/cache';
     
     /**
      * @param \Ufo\Core\Config $config
