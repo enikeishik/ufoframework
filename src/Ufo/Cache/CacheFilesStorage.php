@@ -100,7 +100,7 @@ class CacheFilesStorage implements CacheStorageInterface
             }
         }
         
-        if (!$handle = fopen($cacheFile, 'w')) {
+        if (!$handle = @fopen($cacheFile, 'w')) {
             return false;
         }
         

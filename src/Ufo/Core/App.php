@@ -14,6 +14,7 @@ use Ufo\Cache\CacheStorageNotSupportedException;
 use Ufo\Modules\Controller;
 use Ufo\Modules\Renderable;
 use Ufo\Modules\RenderableInterface;
+use Ufo\Modules\ViewInterface;
 use Ufo\Routing\Route;
 use Ufo\Routing\RouteArrayStorage;
 use Ufo\Routing\RouteDbStorage;
@@ -53,6 +54,11 @@ class App
      * @var \Ufo\Core\Db
      */
     protected $db = null;
+    
+    /**
+     * @var string
+     */
+    protected $path = '';
     
     /**
      * @param \Ufo\Core\ConfigInterface $config
@@ -123,12 +129,19 @@ class App
      */
     public function getPath(): string
     {
-        if (empty($_GET['path']) || '/' == $_GET['path']) {
-            return '/';
-        } elseif (Tools::isPath($_GET['path'])) {
-            return $_GET['path'];
+        if (!empty($this->path)) {
+            return $this->path;
         }
-        throw new BadPathException();
+        
+        if (empty($_GET['path']) || '/' == $_GET['path']) {
+            $this->path = '/';
+        } elseif (Tools::isPath($_GET['path'])) {
+            $this->path = $_GET['path'];
+        } else {
+            throw new BadPathException();
+        }
+        
+        return $this->path;
     }
     
     /**
@@ -201,13 +214,18 @@ class App
     public function render(RenderableInterface $view): void
     {
         //some middleware can change response here
-        //@ob_end_clean(); echo PHP_EOL; //to display output in codeception tests
         
-        echo $view->render();
-        
-        echo PHP_EOL; //to display output in codeception tests
-        
-        //cache
+        if ($view instanceof ViewInterface) {
+            $content = $view->render();
+            echo $content;
+            $this->cache->set(
+                $this->getPath(), 
+                $content, 
+                $this->config->cacheTtlWholePage
+            );
+        } else {
+            echo $view->render();
+        }
     }
     
     /**
