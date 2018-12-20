@@ -19,11 +19,6 @@ use Ufo\Core\TypeNotSupportedException;
 class Cache implements CacheInterface
 {
     /**
-     * @var \Ufo\Core\Db
-     */
-    protected static $instance = null;
-    
-    /**
      * @var \Ufo\Core\Config
      */
     protected $config = null;
@@ -37,41 +32,32 @@ class Cache implements CacheInterface
      * @var \Ufo\Cache\CacheStorageInterface
      */
     protected $storage = null;
-     
-    /**
-     * Implementation of singleton pattern.
-     * @param \Ufo\Core\Config $config
-     * @param \Ufo\Core\DebugInterface $debug = null
-     * @return \Ufo\Core\Db
-     */
-    public static function getInstance(Config $config, DebugInterface $debug = null): Cache
-    {
-        if (null === static::$instance) {
-            static::$instance = new static($config, $debug);
-        }
-        
-        return static::$instance;
-    }
     
     /**
      * @param \Ufo\Core\Config $config
-     * @return void
+     * @param \Ufo\Core\DebugInterface $debug = null
      * @throws CacheStorageNotSupportedException
      */
-    public function overrideStorage(Config $config): void
+    public function __construct(Config $config, DebugInterface $debug = null)
     {
         $this->config = $config;
+        $this->debug = $debug;
         
         switch ($this->config->cacheType) {
             
-            case $this->config::CACHE_TYPE_FS:
-                $this->storage = new CacheFsStorage($this->config);
+            case $this->config::CACHE_TYPE_FILES:
+                $this->storage = new CacheFilesStorage($this->config);
                 break;
             
-            case $this->config::CACHE_TYPE_DB:
-                break;
+            // case $this->config::CACHE_TYPE_MYSQL:
+                // $this->storage = new CacheMysqlStorage($this->config);
+                // break;
             
             // case $this->config::CACHE_TYPE_REDIS:
+                // break;
+            // case $this->config::CACHE_TYPE_SQLITE:
+                // break;
+            // case $this->config::CACHE_TYPE_MEMCACHED:
                 // break;
             
             case $this->config::CACHE_TYPE_ARRAY:
@@ -81,17 +67,6 @@ class Cache implements CacheInterface
             default:
                 throw new CacheStorageNotSupportedException();
         }
-    }
-    
-    /**
-     * @param \Ufo\Core\Config $config
-     * @param \Ufo\Core\DebugInterface $debug = null
-     * @throws CacheStorageNotSupportedException
-     */
-    protected function __construct(Config $config, DebugInterface $debug = null)
-    {
-        $this->debug = $debug;
-        $this->overrideStorage($config);
     }
     
     /**
@@ -219,7 +194,6 @@ class Cache implements CacheInterface
             return true;
         }
         
-        //var_dump($this->storage->getAge($key)); exit();
         return $ttl < $this->storage->getAge($key);
     }
     
@@ -232,13 +206,5 @@ class Cache implements CacheInterface
     public function deleteOutdated($tts): bool
     {
         return $this->storage->deleteOutdated($tts);
-    }
-    
-    protected function __clone()
-    {
-    }
-    
-    private function __wakeup()
-    {
     }
 }

@@ -24,9 +24,8 @@ class CacheTest extends \Codeception\Test\Unit
     public function testCacheArrayStorage()
     {
         $config = new Config();
-        $config->cacheType = 'array';
-        $cache = Cache::getInstance($config, new Debug());
-        $cache->overrideStorage($config);
+        $config->cacheType = Config::CACHE_TYPE_ARRAY;
+        $cache = new Cache($config, new Debug());
         
         $this->assertEmpty($cache->get('any-key'));
         $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
@@ -60,14 +59,16 @@ class CacheTest extends \Codeception\Test\Unit
     public function testCacheFsStorage()
     {
         $cacheDir = 'c:/tmp/ufo-cache-test-dir';
+        if (file_exists($cacheDir)) {
+            rmdir($cacheDir);
+        }
         mkdir($cacheDir);
         
         $config = new Config();
-        $config->cacheType = 'fs';
+        $config->cacheType = Config::CACHE_TYPE_FILES;
         $config->rootPath = '';
         $config->cacheDir = $cacheDir;
-        $cache = Cache::getInstance($config, new Debug());
-        $cache->overrideStorage($config);
+        $cache = new Cache($config, new Debug());
         
         $this->assertEmpty($cache->get('any-key'));
         $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));

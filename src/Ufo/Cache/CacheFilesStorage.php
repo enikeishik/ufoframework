@@ -13,9 +13,9 @@ use Ufo\Core\Config;
 use Ufo\Core\DebugInterface;
 
 /**
- * Cache filesystem based storage.
+ * Cache files based storage.
  */
-class CacheFsStorage implements CacheStorageInterface
+class CacheFilesStorage implements CacheStorageInterface
 {
     /**
      * @var \Ufo\Core\Config
@@ -68,7 +68,7 @@ class CacheFsStorage implements CacheStorageInterface
     }
     
     /**
-     * Fetches a values age from the cache.
+     * Fetches a value age from the cache.
      * @param string $key
      * @return int
      */

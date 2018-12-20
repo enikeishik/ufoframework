@@ -16,7 +16,7 @@ use Ufo\Core\DebugInterface;
 /**
  * Cache database based storage.
  */
-class CacheDbStorage implements CacheStorageInterface
+class CacheMysqlStorage implements CacheStorageInterface
 {
     /**
      * @var \Ufo\Core\Config
@@ -98,7 +98,7 @@ class CacheDbStorage implements CacheStorageInterface
     }
     
     /**
-     * Fetches a values age from the cache.
+     * Fetches a value age from the cache.
      * @param string $key
      * @return int
      */

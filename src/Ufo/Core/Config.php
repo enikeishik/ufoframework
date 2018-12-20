@@ -18,9 +18,11 @@ class Config extends Struct implements ConfigInterface
     public const STORAGE_TYPE_DB = 'db';
     
     public const CACHE_TYPE_ARRAY = 'array';
-    public const CACHE_TYPE_FS = 'fs';
-    public const CACHE_TYPE_DB = 'db';
+    public const CACHE_TYPE_FILES = 'files';
+    public const CACHE_TYPE_MYSQL = 'mysql';
+    public const CACHE_TYPE_SQLITE = 'sqlite';
     public const CACHE_TYPE_REDIS = 'redis';
+    public const CACHE_TYPE_MEMCACHED = 'memcached';
     
     /**
      * Type of routes storage.
@@ -42,7 +44,7 @@ class Config extends Struct implements ConfigInterface
     
     /**
      * Type of widgets storage.
-     * @var string 'array', 'db'
+     * @var string STORAGE_TYPE_*
      */
     public $widgetsStorageType = 'array';
     
@@ -72,9 +74,9 @@ class Config extends Struct implements ConfigInterface
     
     /**
      * Cache storage type.
-     * @var string 'array', 'fs', 'db', 'redis'
+     * @var string CACHE_TYPE_*
      */
-    public $cacheType = 'fs';
+    public $cacheType = 'files';
     
     /**
      * Path to cache dir.

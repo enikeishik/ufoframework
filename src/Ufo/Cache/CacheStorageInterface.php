@@ -29,7 +29,7 @@ interface CacheStorageInterface
     public function get(string $key);
     
     /**
-     * Fetches a values age from the cache.
+     * Fetches a value age from the cache.
      * @param string $key
      * @return int
      */
