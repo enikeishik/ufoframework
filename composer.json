@@ -3,7 +3,7 @@
     "type": "project",
     "description": "UFO Framework.",
     "homepage": "https://github.com/enikeishik/ufoframework",
-    "license": "GPL-3",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Enikeishik",

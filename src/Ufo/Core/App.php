@@ -71,6 +71,7 @@ class App
     }
     
     /**
+     * Application main workflow.
      * @return void
      */
     public function execute(): void
