@@ -4,10 +4,10 @@ sudo: required
 php:
   - '7.2'
   - '7.3'
+before_script:
+  - composer install
 script:
   - php -v
   - phpunit --version
-  - cd tests; php codecept.phar --version; cd ..
-  - cd tests
-  - php codecept.phar run unit
-  - cd ..
+  - vendor/bin/codecept --version
+  - vendor/bin/codecept run unit
