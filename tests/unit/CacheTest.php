@@ -111,7 +111,11 @@ class CacheTest extends \Codeception\Test\Unit
     
     public function testCacheFilesStorage()
     {
-        $cacheDir = 'c:/tmp/ufo-cache-test-dir';
+        if (strcasecmp(substr(PHP_OS, 0, 3), 'WIN') === 0) {
+            $cacheDir = 'c:/tmp/ufo-cache-test-dir';
+        } else {
+            $cacheDir = '/tmp/ufo-cache-test-dir';
+        }
         if (file_exists($cacheDir)) {
             rmdir($cacheDir);
         }
