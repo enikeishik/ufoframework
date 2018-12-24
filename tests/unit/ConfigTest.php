@@ -42,5 +42,16 @@ class ConfigTest extends \Codeception\Test\Unit
         $this->assertTrue(property_exists($config, 'testVarName1'));
         $this->assertEquals($config->test1, 7);
         $this->assertEquals($config->testVarName1, 'test var name 1');
+        $this->assertEquals($config->typedVal1, 1);
+        $this->assertFalse($config->typedVal1 === '1');
+        $this->assertTrue($config->typedVal1 === 1);
+        $this->assertEquals($config->typedValOn, true);
+        $this->assertEquals($config->typedValYes, true);
+        $this->assertEquals($config->typedValOff, false);
+        $this->assertEquals($config->typedValNo, false);
+        $this->assertTrue($config->typedVal15 === 1.5);
+        $this->assertTrue($config->typedValStr === 'str');
+        $this->assertTrue($config->typedValStrnum === '123');
+        $this->assertTrue($config->typedValNum === 123);
     }
 }
