@@ -11,6 +11,7 @@ namespace Ufo\Cache;
 
 use Ufo\Core\Config;
 use Ufo\Core\DebugInterface;
+use Ufo\Core\TypeNotSupportedException;
 
 /**
  * Cache files based storage.
@@ -163,7 +164,7 @@ class CacheFilesStorage implements CacheStorageInterface
      */
     public function deleteOutdated($tts): bool
     {
-        if ($tts instanceof DateInterval) {
+        if ($tts instanceof \DateInterval) {
             throw new TypeNotSupportedException();
         }
         
@@ -210,7 +211,7 @@ class CacheFilesStorage implements CacheStorageInterface
         if ('' == $key) {
             return 'empty,' . time();
         } elseif (preg_match('/[^A-Za-z0-9~_,\.\/\-]|(\.{2})/', $key)) {
-            return md5($hash);
+            return md5($key);
         }
         return str_replace('/', ',', $key);
     }

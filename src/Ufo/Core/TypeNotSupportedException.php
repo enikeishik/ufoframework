@@ -9,7 +9,7 @@
 
 namespace Ufo\Core;
 
-class TypeNotSupportedException extends Exception
+class TypeNotSupportedException extends \Exception
 {
     //
 }

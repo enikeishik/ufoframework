@@ -12,6 +12,7 @@ namespace Ufo\Cache;
 use Ufo\Core\Config;
 use Ufo\Core\Db;
 use Ufo\Core\DebugInterface;
+use Ufo\Core\TypeNotSupportedException;
 
 /**
  * Cache database based storage.
@@ -127,7 +128,7 @@ class CacheSqliteStorage implements CacheStorageInterface
      */
     public function set(string $key, $value, $ttl = null, $tts = null): bool
     {
-        if ($ttl instanceof DateInterval || $tts instanceof DateInterval) {
+        if ($ttl instanceof \DateInterval || $tts instanceof \DateInterval) {
             throw new TypeNotSupportedException();
         }
         
@@ -177,7 +178,7 @@ class CacheSqliteStorage implements CacheStorageInterface
      */
     public function deleteOutdated($tts): bool
     {
-        if ($tts instanceof DateInterval) {
+        if ($tts instanceof \DateInterval) {
             throw new TypeNotSupportedException();
         }
         

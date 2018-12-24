@@ -28,7 +28,7 @@ class RouteDbStorage extends RouteStorage
     {
         $sql = 'SELECT m.id, m.disabled, m.name FROM #__sections AS s' . 
                ' INNER JOIN #__modules AS m ON s.module_id = m.id' . 
-               " WHERE s.path IN('" . implode("','", $paths) . "')" . 
+               " WHERE s.path IN('" . implode("','", $path) . "')" . 
                ' ORDER BY s.path DESC' . 
                ' LIMIT 1';
         $item = $this->db->getItem($sql);
@@ -52,7 +52,7 @@ class RouteDbStorage extends RouteStorage
     
     protected function getSection(string $path, array $item): Section
     {
-        $item['dbless'] => false;
+        $item['dbless'] = false;
         $item['callback'] = ''; //to prevent hack by SQL injection
         
         return new Section(array_merge(['path' => $path], $item));

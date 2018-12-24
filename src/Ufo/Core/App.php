@@ -114,7 +114,7 @@ class App
         } catch (ModuleDisabledException $e) {
             $result = $this->getError(403, 'Section module disabled');
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $result = $this->getError(500, 'Unexpected exception');
             
         }

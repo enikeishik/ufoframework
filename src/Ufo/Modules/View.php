@@ -126,7 +126,7 @@ class View extends DIObject implements ViewInterface
                 $this->section->module->name ?? '', 
                 $this->template
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->handleRenderException($e, $obLevel);
         }
         
@@ -181,7 +181,7 @@ class View extends DIObject implements ViewInterface
      * @return void
      * @throws \Exception
      */
-    protected function handleRenderException(Exception $e, $obLevel)
+    protected function handleRenderException(\Exception $e, $obLevel)
     {
         while (ob_get_level() > $obLevel) {
             ob_end_clean();

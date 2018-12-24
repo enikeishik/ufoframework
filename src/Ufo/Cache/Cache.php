@@ -187,7 +187,7 @@ class Cache implements CacheInterface
      */
     public function expired(string $key, $ttl): bool
     {
-        if ($ttl instanceof DateInterval) {
+        if ($ttl instanceof \DateInterval) {
             throw new TypeNotSupportedException();
         }
         
