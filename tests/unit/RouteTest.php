@@ -9,7 +9,7 @@ class RouteTest extends \Codeception\Test\Unit
     // tests
     public function testRouteParse()
     {
-        $routeStorageData = require 'RouteStorageData.php';
+        $routeStorageData = require dirname(__DIR__) . '/_data/RouteStorageData.php';
         $section = Route::parse('/qwe/asd', new RouteArrayStorage($routeStorageData));
         $this->assertNotNull($section);
         $this->assertEquals('/qwe/asd', $section->path);

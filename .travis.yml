@@ -1,0 +1,13 @@
+language: php
+dist: trusty
+sudo: required
+php:
+  - '7.2'
+  - '7.3'
+script:
+  - php -v
+  - phpunit --version
+  - cd tests; php codecept.phar --version; cd ..
+  - cd tests
+  - php codecept.phar run unit
+  - cd ..

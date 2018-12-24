@@ -133,7 +133,7 @@ class CacheTest extends \Codeception\Test\Unit
         $config = new Config();
         $config->cacheType = Config::CACHE_TYPE_SQLITE;
         $config->rootPath = '';
-        $config->cacheDir = __DIR__;
+        $config->cacheDir = dirname(__DIR__) . '/_data';
         $cache = new Cache($config, new Debug());
         
         $this->testCacheCases($cache);
