@@ -21,10 +21,15 @@ abstract class DIObject implements DIObjectInterface
     
     /**
      * @param \Ufo\Core\ContainerInterface $container
+     * @param bool $dontUnpack = false
+     * @return void
      */
-    public function inject(ContainerInterface $container): void
+    public function inject(ContainerInterface $container, bool $dontUnpack = false): void
     {
         $this->container = $container;
+        if (!$dontUnpack) {
+            $this->unpackContainer();
+        }
     }
     
     /**

@@ -43,15 +43,6 @@ class Controller extends DIObject implements ControllerInterface
     protected $data = [];
     
     /**
-     * @param \Ufo\Core\ContainerInterface $container
-     */
-    public function inject(ContainerInterface $container): void
-    {
-        parent::inject($container);
-        $this->unpackContainer();
-    }
-    
-    /**
      * Main controller method, compose all content.
      * @param \Ufo\Core\Section $section = null
      * @return \Ufo\Core\Result

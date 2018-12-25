@@ -34,13 +34,4 @@ class Model extends DIObject //implements ModelInterface
      * @var \Ufo\Core\Section
      */
     protected $section;
-    
-    /**
-     * @param \Ufo\Core\ContainerInterface $container
-     */
-    public function inject(ContainerInterface $container): void
-    {
-        parent::inject($container);
-        $this->unpackContainer();
-    }
 }
