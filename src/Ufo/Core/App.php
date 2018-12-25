@@ -11,7 +11,7 @@ namespace Ufo\Core;
 
 use Ufo\Cache\Cache;
 use Ufo\Cache\CacheStorageNotSupportedException;
-use Ufo\Modules\Controller;
+use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
 use Ufo\Modules\RenderableInterface;
 use Ufo\Modules\ViewInterface;
@@ -193,7 +193,9 @@ class App
         }
         
         $controller = $this->getModuleController($section->module);
-        $controller->inject($this->getContainer());
+        if ($controller instanceof DIObjectInterface) {
+            $controller->inject($this->getContainer());
+        }
         
         return $controller->compose($section);
     }
@@ -360,10 +362,10 @@ class App
     
     /**
      * @param \Ufo\Core\Moule $module
-     * @return \Ufo\Modules\Controller
+     * @return \Ufo\Modules\ControllerInterface
      * @throws \Ufo\Core\ControllerNotSetException
      */
-    protected function getModuleController(Module $module): Controller
+    protected function getModuleController(Module $module): ControllerInterface
     {
         $controllerClass = $module->callback;
         if (empty($controllerClass) || false === strpos($controllerClass, '\\')) {
