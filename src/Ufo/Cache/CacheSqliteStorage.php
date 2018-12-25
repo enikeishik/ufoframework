@@ -68,7 +68,7 @@ class CacheSqliteStorage implements CacheStorageInterface
         $this->config = $config;
         $this->debug = $debug;
         
-        $this->db = new \SQLite3($this->config->rootPath . $this->config->cacheDir . '/' . $this->base);
+        $this->db = new \SQLite3($this->config->projectPath . $this->config->cacheDir . '/' . $this->base);
     }
     
     public function __destruct()

@@ -41,7 +41,7 @@ class CacheFilesStorage implements CacheStorageInterface
     {
         $this->config = $config;
         $this->debug = $debug;
-        $this->cacheDir =  $this->config->rootPath . $this->config->cacheDir;
+        $this->cacheDir =  $this->config->projectPath . $this->config->cacheDir;
     }
     
     /**
