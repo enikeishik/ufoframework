@@ -24,13 +24,4 @@ abstract class WidgetsStorage extends DIObject implements WidgetsStorageInterfac
      * @var \Ufo\Core\DebugInterface
      */
     protected $debug;
-    
-    /**
-     * @param \Ufo\Core\ContainerInterface $container
-     */
-    public function inject(ContainerInterface $container): void
-    {
-        parent::inject($container);
-        $this->unpackContainer();
-    }
 }
