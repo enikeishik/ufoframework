@@ -67,15 +67,6 @@ class View extends DIObject implements ViewInterface
     }
     
     /**
-     * @param \Ufo\Core\ContainerInterface $container
-     */
-    public function inject(ContainerInterface $container): void
-    {
-        parent::inject($container);
-        $this->unpackContainer();
-    }
-    
-    /**
      * @param string $template
      * @return void
      */
