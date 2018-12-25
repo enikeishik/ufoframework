@@ -43,18 +43,4 @@ class Model extends DIObject //implements ModelInterface
         parent::inject($container);
         $this->unpackContainer();
     }
-    
-    /**
-     * Some model method.
-     * @return array
-     */
-    public function getItems(): array
-    {
-        return [
-            ['id' => 1, 'title' => 'first item title', 'text' => 'first item text'], 
-            ['id' => 2, 'title' => 'second item title', 'text' => 'second item text', 'disabled' => true], 
-            ['id' => 3, 'title' => 'third item title', 'text' => 'third item text'], 
-            ['id' => 4, 'title' => 'fourth item title', 'text' => 'fourth item text'], 
-        ];
-    }
 }
