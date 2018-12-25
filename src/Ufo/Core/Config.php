@@ -61,18 +61,6 @@ class Config extends Struct implements ConfigInterface
     public $widgetsStorageData = [];
     
     /**
-     * Path to site root.
-     * @var string
-     */
-    public $rootPath = '';
-    
-    /**
-     * Path to site root for URL, sets from $rootPath.
-     * @var string
-     */
-    public $rootUrl = '';
-    
-    /**
      * Cache enabled flag.
      * @var bool
      */
@@ -101,6 +89,23 @@ class Config extends Struct implements ConfigInterface
      * @var string
      */
     public $cacheDir = '/cache';
+    
+    /**
+     * Path to site root.
+     * @var string
+     */
+    public $rootPath = '';
+    
+    /**
+     * Path to site root for URL, sets from $rootPath.
+     * @var string
+     */
+    public $rootUrl = '';
+    
+    /**
+     * Path to project root (usually its parent for site root).
+     */
+    public $projectPath = '';
     
     /**
      * Path to templates root.
@@ -139,6 +144,7 @@ class Config extends Struct implements ConfigInterface
     {
         $this->rootUrl = $this->rootPath;
         $this->rootPath = $_SERVER['DOCUMENT_ROOT'] . $this->rootPath;
+        $this->projectPath = dirname($_SERVER['DOCUMENT_ROOT']);
         parent::__construct($vars, $cast);
     }
     

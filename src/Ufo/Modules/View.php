@@ -122,7 +122,7 @@ class View extends DIObject implements ViewInterface
         
         try {
             include $this->findView(
-                $this->config->rootPath . $this->config->templatesPath, 
+                $this->config->projectPath . $this->config->templatesPath, 
                 $this->section->module->name ?? '', 
                 $this->template
             );
