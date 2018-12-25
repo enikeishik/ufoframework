@@ -81,15 +81,16 @@ class App
         try {
             $path = $this->getPath();
             
-            try {
-                $this->setCache();
-            } catch (CacheStorageNotSupportedException $e) {
-                $this->cache = null;
-                $this->config->cacheType = Config::CACHE_TYPE_ARRAY;
-                $this->setCache();
+            if ($this->config->cache) {
+                try {
+                    $this->setCache();
+                } catch (CacheStorageNotSupportedException $e) {
+                    $this->cache = null;
+                }
             }
             
-            if (!$this->cache->expired($path, $this->config->cacheTtlWholePage)) {
+            if (null !== $this->cache 
+            && !$this->cache->expired($path, $this->config->cacheTtlWholePage)) {
                 $result = $this->getCacheResult($this->cache->get($path));
             } else {
                 $result = $this->compose($this->parse($path));
@@ -99,7 +100,7 @@ class App
             $result = $this->getError(500, 'Bad path');
             
         } catch (DbConnectException $e) {
-            if ($this->cache->has($path)) {
+            if (null !== $this->cache && $this->cache->has($path)) {
                 $result = $this->getCacheResult($this->cache->get($path));
             } else {
                 $result = $this->getError(500, 'DataBase connection error');
@@ -216,7 +217,7 @@ class App
     {
         //some middleware can change response here
         
-        if ($view instanceof ViewInterface) {
+        if (null !== $this->cache && $view instanceof ViewInterface) {
             $content = $view->render();
             echo $content;
             $this->cache->set(

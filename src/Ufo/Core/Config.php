@@ -73,6 +73,12 @@ class Config extends Struct implements ConfigInterface
     public $rootUrl = '';
     
     /**
+     * Cache enabled flag.
+     * @var bool
+     */
+    public $cache = false;
+    
+    /**
      * Cache storage type.
      * @var string CACHE_TYPE_*
      */
