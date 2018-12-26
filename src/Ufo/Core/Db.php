@@ -50,14 +50,23 @@ class Db extends \mysqli
     protected function __construct(DebugInterface $debug = null)
     {
         $this->debug = $debug;
+        if (null !== $this->debug) {
+            $this->debug->trace(__METHOD__);
+        }
         
         //подавляем вывод ошибок, т.к. иначе (даже при try-catch) выдается Warning
         @parent::__construct(C_DB_SERVER, C_DB_USER, C_DB_PASSWD, C_DB_NAME);
         if (0 != $this->connect_errno) {
+            if (null !== $this->debug) {
+                $this->debug->traceClose(null, $this->connect_errno, $this->connect_error);
+            }
             throw new DbConnectException(preg_replace('/[^a-z0-1\s\.\-;:,_~]+/i', '', $this->connect_error));
         }
         if ('' != C_DB_CHARSET) {
             $this->query('SET NAMES ' . C_DB_CHARSET);
+        }
+        if (null !== $this->debug) {
+            $this->debug->traceClose();
         }
     }
     
@@ -76,7 +85,7 @@ class Db extends \mysqli
                 return false;
             }
             $this->debug->trace($query);
-            $this->debug->trace();
+            $this->debug->traceClose();
             return false;
         }
         
@@ -87,9 +96,9 @@ class Db extends \mysqli
         $this->debug->trace($query);
         $result = parent::query($query);
         if (0 == $this->errno) {
-            $this->debug->trace();
+            $this->debug->traceClose();
         } else {
-            $this->debug->trace(null, $this->errno, $this->error);
+            $this->debug->traceClose(null, $this->errno, $this->error);
         }
         return $result;
     }

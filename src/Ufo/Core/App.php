@@ -46,6 +46,11 @@ class App
     protected $debug = null;
     
     /**
+     * @var array
+     */
+    protected $debugStack = [];
+    
+    /**
      * @var \Ufo\Cache\Cache
      */
     protected $cache = null;
@@ -131,6 +136,8 @@ class App
      */
     public function getPath(): string
     {
+        $this->debugTrace(__METHOD__);
+        
         if (!empty($this->path)) {
             return $this->path;
         }
@@ -143,6 +150,8 @@ class App
             throw new BadPathException();
         }
         
+        $this->debugTrace();
+        
         return $this->path;
     }
     
@@ -154,6 +163,8 @@ class App
      */
     public function parse(string $path): Section
     {
+        $this->debugTrace(__METHOD__);
+        
         if ($this->config->routeStorageType == $this->config::STORAGE_TYPE_DB) {
             $this->setDb();
         }
@@ -162,6 +173,8 @@ class App
         if (null === $section) {
             throw new SectionNotExistsException();
         }
+        
+        $this->debugTrace();
         
         return $section;
     }
@@ -192,10 +205,14 @@ class App
             return new Result(new Renderable($callback($this->getContainer(['section' => $section]))));
         }
         
+        $this->debugTrace(__METHOD__);
+        
         $controller = $this->getModuleController($section->module);
         if ($controller instanceof DIObjectInterface) {
             $controller->inject($this->getContainer());
         }
+        
+        $this->debugTrace();
         
         return $controller->compose($section);
     }
@@ -217,6 +234,8 @@ class App
      */
     public function render(RenderableInterface $view): void
     {
+        $this->debugTrace(__METHOD__);
+        
         //some middleware can change response here
         
         if (null !== $this->cache && $view instanceof ViewInterface) {
@@ -230,6 +249,8 @@ class App
         } else {
             echo $view->render();
         }
+        
+        $this->debugTrace();
     }
     
     /**
@@ -273,6 +294,12 @@ class App
     {
         if (null !== $this->db) {
             $this->db->close();
+        }
+        
+        if (null !== $this->debug && count($this->debugStack) > 0) {
+            for ($i = count($this->debugStack) - 1; $i >= 0; $i--) {
+                $this->debugTrace();
+            }
         }
         
         $headers = [];
@@ -380,5 +407,22 @@ class App
         }
         
         throw new ControllerNotSetException();
+    }
+    
+    /**
+     * @param string $operation = null
+     * @return void
+     */
+    protected function debugTrace(string $operation = null): void
+    {
+        if (null === $this->debug) {
+            return;
+        }
+        
+        if (null !== $operation) {
+            $this->debugStack[] = $this->debug->trace($operation);
+        } else {
+            $this->debug->traceClose(array_pop($this->debugStack));
+        }
     }
 }
