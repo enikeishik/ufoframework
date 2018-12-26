@@ -136,11 +136,11 @@ class App
      */
     public function getPath(): string
     {
-        $this->debugTrace(__METHOD__);
-        
         if (!empty($this->path)) {
             return $this->path;
         }
+        
+        $this->debugTrace(__METHOD__);
         
         if (empty($_GET['path']) || '/' == $_GET['path']) {
             $this->path = '/';
