@@ -1,3 +1,8 @@
+Application gets requested path [App::getPath] and find section corresponding it [App::parse - routing analogy].
+Each section handled by module, so application gets (from section) module info and call its controller, passing section as parameter (module can handle many sections) [App::compose].
+Module controller generate some data and wrap it into Result object, returning Result back to application.
+Result object contains (array of) headers and View object, wich implements RenderableInterface and can be rendered by application.
+Application send (to client) headers [App::sendHeaders] and render View [App::render].
 
     \Ufo\Core\App::__construct(\Ufo\Core\Config, \Ufo\Core\Debug)
         ::execute
