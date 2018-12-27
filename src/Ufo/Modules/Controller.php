@@ -38,6 +38,7 @@ class Controller extends DIObject implements ControllerInterface
     protected $debug;
     
     /**
+     * External data passed through DI.
      * @var array
      */
     protected $data = [];
@@ -50,27 +51,51 @@ class Controller extends DIObject implements ControllerInterface
     public function compose(Section $section = null): Result
     {
         $this->container->set('section', $section);
-        
-        if (0 == count($this->data)) {
-            $model = new Model();
-            $model->inject($this->container);
-            
-            $this->container->set('model', $model);
-            if (null !== $section) {
-                $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
-            }
-            
-            $this->data = [
-                'info'      => __METHOD__ . PHP_EOL . print_r($section, true), 
-                'title'     => $section->title, 
-                'items'     => $model->getItems(), 
-            ];
-        }
+        $this->setWidgets($section);
+        $this->setData($section);
         
         $view = new View($this->config->templateDefault, $this->data);
         $view->inject($this->container);
         
         return new Result($view);
+    }
+    
+    /**
+     * @param \Ufo\Core\Section $section = null
+     * @return void
+     */
+    protected function setData(Section $section = null): void
+    {
+        if (0 != count($this->data)) {
+            return;
+        }
+        
+        $model = new Model();
+        $model->inject($this->container);
+        $this->container->set('model', $model);
+        
+        $this->data['section'] = $section;
+        
+        foreach (get_class_methods($model) as $method) {
+            if (0 !== strpos($method, 'get')) {
+                continue;
+            }
+            
+            $this->data[strtolower(substr($method, 3))] = $model->$method();
+        }
+    }
+    
+    /**
+     * @param \Ufo\Core\Section $section = null
+     * @return void
+     */
+    protected function setWidgets(Section $section = null): void
+    {
+        if (0 != count($this->data) || null === $section) {
+            return;
+        }
+        
+        $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
     }
     
     /**
