@@ -1,7 +1,8 @@
 {
     "name": "enikeishik/ufoframework",
-    "type": "project",
-    "description": "UFO Framework.",
+    "type": "library",
+    "description": "UFO Framework is a PHP mini framework with small core and powerful modules.",
+    "keywords": ["ufo","framework","mini","web"],
     "homepage": "https://github.com/enikeishik/ufoframework",
     "license": "GPL-2.0-or-later",
     "authors": [
