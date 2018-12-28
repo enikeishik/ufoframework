@@ -27,6 +27,8 @@ class AppTest extends \Codeception\Test\Unit
         $app = new App($config, new Debug());
         $config->routeStorageData = require dirname(__DIR__) . '/_data/RouteStorageData.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/WidgetsStorageData.php';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
         
         $_GET['path'] = '/qwe/asd';
         $result = $app->compose($app->parse($app->getPath()));
