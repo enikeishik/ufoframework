@@ -11,9 +11,11 @@ namespace Ufo\Core;
 
 use Ufo\Cache\Cache;
 use Ufo\Cache\CacheStorageNotSupportedException;
+use Ufo\Modules\Controller;
 use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
 use Ufo\Modules\RenderableInterface;
+use Ufo\Modules\View;
 use Ufo\Modules\ViewInterface;
 use Ufo\Routing\Route;
 use Ufo\Routing\RouteArrayStorage;
@@ -200,21 +202,67 @@ class App
         
         //some middleware can change request params here
         
-        $callback = $section->module->callback;
-        if (is_callable($callback)) {
-            return new Result(new Renderable($callback($this->getContainer(['section' => $section]))));
-        }
-        
         $this->debugTrace(__METHOD__);
         
-        $controller = $this->getModuleController($section->module);
-        if ($controller instanceof DIObjectInterface) {
-            $controller->inject($this->getContainer());
+        $callback = $section->module->callback;
+        if (is_callable($callback)) {
+            $result = $this->composeCallback($callback, $section);
+            
+        } else {
+            $controller = $this->getModuleController($section->module);
+            if ($controller instanceof DIObjectInterface) {
+                $controller->inject($this->getContainer());
+            }
+            
+            $result = $controller->compose($section);
         }
         
         $this->debugTrace();
         
-        return $controller->compose($section);
+        return $this->composeWidgets($section, $result);
+    }
+    
+    /**
+     * @param callable $callback
+     * @param \Ufo\Core\Section $section
+     * @return \Ufo\Core\Result
+     */
+    public function composeCallback(callable $callback, Section $section): Result
+    {
+            $callbackResult = $callback($this->getContainer(['section' => $section]));
+            $callbackResult = is_array($callbackResult) ?: ['content' => $callbackResult];
+            
+            $controller = $this->getDefaultController();
+            
+            $container = $this->getContainer();
+            $container->set('data', array_merge($callbackResult, ['section' => $section]));
+            
+            $controller->inject($container);
+            
+            return $controller->compose($section);
+    }
+    
+    /**
+     * @param \Ufo\Core\Section $section
+     * @param \Ufo\Core\Result $result
+     * @return \Ufo\Core\Result
+     */
+    public function composeWidgets(Section $section, Result $result): Result
+    {
+        $this->debugTrace(__METHOD__);
+        
+        $view = $result->getView();
+        
+        $controller = $this->getDefaultController();
+        $controller->inject($this->getContainer());
+        
+        $view->setWidgets($controller->composeWidgets($this->getWidgets($section)));
+        
+        $result->setView($view);
+        
+        $this->debugTrace();
+        
+        return $result;
     }
     
     /**
@@ -390,7 +438,6 @@ class App
     /**
      * @param \Ufo\Core\Moule $module
      * @return \Ufo\Modules\ControllerInterface
-     * @throws \Ufo\Core\ControllerNotSetException
      */
     protected function getModuleController(Module $module): ControllerInterface
     {
@@ -398,15 +445,20 @@ class App
         if (empty($controllerClass) || false === strpos($controllerClass, '\\')) {
             $controllerClass = '\Ufo\Modules\\' . $module->name . '\Controller';
         }
-        if (!class_exists($controllerClass)) {
-            $controllerClass = '\Ufo\Modules\Controller'; //defaultController
-        }
         
         if (class_exists($controllerClass)) {
             return new $controllerClass();
         }
         
-        throw new ControllerNotSetException();
+        return $this->getDefaultController();
+    }
+    
+    /**
+     * @return \Ufo\Modules\Controller
+     */
+    protected function getDefaultController(): Controller
+    {
+        return new Controller();
     }
     
     /**

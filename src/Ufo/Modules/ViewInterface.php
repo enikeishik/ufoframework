@@ -35,10 +35,21 @@ interface ViewInterface extends RenderableInterface
      * @param array $data
      * @return void
      */
-    public function setData(string $data): void;
+    public function setData(array $data): void;
     
     /**
      * @return array
      */
     public function getData(): array;
+    
+    /**
+     * @param array $widgets
+     * @return void
+     */
+    public function setWidgets(array $widgets): void;
+    
+    /**
+     * @return array
+     */
+    public function getWidgets(): array;
 }

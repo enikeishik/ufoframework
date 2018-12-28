@@ -87,7 +87,7 @@ class View extends DIObject implements ViewInterface
      * @param array $data
      * @return void
      */
-    public function setData(string $data): void
+    public function setData(array $data): void
     {
         $this->data = $data;
     }
@@ -98,6 +98,23 @@ class View extends DIObject implements ViewInterface
     public function getData(): array
     {
         return $this->data;
+    }
+    
+    /**
+     * @param array $data
+     * @return void
+     */
+    public function setWidgets(array $widgets): void
+    {
+        $this->widgets = $widgets;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getWidgets(): array
+    {
+        return $this->widgets;
     }
     
     /**
@@ -124,6 +141,10 @@ class View extends DIObject implements ViewInterface
         return ob_get_clean();
     }
     
+    /**
+     * @param string $place
+     * @return string
+     */
     protected function renderWidgets(string $place): string
     {
         if (array_key_exists($place, $this->widgets)) {
@@ -133,6 +154,10 @@ class View extends DIObject implements ViewInterface
         return '';
     }
     
+    /**
+     * @param Result $widget
+     * @return string
+     */
     protected function renderWidget(Result $widget): string
     {
         return $widget->getView()->render();

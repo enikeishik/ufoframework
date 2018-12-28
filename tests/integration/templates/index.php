@@ -1,7 +1,6 @@
 <?php
 /**
  * @var \Ufo\Modules\View $this
- * @var array $items
  */
 
 ?><!DOCTYPE html>
@@ -12,7 +11,7 @@
 </head>
 <body>
 <h1><?=$section->title?></h1>
-<?=$info?>
+<?=($content??'')?>
 <?=$this->renderWidgets('left col top')?>
 </body>
 </html>

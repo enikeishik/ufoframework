@@ -15,7 +15,7 @@ use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
 use Ufo\Core\Result;
 use Ufo\Core\Section;
-use \Ufo\Modules\View;
+use Ufo\Modules\View;
 
 /**
  * Module level controller base class.
@@ -51,7 +51,6 @@ class Controller extends DIObject implements ControllerInterface
     public function compose(Section $section = null): Result
     {
         $this->container->set('section', $section);
-        $this->setWidgets($section);
         $this->setData($section);
         
         $view = new View($this->config->templateDefault, $this->data);
@@ -83,29 +82,6 @@ class Controller extends DIObject implements ControllerInterface
             
             $this->data[strtolower(substr($method, 3))] = $model->$method();
         }
-    }
-    
-    /**
-     * @param \Ufo\Core\Section $section = null
-     * @return void
-     */
-    protected function setWidgets(Section $section = null): void
-    {
-        if (0 != count($this->data) || null === $section) {
-            return;
-        }
-        
-        $this->container->set('widgets', $this->composeWidgets($this->getWidgets($section)));
-    }
-    
-    /**
-     * Returns widgets data grouped by place (place is a key).
-     * @param \Ufo\Core\Section $section
-     * @return array
-     */
-    public function getWidgets(Section $section): array
-    {
-        return $this->app->getWidgets($section);
     }
     
     /**
