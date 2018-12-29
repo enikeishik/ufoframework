@@ -230,7 +230,7 @@ class App
     public function composeCallback(callable $callback, Section $section): Result
     {
             $callbackResult = $callback($this->getContainer(['section' => $section]));
-            $callbackResult = is_array($callbackResult) ?: ['content' => $callbackResult];
+            $callbackResult = is_array($callbackResult) ? $callbackResult : ['content' => $callbackResult];
             
             $controller = $this->getDefaultController();
             
