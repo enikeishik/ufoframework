@@ -18,7 +18,7 @@ use Ufo\Core\Section;
 /**
  * Module level model base class.
  */
-class Model extends DIObject //implements ModelInterface
+class Model extends DIObject implements ModelInterface
 {
     /**
      * @var \Ufo\Core\Config
