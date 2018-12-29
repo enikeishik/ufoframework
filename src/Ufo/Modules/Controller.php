@@ -53,8 +53,7 @@ class Controller extends DIObject implements ControllerInterface
         $this->container->set('section', $section);
         $this->setData($section);
         
-        $view = new View($this->config->templateDefault, $this->data);
-        $view->inject($this->container);
+        $view = $this->getView();
         
         return new Result($view);
     }
@@ -69,8 +68,7 @@ class Controller extends DIObject implements ControllerInterface
             return;
         }
         
-        $model = new Model();
-        $model->inject($this->container);
+        $model = $this->getModel();
         $this->container->set('model', $model);
         
         $this->data['section'] = $section;
@@ -82,6 +80,26 @@ class Controller extends DIObject implements ControllerInterface
             
             $this->data[strtolower(substr($method, 3))] = $model->$method();
         }
+    }
+    
+    /**
+     * @return \Ufo\Modules\ModelInterface
+     */
+    protected function getModel(): ModelInterface
+    {
+        $model = new Model();
+        $model->inject($this->container);
+        return $model;
+    }
+    
+    /**
+     * @return \Ufo\Modules\ViewInterface
+     */
+    protected function getView(): ViewInterface
+    {
+        $view = new View($this->config->templateDefault, $this->data);
+        $view->inject($this->container);
+        return $view;
     }
     
     /**
