@@ -219,7 +219,11 @@ class App
         
         $this->debugTrace();
         
-        return $this->composeWidgets($section, $result);
+        if ($result->getView() instanceof ViewInterface) {
+            return $this->composeWidgets($section, $result);
+        }
+        
+        return $result;
     }
     
     /**
@@ -360,7 +364,8 @@ class App
                 $headers[] = 'Location: ' . $options['location'];
             } else {
                 $s = empty($_SERVER['HTTPS']) || 'off' == $_SERVER['HTTPS'] ? '' : 's';
-                $headers[] = 'Location: ' . 'http' . $s . '://' . $_SERVER['HTTP_HOST'] . $options['location'];
+                $host = empty($_SERVER['HTTP_HOST']) ? 'localhost' : $_SERVER['HTTP_HOST'];
+                $headers[] = 'Location: ' . 'http' . $s . '://' . $host . $options['location'];
             }
         }
         
