@@ -22,7 +22,7 @@ class Renderable implements RenderableInterface
     /**
      * @param string $content
      */
-    public function __construct(string $content)
+    public function __construct(string $content = '')
     {
         $this->content = $content;
     }
