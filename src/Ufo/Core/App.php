@@ -356,7 +356,12 @@ class App
         $headers[] = 'HTTP/1.0 ' . $errCode . ' ' . $errMessage;
         
         if ((301 == $errCode || 302 == $errCode) && !empty($options['location'])) {
-            $headers[] = 'Location: ' . $options['location'];
+            if (0 === strpos($options['location'], 'http')) {
+                $headers[] = 'Location: ' . $options['location'];
+            } else {
+                $s = empty($_SERVER['HTTPS']) || 'off' == $_SERVER['HTTPS'] ? '' : 's';
+                $headers[] = 'Location: ' . 'http' . $s . '://' . $_SERVER['HTTP_HOST'] . $options['location'];
+            }
         }
         
         $content = 'ERROR: (' . $errCode . ') ' . $errMessage . PHP_EOL;
