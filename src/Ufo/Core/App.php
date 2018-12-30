@@ -234,6 +234,9 @@ class App
     public function composeCallback(callable $callback, Section $section): Result
     {
             $callbackResult = $callback($this->getContainer(['section' => $section]));
+            if ($callbackResult instanceof Result) {
+                return $callbackResult;
+            }
             $callbackResult = is_array($callbackResult) ? $callbackResult : ['content' => $callbackResult];
             
             $controller = $this->getDefaultController();
