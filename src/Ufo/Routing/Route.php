@@ -19,9 +19,21 @@ class Route
     public static function parse(string $path, RouteStorageInterface $routeStorage): ?Section
     {
         if (empty($path) || '/' == $path) {
-            return $routeStorage->get('/');
+            $section = $routeStorage->get('/');
+        } else {
+            $section = $routeStorage->find($path);
         }
         
-        return $routeStorage->find($path);
+        if (null === $section) {
+            return null;
+        }
+        
+        //strlen faster than simple comparison
+        $splen = strlen($section->path);
+        if (strlen($path) > $splen) {
+            $section->params = explode('/', trim(substr($path, $splen), '/'));
+        }
+        
+        return $section;
     }
 }
