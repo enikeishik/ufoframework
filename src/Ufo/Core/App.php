@@ -122,6 +122,9 @@ class App
         } catch (ModuleDisabledException $e) {
             $result = $this->getError(403, 'Section module disabled');
             
+        } catch (ModuleParameterUnknownException $e) {
+            $result = $this->getError(404, 'Module parameter unknown');
+            
         } catch (\Exception $e) {
             $result = $this->getError(500, 'Unexpected exception');
             
@@ -134,7 +137,7 @@ class App
     
     /**
      * @return string
-     * @throws BadPathException
+     * @throws \Ufo\Core\BadPathException
      */
     public function getPath(): string
     {
@@ -185,6 +188,7 @@ class App
      * @return \Ufo\Core\Result
      * @throws \Ufo\Core\SectionDisabledException
      * @throws \Ufo\Core\ModuleDisabledException
+     * @throws \Ufo\Core\ModuleParameterUnknownException
      * @throws \Ufo\Core\DbConnectException
      */
     public function compose(Section $section): Result

@@ -13,9 +13,9 @@ use Ufo\Core\Config;
 use Ufo\Core\ContainerInterface;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
+use Ufo\Core\ModuleParameterUnknownException;
 use Ufo\Core\Result;
 use Ufo\Core\Section;
-use Ufo\Modules\View;
 
 /**
  * Module level controller base class.
@@ -44,13 +44,46 @@ class Controller extends DIObject implements ControllerInterface
     protected $data = [];
     
     /**
+     * Module parameters coming from URL|GET|POST|COOKIE.
+     * @var array
+     */
+    protected $params = [];
+    
+    /**
+     * Buffer to keep already assigned parameters.
+     * @var array
+     */
+    protected $paramsAssigned = [];
+    
+    /**
+     * Initialization of structures of module parameters with default values.
+     * @return void
+     */
+    protected function initParams(): void
+    {
+        $this->params = [
+            'isRoot'    => Parameter::make('isRoot', 'bool', '', 'none', false, true), 
+            'isRss'     => Parameter::make('isRss', 'bool', 'rss', 'path', false, false), 
+            'itemId'    => Parameter::make('itemId', 'int', 'id', 'path', false, 0), 
+            'page'      => Parameter::make('page', 'int', 'page', 'path', true, 1), 
+        ];
+    }
+    
+    /**
      * Main controller method, compose all content.
      * @param \Ufo\Core\Section $section = null
      * @return \Ufo\Core\Result
+     * @throws \Ufo\Core\ModuleParameterUnknownException
      */
     public function compose(Section $section = null): Result
     {
         $this->container->set('section', $section);
+        
+        if (null !== $section) {
+            $this->initParams();
+            $this->setParams($section);
+        }
+        
         $this->setData($section);
         
         $view = $this->getView();
@@ -154,5 +187,152 @@ class Controller extends DIObject implements ControllerInterface
         }
         
         return $widgetsResults;
+    }
+    
+    /**
+     * @param \Ufo\Core\Section $section
+     * @return void
+     * @throws \Ufo\Core\ModuleParameterUnknownException
+     */
+    protected function setParams(Section $section): void
+    {
+        $this->setPathParams($section->params);
+        
+        $this->setGetParams();
+        
+        $this->setIsRootParam(); //set before setBoolParams!
+        
+        $this->setBoolParams();
+    }
+    
+    /**
+     * @param array $params
+     * @return void
+     * @throws \Ufo\Core\ModuleParameterUnknownException
+     */
+    protected function setPathParams(array $params): void
+    {
+        foreach ($params as $param) {
+            if (!$this->setParam($param)) {
+                throw new ModuleParameterUnknownException();
+            }
+        }
+    }
+    
+    /**
+     * @return void
+     */
+    protected function setGetParams(): void
+    {
+        foreach ($this->params as $paramName => $paramSet) {
+            if ('get' != $paramSet->from || !isset($_GET[$paramSet->prefix])) {
+                continue;
+            }
+            switch ($paramSet->type) {
+                case 'int':
+                    $this->params[$paramName]->value = (int) $_GET[$paramSet->prefix];
+                    break;
+                case 'bool':
+                    $this->params[$paramName]->value = true;
+                    break;
+                default:
+                    $this->params[$paramName]->value = $_GET[$paramSet->prefix];
+            }
+        }
+    }
+    
+    /**
+     * @return void
+     */
+    protected function setIsRootParam(): void
+    {
+        foreach ($this->params as $paramName => $paramSet) {
+            if ('isRoot' != $paramName && null !== $paramSet->value) {
+                $this->params['isRoot']->value = false;
+                break;
+            }
+        }
+    }
+    
+    /**
+     * @return void
+     */
+    protected function setBoolParams(): void
+    {
+        foreach ($this->params as $paramName => $paramSet) {
+            if ('bool' == $paramSet->type && null === $paramSet->value) {
+                $this->params[$paramName]->value = $paramSet->defval;
+            }
+        }
+    }
+    
+    /**
+     * Search $param in module parameters and set module parameter value if found.
+     * @param string $param
+     * @return bool
+     */
+    protected function setParam(string $param): bool
+    {
+        foreach ($this->params as $paramName => $paramSet) {
+            if ('path' != $paramSet->from) {
+                continue;
+            }
+            if (in_array($paramName, $this->paramsAssigned)) {
+                return false;
+            }
+            
+            if ('' != $paramSet->prefix 
+            && 0 === strpos($param, $paramSet->prefix)) { //for named params
+                //in case of more than one parameters coming
+                //(например идентификатор элемента и дата) выборки, выдаем ошибку 404, 
+                //поскольку иначе будет неоднозначность и дублирование страниц
+                // /section/id123/dt2017 | /section/dt2017/id123
+                if (!$this->params[$paramName]->additional 
+                && in_array('all', $this->paramsAssigned)) {
+                    return false;
+                }
+                $val = substr($param, strlen($paramSet->prefix));
+                switch ($paramSet->type) {
+                    case 'int':
+                        $this->params[$paramName]->value = (int) $val;
+                        break;
+                    case 'bool':
+                        $this->params[$paramName]->value = true;
+                        break;
+                    default:
+                        $this->params[$paramName]->value = $val;
+                }
+                if ($this->params[$paramName]->additional) {
+                    $this->paramsAssigned[] = $paramName;
+                } else {
+                    $this->paramsAssigned[] = 'all';
+                }
+                return true;
+                
+            } elseif ('itemId' == $paramName && ctype_digit($param)) { //for itemId
+                if (in_array('all', $this->paramsAssigned)) {
+                    return false;
+                }
+                $this->params[$paramName]->value = (int) $param;
+                $this->paramsAssigned[] = 'all';
+                return true;
+                
+            } elseif ('date' == $paramName && 10 == strlen($param) && false !== strtotime($param)) { //for date
+                if (in_array('all', $this->paramsAssigned)) {
+                    return false;
+                }
+                $date = strtotime($param);
+                //BOOKMARK: DateTime format
+                $this->params[$paramName]->value = date('Y-m-d', $date);
+                $this->paramsAssigned[] = 'all';
+                return true;
+                
+            } elseif ('' == $paramSet->prefix && null === $paramSet->value) { //for param without prefix
+                $this->params[$paramName]->value = $param;
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
