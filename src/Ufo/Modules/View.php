@@ -129,7 +129,7 @@ class View extends DIObject implements ViewInterface
         extract($this->data);
         
         try {
-            include $this->findView(
+            include $this->findTemplate(
                 $this->config->projectPath . $this->config->templatesPath, 
                 $this->section->module->name ?? '', 
                 $this->template
@@ -170,7 +170,7 @@ class View extends DIObject implements ViewInterface
      * @param string $templateName
      * @return string
      */
-    protected function findView(string $templatesPath, string $moduleName, string $templateName): string
+    protected function findTemplate(string $templatesPath, string $moduleName, string $templateName): string
     {
         if (!empty($moduleName)) {
             // /templates/module/template.php
