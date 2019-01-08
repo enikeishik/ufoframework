@@ -16,6 +16,7 @@ use Ufo\Core\DIObject;
 use Ufo\Core\ModuleParameterUnknownException;
 use Ufo\Core\Result;
 use Ufo\Core\Section;
+use Ufo\Core\Tools;
 
 /**
  * Module level controller base class.
@@ -64,7 +65,7 @@ class Controller extends DIObject implements ControllerInterface
         $params = [
             Parameter::make('isRoot', 'bool', '', 'none', false, true), 
             Parameter::make('isRss', 'bool', 'rss', 'path', false, false), 
-            Parameter::make('itemId', 'int', 'id', 'path', false, 0), 
+            Parameter::make('itemId', 'int', '', 'path', false, 0), 
             Parameter::make('page', 'int', 'page', 'path', true, 1), 
         ];
         
@@ -217,7 +218,7 @@ class Controller extends DIObject implements ControllerInterface
     protected function setParamsFromPath(array $pathParams): void
     {
         foreach ($pathParams as $pathParam) {
-            if (!$this->setParam($pathParam)) {
+            if (!$this->setParamFromPath($pathParam)) {
                 throw new ModuleParameterUnknownException();
             }
         }
@@ -275,7 +276,7 @@ class Controller extends DIObject implements ControllerInterface
      * @param string $pathParam
      * @return bool
      */
-    protected function setParam(string $pathParam): bool
+    protected function setParamFromPath(string $pathParam): bool
     {
         foreach ($this->params as $paramName => $paramSet) {
             if ('path' != $paramSet->from) {
@@ -287,12 +288,7 @@ class Controller extends DIObject implements ControllerInterface
             
             if ('' != $paramSet->prefix 
             && 0 === strpos($pathParam, $paramSet->prefix)) { //for named params
-                //in case of more than one parameters coming
-                //(например идентификатор элемента и дата) выборки, выдаем ошибку 404, 
-                //поскольку иначе будет неоднозначность и дублирование страниц
-                // /section/id123/dt2017 | /section/dt2017/id123
-                if (!$paramSet->additional 
-                && in_array('all', $this->paramsAssigned)) {
+                if ($this->isParamAssigned($paramSet)) {
                     return false;
                 }
                 $val = substr($pathParam, strlen($paramSet->prefix));
@@ -303,40 +299,78 @@ class Controller extends DIObject implements ControllerInterface
                     case 'bool':
                         $this->params[$paramName]->value = true;
                         break;
+                    case 'date':
+                        $date = strtotime($pathParam);
+                        if (false === $date) {
+                            return false;
+                        }
+                        $this->params[$paramName]->value = $date;
+                        break;
                     default:
                         $this->params[$paramName]->value = $val;
                 }
-                if ($paramSet->additional) {
-                    $this->paramsAssigned[] = $paramName;
-                } else {
-                    $this->paramsAssigned[] = 'all';
-                }
+                $this->setParamAssigned($paramSet);
+                
                 return true;
                 
-            } elseif ('itemId' == $paramName && ctype_digit($pathParam)) { //for itemId
-                if (in_array('all', $this->paramsAssigned)) {
+            } elseif ('int' == $paramSet->type && Tools::isInt($pathParam)) { //digits only, itemId for example
+                if ($this->isParamAssigned($paramSet)) {
                     return false;
                 }
                 $this->params[$paramName]->value = (int) $pathParam;
-                $this->paramsAssigned[] = 'all';
+                $this->setParamAssigned($paramSet);
                 return true;
                 
-            } elseif ('date' == $paramName && 10 == strlen($pathParam) && false !== strtotime($pathParam)) { //for date
-                if (in_array('all', $this->paramsAssigned)) {
+            //for now used only exactly 10 symbols dates formats, like YYYY-MM-DD
+            } elseif ('date' == $paramSet->type && 10 == strlen($pathParam) && false !== strtotime($pathParam)) { //for dates
+                if ($this->isParamAssigned($paramSet)) {
                     return false;
                 }
                 $date = strtotime($pathParam);
                 //BOOKMARK: DateTime format
                 $this->params[$paramName]->value = date('Y-m-d', $date);
-                $this->paramsAssigned[] = 'all';
+                $this->setParamAssigned($paramSet);
                 return true;
                 
-            } elseif ('' == $paramSet->prefix && null === $paramSet->value) { //for param without prefix
+            } elseif ('' == $paramSet->prefix && null === $paramSet->value) { //for params without prefix
+                if ($this->isParamAssigned($paramSet)) {
+                    return false;
+                }
                 $this->params[$paramName]->value = $pathParam;
+                $this->setParamAssigned($paramSet);
                 return true;
             }
+            
+            //TODO: implement user defined types parameters extraction
         }
         
         return false;
+    }
+    
+    /**
+     * @param \Ufo\Modules\Parameter
+     * @return bool
+     */
+    protected function isParamAssigned(Parameter $param): bool
+    {
+        //in case of more than one come parameters
+        //(for example item id and some date) generate 404 error
+        //for not additional parameters, because two (or more)
+        //not additional parameters may give ambiguity
+        // /section/id123/dt2017 | /section/dt2017/id123
+        return !$paramSet->additional && in_array('all', $this->paramsAssigned);
+    }
+    
+    /**
+     * @param \Ufo\Modules\Parameter
+     * @return void
+     */
+    protected function setParamAssigned(Parameter $param): void
+    {
+        if ($param->additional) {
+            $this->paramsAssigned[] = $param->name;
+        } else {
+            $this->paramsAssigned[] = 'all';
+        }
     }
 }
