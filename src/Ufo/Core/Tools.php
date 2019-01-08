@@ -37,7 +37,7 @@ class Tools
     public static function isInt($str, bool $unsigned = false): bool
     {
         if (!$unsigned) {
-            return (string) (int) $str === (string) $str;
+            return strlen((string) (int) $str) == strlen((string) $str);
         } else {
             return ctype_digit((string) $str) && ($str <= PHP_INT_MAX);
         }
