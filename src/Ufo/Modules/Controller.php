@@ -61,12 +61,16 @@ class Controller extends DIObject implements ControllerInterface
      */
     protected function initParams(): void
     {
-        $this->params = [
-            'isRoot'    => Parameter::make('isRoot', 'bool', '', 'none', false, true), 
-            'isRss'     => Parameter::make('isRss', 'bool', 'rss', 'path', false, false), 
-            'itemId'    => Parameter::make('itemId', 'int', 'id', 'path', false, 0), 
-            'page'      => Parameter::make('page', 'int', 'page', 'path', true, 1), 
+        $params = [
+            Parameter::make('isRoot', 'bool', '', 'none', false, true), 
+            Parameter::make('isRss', 'bool', 'rss', 'path', false, false), 
+            Parameter::make('itemId', 'int', 'id', 'path', false, 0), 
+            Parameter::make('page', 'int', 'page', 'path', true, 1), 
         ];
+        
+        foreach ($params as $param) {
+            $this->params[$param->name] = $param;
+        }
     }
     
     /**
@@ -81,7 +85,7 @@ class Controller extends DIObject implements ControllerInterface
         
         if (null !== $section) {
             $this->initParams();
-            $this->setParams($section);
+            $this->setParams($section->params);
         }
         
         $this->setData($section);
@@ -190,15 +194,15 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * @param \Ufo\Core\Section $section
+     * @param array $pathParams
      * @return void
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
-    protected function setParams(Section $section): void
+    protected function setParams(array $pathParams): void
     {
-        $this->setPathParams($section->params);
+        $this->setParamsFromPath($pathParams);
         
-        $this->setGetParams();
+        $this->setParamsFromQs();
         
         $this->setIsRootParam(); //set before setBoolParams!
         
@@ -206,14 +210,14 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * @param array $params
+     * @param array $pathParams
      * @return void
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
-    protected function setPathParams(array $params): void
+    protected function setParamsFromPath(array $pathParams): void
     {
-        foreach ($params as $param) {
-            if (!$this->setParam($param)) {
+        foreach ($pathParams as $pathParam) {
+            if (!$this->setParam($pathParam)) {
                 throw new ModuleParameterUnknownException();
             }
         }
@@ -222,7 +226,7 @@ class Controller extends DIObject implements ControllerInterface
     /**
      * @return void
      */
-    protected function setGetParams(): void
+    protected function setParamsFromQs(): void
     {
         foreach ($this->params as $paramName => $paramSet) {
             if ('get' != $paramSet->from || !isset($_GET[$paramSet->prefix])) {
@@ -267,11 +271,11 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * Search $param in module parameters and set module parameter value if found.
-     * @param string $param
+     * Search $pathParam in module parameters and set module parameter value if found.
+     * @param string $pathParam
      * @return bool
      */
-    protected function setParam(string $param): bool
+    protected function setParam(string $pathParam): bool
     {
         foreach ($this->params as $paramName => $paramSet) {
             if ('path' != $paramSet->from) {
@@ -282,16 +286,16 @@ class Controller extends DIObject implements ControllerInterface
             }
             
             if ('' != $paramSet->prefix 
-            && 0 === strpos($param, $paramSet->prefix)) { //for named params
+            && 0 === strpos($pathParam, $paramSet->prefix)) { //for named params
                 //in case of more than one parameters coming
                 //(например идентификатор элемента и дата) выборки, выдаем ошибку 404, 
                 //поскольку иначе будет неоднозначность и дублирование страниц
                 // /section/id123/dt2017 | /section/dt2017/id123
-                if (!$this->params[$paramName]->additional 
+                if (!$paramSet->additional 
                 && in_array('all', $this->paramsAssigned)) {
                     return false;
                 }
-                $val = substr($param, strlen($paramSet->prefix));
+                $val = substr($pathParam, strlen($paramSet->prefix));
                 switch ($paramSet->type) {
                     case 'int':
                         $this->params[$paramName]->value = (int) $val;
@@ -302,33 +306,33 @@ class Controller extends DIObject implements ControllerInterface
                     default:
                         $this->params[$paramName]->value = $val;
                 }
-                if ($this->params[$paramName]->additional) {
+                if ($paramSet->additional) {
                     $this->paramsAssigned[] = $paramName;
                 } else {
                     $this->paramsAssigned[] = 'all';
                 }
                 return true;
                 
-            } elseif ('itemId' == $paramName && ctype_digit($param)) { //for itemId
+            } elseif ('itemId' == $paramName && ctype_digit($pathParam)) { //for itemId
                 if (in_array('all', $this->paramsAssigned)) {
                     return false;
                 }
-                $this->params[$paramName]->value = (int) $param;
+                $this->params[$paramName]->value = (int) $pathParam;
                 $this->paramsAssigned[] = 'all';
                 return true;
                 
-            } elseif ('date' == $paramName && 10 == strlen($param) && false !== strtotime($param)) { //for date
+            } elseif ('date' == $paramName && 10 == strlen($pathParam) && false !== strtotime($pathParam)) { //for date
                 if (in_array('all', $this->paramsAssigned)) {
                     return false;
                 }
-                $date = strtotime($param);
+                $date = strtotime($pathParam);
                 //BOOKMARK: DateTime format
                 $this->params[$paramName]->value = date('Y-m-d', $date);
                 $this->paramsAssigned[] = 'all';
                 return true;
                 
             } elseif ('' == $paramSet->prefix && null === $paramSet->value) { //for param without prefix
-                $this->params[$paramName]->value = $param;
+                $this->params[$paramName]->value = $pathParam;
                 return true;
             }
         }
