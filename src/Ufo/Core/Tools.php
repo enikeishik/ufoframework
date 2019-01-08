@@ -36,11 +36,13 @@ class Tools
      */
     public static function isInt($str, bool $unsigned = false): bool
     {
+        //compare whole string (not strlen), some calues >PHP_INT_MAX may be reduced to PHP_INT_MAX
+        //use === instead of == because var_dump('1'=='1.0') -> true, see PHP documentation for string comparison
+        $isInt = (string) (int) $str === (string) $str;
         if (!$unsigned) {
-            return strlen((string) (int) $str) == strlen((string) $str);
-        } else {
-            return ctype_digit((string) $str) && ($str <= PHP_INT_MAX);
+            return $isInt;
         }
+        return $isInt && ((int) $str >= 0);
     }
     
     /**

@@ -33,12 +33,12 @@ class ToolsTest extends \Codeception\Test\Unit
             ['0', false, true], 
             ['1', false, true], 
             ['-1', false, true], 
-            [(string) PHP_INT_MAX * -1 - 1, false, true], 
+            [(string) (-PHP_INT_MAX - 1), false, true], 
             [(string) PHP_INT_MAX, false, true], 
             
             //not signed int
-            [(string) PHP_INT_MAX + 1, false, false], 
-            [(string) PHP_INT_MAX * -1 - 2, false, false], 
+            [(string) (PHP_INT_MAX + 1), false, false], 
+            [(string) (-PHP_INT_MAX - 2), false, false], 
             ['1.0', false, false], 
             ['1a', false, false], 
             ['a', false, false], 
@@ -51,7 +51,7 @@ class ToolsTest extends \Codeception\Test\Unit
             
             //not unsigned int
             ['-1', true, false], 
-            [(string) PHP_INT_MAX * -1 - 1, true, false], 
+            [(string) (-PHP_INT_MAX - 1), true, false], 
             ['1.0', true, false], //'1.0' -> not int, but 1.0 -> int!
             ['1a', true, false], 
             ['a', true, false], 
