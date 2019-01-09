@@ -9,10 +9,10 @@ class RouteTest extends \Codeception\Test\Unit
     // tests
     public function testRouteParse()
     {
-        $routeStorageData = require dirname(__DIR__) . '/_data/RouteStorageData.php';
-        $section = Route::parse('/qwe/asd', new RouteArrayStorage($routeStorageData));
+        $routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+        $section = Route::parse('/section-with/callback', new RouteArrayStorage($routeStorageData));
         $this->assertNotNull($section);
-        $this->assertEquals('/qwe/asd', $section->path);
+        $this->assertEquals('/section-with/callback', $section->path);
         $this->assertEquals('Simple callback', $section->module->name);
     }
 }
