@@ -20,23 +20,28 @@ class AppTest extends \Codeception\Test\Unit
         }
     }
     
+    protected function getApp()
+    {
+        $config = new Config();
+        $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+        $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
+        return new App($config, new Debug());
+    }
+    
     // tests
     public function testApp()
     {
-        $config = new Config();
-        $app = new App($config, new Debug());
-        $config->routeStorageData = require dirname(__DIR__) . '/_data/RouteStorageData.php';
-        $config->widgetsStorageData = require dirname(__DIR__) . '/_data/WidgetsStorageData.php';
-        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
-        $config->templatesDefault = '';
+        $app = $this->getApp();
         
-        $_GET['path'] = '/qwe/asd';
+        $_GET['path'] = '/section-with/callback';
         $result = $app->compose($app->parse($app->getPath()));
         $this->assertNotNull($result);
         $this->assertEquals([], $result->getHeaders());
         $this->assertNotEquals('', $result->getView()->render());
         
-        $_GET['path'] = '/!qwe/asd';
+        $_GET['path'] = '/!document';
         $this->expectedException(
             \Ufo\Core\BadPathException::class, 
             function() use($app) { $app->execute(); }
@@ -48,16 +53,52 @@ class AppTest extends \Codeception\Test\Unit
             function() use($app) { $app->execute(); }
         );
         
-        $_GET['path'] = '/asd';
+        $_GET['path'] = '/section-disabled';
         $this->expectedException(
             \Ufo\Core\SectionDisabledException::class, 
             function() use($app) { $app->execute(); }
         );
         
-        $_GET['path'] = '/asd/qwe';
+        $_GET['path'] = '/module/disabled';
         $this->expectedException(
             \Ufo\Core\ModuleDisabledException::class, 
             function() use($app) { $app->execute(); }
+        );
+    }
+    
+    public function testParams()
+    {
+        $_GET['path'] = '/document/123/page2/rss';
+        $app = $this->getApp();
+        $section = $app->parse($app->getPath());
+        $this->assertEquals(['123', 'page2', 'rss'], $section->params);
+        
+        $_GET['path'] = '/some/another/document/456/page3/yandex';
+        $app = $this->getApp();
+        $section = $app->parse($app->getPath());
+        $this->assertEquals(['456', 'page3', 'yandex'], $section->params);
+    }
+    
+    public function testCompose()
+    {
+        $_GET['path'] = '/';
+        $app = $this->getApp();
+        $result = $app->compose($app->parse($app->getPath()));
+        $this->assertTrue(
+            false !== strpos(
+                $result->getView()->render(), 
+                '<title>Main page</title>'
+            )
+        );
+        
+        $_GET['path'] = '/document';
+        $app = $this->getApp();
+        $result = $app->compose($app->parse($app->getPath()));
+        $this->assertTrue(
+            false !== strpos(
+                $result->getView()->render(), 
+                '<title>Document page</title>'
+            )
         );
     }
 }

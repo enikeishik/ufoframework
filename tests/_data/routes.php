@@ -8,7 +8,7 @@ return [
             'dbless' => true, 
         ], 
     ], 
-    '/asd' => [
+    '/section-disabled' => [
         'title' => 'ASD page', 
         'module' => [
             'id' => 1, 
@@ -17,7 +17,7 @@ return [
         ], 
         'disabled' => true, 
     ], 
-    '/asd/qwe' => [
+    '/module/disabled' => [
         'title' => 'ASD QWE page', 
         'module' => [
             'id' => 2, 
@@ -26,14 +26,15 @@ return [
             'disabled' => true, 
         ], 
     ], 
-    '/qwe' => [
-        'title' => 'QWE page', 
+    '/document' => [
+        'title' => 'Document page', 
         'module' => [
             'id' => 3, 
             'name' => 'Documents', 
+            'dbless' => true, 
         ], 
     ], 
-    '/qwe/asd' => [
+    '/section-with/callback' => [
         'title' => 'QWE ASD page', 
         'module' => [
             'id' => 333, 
@@ -46,11 +47,12 @@ return [
         ], 
         'disabled' => false, 
     ], 
-    '/qwe/asd/zxc' => [
+    '/some/another/document' => [
         'title' => 'QWE ASD ZXC page', 
         'module' => [
             'id' => 4, 
             'name' => 'Documents', 
+            'dbless' => true, 
         ], 
     ], 
 ];
