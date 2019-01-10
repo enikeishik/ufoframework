@@ -28,7 +28,7 @@ class WidgetsArrayStorage extends WidgetsStorage
     {
         if (array_key_exists($section->path, $this->storage)) {
             if (array_key_exists('', $this->storage)) {
-                return array_merge($this->storage[''], $this->storage[$section->path]);
+                return array_merge_recursive($this->storage[''], $this->storage[$section->path]);
             } else {
                 return $this->storage[$section->path];
             }
