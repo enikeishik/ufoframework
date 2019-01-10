@@ -13,8 +13,8 @@ if (!empty($argv[1])) {
 }
 
 $config = new Config();
-$config->routeStorageData = require dirname(__DIR__) . '/_data/RouteStorageData.php';
-$config->widgetsStorageData = require dirname(__DIR__) . '/_data/WidgetsStorageData.php';
+$config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+$config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
 $config->templatesPath = '/tests/integration/templates';
 $config->templatesDefault = '';
 $debug = new Debug();
