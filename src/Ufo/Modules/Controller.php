@@ -13,6 +13,8 @@ use Ufo\Core\Config;
 use Ufo\Core\ContainerInterface;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
+use Ufo\Core\ModuleParameterConflictException;
+use Ufo\Core\ModuleParameterFormatException;
 use Ufo\Core\ModuleParameterUnknownException;
 use Ufo\Core\Result;
 use Ufo\Core\Section;
@@ -197,6 +199,8 @@ class Controller extends DIObject implements ControllerInterface
     /**
      * @param array $pathParams
      * @return void
+     * @throws \Ufo\Core\ModuleParameterConflictException
+     * @throws \Ufo\Core\ModuleParameterFormatException;
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
     protected function setParams(array $pathParams): void
@@ -213,14 +217,14 @@ class Controller extends DIObject implements ControllerInterface
     /**
      * @param array $pathParams
      * @return void
+     * @throws \Ufo\Core\ModuleParameterConflictException
+     * @throws \Ufo\Core\ModuleParameterFormatException;
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
     protected function setParamsFromPath(array $pathParams): void
     {
         foreach ($pathParams as $pathParam) {
-            if (!$this->setParamFromPath($pathParam)) {
-                throw new ModuleParameterUnknownException();
-            }
+            $this->setParamFromPath($pathParam);
         }
     }
     
@@ -274,22 +278,22 @@ class Controller extends DIObject implements ControllerInterface
     /**
      * Search $pathParam in module parameters and set module parameter value if found.
      * @param string $pathParam
-     * @return bool
+     * @return void
+     * @throws \Ufo\Core\ModuleParameterConflictException
+     * @throws \Ufo\Core\ModuleParameterFormatException;
+     * @throws \Ufo\Core\ModuleParameterUnknownException
      */
-    protected function setParamFromPath(string $pathParam): bool
+    protected function setParamFromPath(string $pathParam): void
     {
         foreach ($this->params as $paramName => $paramSet) {
-            if ('path' != $paramSet->from) {
+            if ('path' != $paramSet->from || in_array($paramName, $this->paramsAssigned)) {
                 continue;
-            }
-            if (in_array($paramName, $this->paramsAssigned)) {
-                return false;
             }
             
             if ('' != $paramSet->prefix 
             && 0 === strpos($pathParam, $paramSet->prefix)) { //for named params
                 if ($this->isParamAssigned($paramSet)) {
-                    return false;
+                    throw new ModuleParameterConflictException();
                 }
                 $val = substr($pathParam, strlen($paramSet->prefix));
                 switch ($paramSet->type) {
@@ -300,9 +304,9 @@ class Controller extends DIObject implements ControllerInterface
                         $this->params[$paramName]->value = true;
                         break;
                     case 'date':
-                        $date = strtotime($pathParam);
+                        $date = strtotime($val);
                         if (false === $date) {
-                            return false;
+                            throw new ModuleParameterFormatException();
                         }
                         $this->params[$paramName]->value = $date;
                         break;
@@ -310,41 +314,38 @@ class Controller extends DIObject implements ControllerInterface
                         $this->params[$paramName]->value = $val;
                 }
                 $this->setParamAssigned($paramSet);
-                
-                return true;
+                return;
                 
             } elseif ('int' == $paramSet->type && Tools::isInt($pathParam)) { //digits only, itemId for example
                 if ($this->isParamAssigned($paramSet)) {
-                    return false;
+                    throw new ModuleParameterConflictException();
                 }
                 $this->params[$paramName]->value = (int) $pathParam;
                 $this->setParamAssigned($paramSet);
-                return true;
+                return;
                 
             //for now used only exactly 10 symbols dates formats, like YYYY-MM-DD
             } elseif ('date' == $paramSet->type && 10 == strlen($pathParam) && false !== strtotime($pathParam)) { //for dates
                 if ($this->isParamAssigned($paramSet)) {
-                    return false;
+                    throw new ModuleParameterConflictException();
                 }
-                $date = strtotime($pathParam);
-                //BOOKMARK: DateTime format
-                $this->params[$paramName]->value = date('Y-m-d', $date);
+                $this->params[$paramName]->value = strtotime($pathParam);
                 $this->setParamAssigned($paramSet);
-                return true;
+                return;
                 
-            } elseif ('' == $paramSet->prefix && null === $paramSet->value) { //for params without prefix
+            } elseif ('' == $paramSet->prefix && 'string' == $paramSet->type && null === $paramSet->value) { //for params without prefix
                 if ($this->isParamAssigned($paramSet)) {
-                    return false;
+                    throw new ModuleParameterConflictException();
                 }
                 $this->params[$paramName]->value = $pathParam;
                 $this->setParamAssigned($paramSet);
-                return true;
+                return;
             }
             
             //TODO: implement user defined types parameters extraction
         }
         
-        return false;
+        throw new ModuleParameterUnknownException();
     }
     
     /**
@@ -358,7 +359,7 @@ class Controller extends DIObject implements ControllerInterface
         //for not additional parameters, because two (or more)
         //not additional parameters may give ambiguity
         // /section/id123/dt2017 | /section/dt2017/id123
-        return !$paramSet->additional && in_array('all', $this->paramsAssigned);
+        return !$param->additional && in_array('all', $this->paramsAssigned);
     }
     
     /**

@@ -14,4 +14,15 @@ return [
             ['module' => '', 'name' => 'cbrf', 'title' => 'currency widget', 'text' => 'USD GBR RUB EUR'], 
         ], 
     ], 
+    '/document' => [
+        'left col top' => [
+            ['module' => '', 'name' => 'images', 'title' => 'images widget', 'text' => 'images test'], 
+        ], 
+        'right col bottom' => [
+            ['module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => '2 first wdg text'], 
+        ], 
+        'middle col bottom' => [
+            ['module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles text'], 
+        ], 
+    ], 
 ];

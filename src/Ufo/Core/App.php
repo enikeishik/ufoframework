@@ -122,6 +122,12 @@ class App
         } catch (ModuleDisabledException $e) {
             $result = $this->getError(403, 'Section module disabled');
             
+        } catch (ModuleParameterConflictException $e) {
+            $result = $this->getError(404, 'Module parameter conflict with another');
+            
+        } catch (ModuleParameterFormatException $e) {
+            $result = $this->getError(404, 'Module parameter bad format');
+            
         } catch (ModuleParameterUnknownException $e) {
             $result = $this->getError(404, 'Module parameter unknown');
             
@@ -188,6 +194,8 @@ class App
      * @return \Ufo\Core\Result
      * @throws \Ufo\Core\SectionDisabledException
      * @throws \Ufo\Core\ModuleDisabledException
+     * @throws \Ufo\Core\ModuleParameterConflictException
+     * @throws \Ufo\Core\ModuleParameterFormatException;
      * @throws \Ufo\Core\ModuleParameterUnknownException
      * @throws \Ufo\Core\DbConnectException
      */
