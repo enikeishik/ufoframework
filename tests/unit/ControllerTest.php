@@ -258,4 +258,63 @@ class ControllerTest extends \Codeception\Test\Unit
             function() use($controller) { $controller->setParamsFromPath([123, 'prefixQWE']); }
         );
     }
+    
+    protected function getControllerForSetParams()
+    {
+        return new class() extends Controller {
+            public $params = [];
+            public $paramsAssigned = [];
+            public function initParams(): void
+            {
+                parent::initParams();
+            }
+            public function setParams(array $pathParams): void
+            {
+                parent::setParams($pathParams);
+            }
+        };
+    }
+    
+    public function testSetParams()
+    {
+        $controller = $this->getControllerForSetParams();
+        
+        $controller->params = [];
+        $controller->paramsAssigned = [];
+        $controller->initParams();
+        $this->assertNull($controller->params['isRoot']->value);
+        $controller->setParams([]);
+        $this->assertTrue($controller->params['isRoot']->value);
+        
+        $controller->params = [];
+        $controller->paramsAssigned = [];
+        $controller->initParams();
+        $this->assertNull($controller->params['isRoot']->value);
+        $controller->setParams(['123', 'page2']);
+        $this->assertFalse($controller->params['isRoot']->value);
+        $this->assertEquals(123, $controller->params['itemId']->value);
+        $this->assertEquals(2, $controller->params['page']->value);
+        $this->assertFalse($controller->params['isRss']->value);
+        
+        $controller->params = [];
+        $controller->paramsAssigned = [];
+        $controller->initParams();
+        $controller->params['somegetparam'] = Parameter::make('somegetparam', 'int', 'somegetparam', 'get', false, 0);
+        $_GET['somegetparam'] = 5;
+        $this->assertNull($controller->params['isRoot']->value);
+        $this->assertNull($controller->params['isRss']->value);
+        $controller->setParams([]);
+        $this->assertEquals(5, $controller->params['somegetparam']->value);
+        $this->assertFalse($controller->params['isRoot']->value);
+        $this->assertFalse($controller->params['isRss']->value);
+        
+        $controller->params = [];
+        $controller->paramsAssigned = [];
+        $controller->initParams();
+        $this->assertNull($controller->params['isRoot']->value);
+        $this->assertNull($controller->params['isRss']->value);
+        $controller->setParams(['rss']);
+        $this->assertFalse($controller->params['isRoot']->value);
+        $this->assertTrue($controller->params['isRss']->value);
+    }
 }
