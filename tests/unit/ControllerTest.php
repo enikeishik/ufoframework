@@ -177,6 +177,26 @@ class ControllerTest extends \Codeception\Test\Unit
             \Ufo\Core\ModuleParameterUnknownException::class, 
             function() use($controller) { $controller->setParamsFromPath(['asd']); }
         );
+        
+        $paramName = 'test10';
+        $controller->params = [];
+        $controller->paramsAssigned = [];
+        $controller->params[$paramName] = Parameter::make($paramName, 'date', '', 'path', true, 0);
+        $this->assertNull($controller->params[$paramName]->value);
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterUnknownException::class, 
+            function() use($controller) { $controller->setParamsFromPath(['1970-01-aa']); }
+        );
+        
+        $paramName = 'test11';
+        $controller->params = [];
+        $controller->paramsAssigned = [];
+        $controller->params[$paramName] = Parameter::make($paramName, 'date', 'dt', 'path', true, 0);
+        $this->assertNull($controller->params[$paramName]->value);
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterFormatException::class, 
+            function() use($controller) { $controller->setParamsFromPath(['dt1970-01-aa']); }
+        );
     }
     
     public function testParamsFromPathByMany()
@@ -201,22 +221,40 @@ class ControllerTest extends \Codeception\Test\Unit
         $controller->params = [];
         $controller->params['test11'] = Parameter::make('test11', 'bool', 'test11', 'path', true, false);
         $controller->params['test12'] = Parameter::make('test12', 'int', '', 'path', false, 0);
-        $controller->params['test13'] = Parameter::make('test13', 'string', 'prefix', 'path', false, '');
+        $controller->params['test13'] = Parameter::make('test13', 'date', 'dt', 'path', false, 0);
+        $controller->params['test14'] = Parameter::make('test14', 'string', 'prefix', 'path', false, '');
         $this->assertNull($controller->params['test11']->value);
         $this->assertNull($controller->params['test12']->value);
         $this->assertNull($controller->params['test13']->value);
+        $this->assertNull($controller->params['test14']->value);
         
         $controller->paramsAssigned = [];
         $controller->setParamsFromPath(['789']);
         $this->assertEquals(789, $controller->params['test12']->value);
         
         $controller->paramsAssigned = [];
+        $controller->setParamsFromPath(['dt1970-02-03']);
+        $this->assertEquals(strtotime('1970-02-03'), $controller->params['test13']->value);
+        
+        $controller->paramsAssigned = [];
         $controller->setParamsFromPath(['prefixQWE']);
-        $this->assertEquals('QWE', $controller->params['test13']->value);
+        $this->assertEquals('QWE', $controller->params['test14']->value);
         
         $controller->paramsAssigned = [];
         $this->expectedException(
             \Ufo\Core\ModuleParameterUnknownException::class, 
+            function() use($controller) { $controller->setParamsFromPath(['QWE']); }
+        );
+        
+        $controller->paramsAssigned = [];
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterFormatException::class, 
+            function() use($controller) { $controller->setParamsFromPath(['dtasd']); }
+        );
+        
+        $controller->paramsAssigned = [];
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterConflictException::class, 
             function() use($controller) { $controller->setParamsFromPath([123, 'prefixQWE']); }
         );
     }
