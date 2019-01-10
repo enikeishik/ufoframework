@@ -2,11 +2,11 @@
 return [
     '/' => [
         'left col top' => [
-            ['module' => '', 'name' => 'gismeteo', 'title' => '1 first wdg title', 'text' => '1 first wdg text'], 
-            ['module' => 'news', 'name' => '', 'title' => '1 second wdg title', 'text' => '1 second wdg text'], 
+            ['module' => '', 'name' => 'gismeteo', 'title' => 'gismeteo widget', 'text' => '1 first wdg text'], 
+            ['module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => '1 second wdg text'], 
         ], 
         'right col bottom' => [
-            ['module' => 'gallery', 'name' => '', 'title' => '2 first wdg title', 'text' => '2 first wdg text'], 
+            ['module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => '2 first wdg text'], 
         ], 
     ], 
     '' => [

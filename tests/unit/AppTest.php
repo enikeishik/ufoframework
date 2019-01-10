@@ -90,6 +90,18 @@ class AppTest extends \Codeception\Test\Unit
                 '<title>Main page</title>'
             )
         );
+        $this->assertTrue(
+            false !== strpos(
+                $result->getView()->render(), 
+                'currency widget'
+            )
+        );
+        $this->assertTrue(
+            false !== strpos(
+                $result->getView()->render(), 
+                'news widget'
+            )
+        );
         
         $_GET['path'] = '/document';
         $app = $this->getApp();
@@ -98,6 +110,18 @@ class AppTest extends \Codeception\Test\Unit
             false !== strpos(
                 $result->getView()->render(), 
                 '<title>Document page</title>'
+            )
+        );
+        $this->assertTrue(
+            false !== strpos(
+                $result->getView()->render(), 
+                'currency widget'
+            )
+        );
+        $this->assertFalse(
+            false !== strpos(
+                $result->getView()->render(), 
+                'news widget'
             )
         );
     }
