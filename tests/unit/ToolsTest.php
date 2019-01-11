@@ -26,6 +26,40 @@ class ToolsTest extends \Codeception\Test\Unit
     }
     
     // tests
+    public function isPathDataProvider()
+    {
+        return [
+            ['', false, false], 
+            ['/', false, false], 
+            ['/!', false, false], 
+            ['//', false, false], 
+            ['/..', false, false], 
+            ['/123+', false, false], 
+            
+            ['/../', true, false], 
+            ['/123', true, false], 
+            
+            ['/123', false, true], 
+            ['/123/', false, true], 
+            ['/123/asd', false, true], 
+            ['/123/asd/', false, true], 
+            ['/12-3/as_d/~qwe.htm', false, true], 
+            
+            ['/123/', true, true], 
+            ['/123/asd/', true, true], 
+            ['/12-3/as_d/~qwe.htm/', true, true], 
+        ];
+    }
+    
+    /**
+     * @dataProvider isPathDataProvider
+     */
+    public function testIsPath($val, $closingSlashRequired, $expected)
+    {
+        $result = $this->tools->isPath($val, $closingSlashRequired);
+        $this->assertEquals($expected, $result);
+    }
+    
     public function isIntDataProvider()
     {
         return [
@@ -186,6 +220,7 @@ class ToolsTest extends \Codeception\Test\Unit
     public function isEmailDataProvider()
     {
         return [
+            ['', false], 
             ['aa@aa.aa', true], 
             ['aa-aa@aa.aa', true], 
             ['aa@aa-aa.aa', true], 
