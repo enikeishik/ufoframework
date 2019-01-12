@@ -25,13 +25,13 @@ abstract class Struct implements StructInterface
         if (is_array($vars)) {
             $this->setFromArray($vars, $cast);
         } elseif (is_object($vars)) {
-            if (is_a($vars, __CLASS__)) {
+            if ($vars instanceof StructInterface) {
                 $this->set($vars);
             } else {
                 $this->setFromArray(get_object_vars($vars), $cast);
             }
         } elseif (is_string($vars)) {
-            $this->setFromArray(json_decode($vars, true), $cast);
+            $this->setFromArray(get_object_vars(json_decode($vars)), $cast);
         }
     }
     
