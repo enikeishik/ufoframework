@@ -10,4 +10,6 @@ script:
   - php -v
   - phpunit --version
   - vendor/bin/codecept --version
-  - vendor/bin/codecept run unit
+  - vendor/bin/codecept run unit --coverage --coverage-xml
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
