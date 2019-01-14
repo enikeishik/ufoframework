@@ -212,7 +212,11 @@ class Config extends Struct implements ConfigInterface
             return;
         }
         
-        $iniArr = parse_ini_file($iniPath, false, INI_SCANNER_TYPED);
+        $iniArr = null;
+        try {
+            $iniArr = parse_ini_file($iniPath, false, INI_SCANNER_TYPED);
+        } catch (\Exception $e) {
+        }
         if (!is_array($iniArr)) {
             return;
         }

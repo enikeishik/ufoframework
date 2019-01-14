@@ -37,7 +37,16 @@ class ConfigTest extends \Codeception\Test\Unit
     public function testLoadFromIni()
     {
         $config = new Config();
+        $initialConfigPropsCount = count(get_object_vars($config));
+        
+        $config->loadFromIni(dirname(__DIR__) . '/_data/non-existence-config.ini');
+        $this->assertCount($initialConfigPropsCount, get_object_vars($config));
+        
+        $config->loadFromIni(dirname(__DIR__) . '/_data/config-bad.ini');
+        $this->assertCount($initialConfigPropsCount, get_object_vars($config));
+        
         $config->loadFromIni(dirname(__DIR__) . '/_data/config.ini');
+        $this->assertNotEquals($initialConfigPropsCount, get_object_vars($config));
         $this->assertTrue(property_exists($config, 'test1'));
         $this->assertTrue(property_exists($config, 'testVarName1'));
         $this->assertEquals($config->test1, 7);
