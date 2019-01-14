@@ -17,21 +17,70 @@ class ConfigTest extends \Codeception\Test\Unit
         $this->assertTrue(property_exists($config, 'test'));
         $this->assertEquals($config->test, 3);
     }
+    public function testLoad()
+    {
+        $config = new Config();
+        $initialConfigPropsCount = count(get_object_vars($config));
+        
+        $config->load(dirname(__DIR__) . '/_data/non-existence-config.php');
+        $this->assertCount($initialConfigPropsCount, get_object_vars($config));
+        
+        $config->load(dirname(__DIR__) . '/_data/config-bad.php');
+        $this->assertCount($initialConfigPropsCount, get_object_vars($config));
+        
+        $config->load(dirname(__DIR__) . '/_data/config-arr.php');
+        $this->assertNotEquals($initialConfigPropsCount, get_object_vars($config));
+        $this->assertTrue(property_exists($config, 'testArr1'));
+        $this->assertEquals('test array config value 1', $config->testArr1);
+        
+        $config = new Config();
+        $initialConfigPropsCount = count(get_object_vars($config));
+        $config->load(dirname(__DIR__) . '/_data/config-obj.php');
+        $this->assertNotEquals($initialConfigPropsCount, get_object_vars($config));
+        $this->assertTrue(property_exists($config, 'testObj1'));
+        $this->assertEquals('test object config value 1', $config->testObj1);
+    }
+    
+    public function testLoadWithDefault()
+    {
+        $config = new Config();
+        $initialConfigPropsCount = count(get_object_vars($config));
+        
+        $nonExistenceConfig = dirname(__DIR__) . '/_data/non-existence-config.php';
+        $badConfig = dirname(__DIR__) . '/_data/config-bad.php';
+        $arrConfig = dirname(__DIR__) . '/_data/config-arr.php';
+        $arrConfigDefault = dirname(__DIR__) . '/_data/config-arr-default.php';
+        
+        $config->loadWithDefault($nonExistenceConfig, $nonExistenceConfig);
+        $this->assertCount($initialConfigPropsCount, get_object_vars($config));
+        
+        $config->loadWithDefault($badConfig, $badConfig);
+        $this->assertCount($initialConfigPropsCount, get_object_vars($config));
+        
+        $config->loadWithDefault($arrConfig, $arrConfigDefault);
+        $this->assertNotEquals($initialConfigPropsCount, get_object_vars($config));
+        $this->assertTrue(property_exists($config, 'testArr1'));
+        $this->assertEquals('test array config value 1', $config->testArr1);
+        $this->assertTrue(property_exists($config, 'testArr2'));
+        $this->assertEquals('test default array config value 2', $config->testArr2);
+    }
     
     public function testLoadArray()
     {
         $config = new Config();
+        $initialConfigPropsCount = count(get_object_vars($config));
         $this->assertFalse(property_exists($config, 'test'));
         
         $config->loadArray(['test' => 4]);
+        $this->assertNotEquals($initialConfigPropsCount, get_object_vars($config));
         $this->assertTrue(property_exists($config, 'test'));
-        $this->assertEquals($config->test, 4);
+        $this->assertEquals(4, $config->test);
         
         $config->loadArray(['test' => 5]);
-        $this->assertEquals($config->test, 4);
+        $this->assertEquals(4, $config->test);
         
         $config->loadArray(['test' => 5], true);
-        $this->assertEquals($config->test, 5);
+        $this->assertEquals(5, $config->test);
     }
     
     public function testLoadFromIni()

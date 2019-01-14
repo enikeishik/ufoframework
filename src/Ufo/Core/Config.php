@@ -158,7 +158,7 @@ class Config extends Struct implements ConfigInterface
         if (!file_exists($configPath)) {
             return;
         }
-        $config = include_once $configPath;
+        $config = include $configPath;
         if (!is_array($config) && !is_object($config)) {
             return;
         }
@@ -178,8 +178,8 @@ class Config extends Struct implements ConfigInterface
         if (!file_exists($configPath)) {
             return;
         }
-        $configDefault = include_once $defaultConfigPath;
-        $config = include_once $configPath;
+        $configDefault = include $defaultConfigPath;
+        $config = include $configPath;
         if (!is_array($configDefault) && !is_array($config)) {
             return;
         }
