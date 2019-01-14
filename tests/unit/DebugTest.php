@@ -1,10 +1,8 @@
 <?php
-require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
-
 use \Ufo\Core\Debug;
 use \Ufo\Core\DebugIndexNotExistsException;
  
-class DebugTest extends \Codeception\Test\Unit
+class DebugTest extends BaseUnitTest
 {
     /**
      * @var int
@@ -25,19 +23,6 @@ class DebugTest extends \Codeception\Test\Unit
             round($expected, self::TIME_PRECISION), 
             round($result, self::TIME_PRECISION)
         );
-    }
-    
-    /**
-     * @param string $expectedExceptionClass
-     * @param callable $call = null
-     */
-    protected function expectedException(string $expectedExceptionClass, callable $call = null)
-    {
-        try {
-            $call();
-        } catch (\Exception $e) {
-            $this->assertEquals($expectedExceptionClass, get_class($e));
-        }
     }
     
     public function testTrace()
@@ -83,5 +68,25 @@ class DebugTest extends \Codeception\Test\Unit
         $this->assertEquals($traceCount, count($trace));
         $traceLastItem = $trace[$traceCount - 1];
         $this->assertEquals('Trace end', $traceLastItem['result']);
+    }
+    
+    public function testErrorHandler()
+    {
+        set_error_handler(['\Ufo\Core\Debug', 'errorHandler']);
+        $a = 1 / 0;
+        restore_error_handler();
+        $debug = new Debug();
+        $errors = $debug->getErrors();
+        $this->assertTrue(is_array($errors));
+        $this->assertCount(1, $errors);
+        $this->assertContains('Division by zero', $errors[0]);
+    }
+    
+    public function testVarDump()
+    {
+        ob_start();
+        Debug::vd('test', false, false);
+        $content = ob_get_clean();
+        $this->assertContains('test', $content);
     }
 }

@@ -127,6 +127,7 @@ class Debug implements DebugInterface
     public static function errorHandler(int $errno, string $errstr, string $errfile, string $errline): bool
     {
         self::$buffErr[] = $errno . "\t" . $errfile . "\t" . $errline . "\t" . $errstr;
+        return true;
     }
     
     /**
@@ -152,9 +153,11 @@ class Debug implements DebugInterface
         $dump ? var_dump($var) : print_r($var);
         echo htmlspecialchars(str_replace("=>\n", '  =>', ob_get_clean()));
         echo '</pre>';
+        // @codeCoverageIgnoreStart
         if ($exit) {
             exit();
         }
+        // @codeCoverageIgnoreEnd
     }
     
     /**
