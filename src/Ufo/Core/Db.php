@@ -34,13 +34,23 @@ class Db extends \mysqli
      * @param \Ufo\Core\DebugInterface $debug = null
      * @return \Ufo\Core\Db
      */
-    public static function getInstance(DebugInterface $debug = null): Db
+    public static function getInstance(DebugInterface $debug = null): self
     {
         if (null === static::$instance) {
             static::$instance = new static($debug);
         }
         
         return static::$instance;
+    }
+    
+    /**
+     * Close current connection and unset instance.
+     * @return bool
+     */
+    public function close(): bool
+    {
+        static::$instance = null;
+        return parent::close();
     }
     
     /**
@@ -184,10 +194,16 @@ class Db extends \mysqli
         return '' != $this->error ? $this->error : $this->generatedError;
     }
     
+    /**
+     * @codeCoverageIgnore
+     */
     protected function __clone()
     {
     }
     
+    /**
+     * @codeCoverageIgnore
+     */
     private function __wakeup()
     {
     }
