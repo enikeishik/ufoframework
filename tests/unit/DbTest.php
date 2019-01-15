@@ -4,7 +4,7 @@ require_once dirname(__DIR__) . '/_data/cctestsdb.php';
 use \Ufo\Core\Db;
 use \Ufo\Core\Debug;
 
-class FrontendDbTest extends BaseUnitTest
+class DbTest extends BaseUnitTest
 {
     protected function getDb($withDebug = true)
     {
