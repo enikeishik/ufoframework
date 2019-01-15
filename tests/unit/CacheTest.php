@@ -1,25 +1,10 @@
 <?php
-require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
-
 use \Ufo\Core\Config;
 use \Ufo\Core\Debug;
 use \Ufo\Cache\Cache;
  
-class CacheTest extends \Codeception\Test\Unit
+class CacheTest extends BaseUnitTest
 {
-    /**
-     * @param string $expectedExceptionClass
-     * @param callable $call = null
-     */
-    protected function expectedException(string $expectedExceptionClass, callable $call = null)
-    {
-        try {
-            $call();
-        } catch (\Exception $e) {
-            $this->assertEquals($expectedExceptionClass, get_class($e));
-        }
-    }
-    
     // tests
     protected function testCacheCases($cache)
     {
@@ -29,6 +14,7 @@ class CacheTest extends \Codeception\Test\Unit
         $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
         
         $this->assertTrue($cache->set('any-key', 'any-value'));
+        $this->assertTrue($cache->set('any-key', 'any-value')); //add the same
         $this->assertTrue($cache->has('any-key'));
         $this->assertEquals('any-value', $cache->get('any-key'));
         $this->assertEquals('any-value', $cache->get('any-key', 'default-value'));
@@ -65,13 +51,59 @@ class CacheTest extends \Codeception\Test\Unit
         sleep(1);
         $this->assertTrue($cache->expired('key1', 0));
         $this->assertFalse($cache->expired('key1', 2));
+        
+        $this->expectedException(
+            \Ufo\Core\TypeNotSupportedException::class, 
+            function() use($cache) { $cache->expired('key1', new DateInterval('PT0S')); }
+        );
 
         $this->assertTrue($cache->deleteOutdated(100));
         $this->assertTrue($cache->has('key1'));
         $this->assertTrue($cache->deleteOutdated(0));
         $this->assertFalse($cache->has('key1'));
         
+        $this->expectedException(
+            \Ufo\Core\TypeNotSupportedException::class, 
+            function() use($cache) { $cache->deleteOutdated(new DateInterval('PT0S')); }
+        );
+        
         $cache->clear();
+    }
+    
+    protected function testCacheCasesFail($cache)
+    {
+        $this->assertEmpty($cache->get('any-key'));
+        $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
+        
+        $this->assertFalse($cache->set('any-key', 'any-value'));
+        $this->assertFalse($cache->has('any-key'));
+        $this->assertNull($cache->get('any-key'));
+        $this->assertEquals('default-value', $cache->get('any-key', 'default-value'));
+        
+        $this->assertFalse($cache->delete('any-key'));
+        $this->assertFalse($cache->clear());
+        
+        $this->assertFalse($cache->setMultiple([
+            'key1' => 'value1', 
+            'key2' => 'value2', 
+            'key3' => 'value3', 
+            'key4' => 'value4', 
+        ]));
+        $this->assertEquals(
+            [null, null, null], 
+            $cache->getMultiple(['key3', 'key1', 'key0'])
+        );
+        $this->assertEquals(
+            ['default-value', 'default-value', 'default-value'], 
+            $cache->getMultiple(['key2', 'key-4', 'key-1'], 'default-value')
+        );
+        $this->assertFalse($cache->deleteMultiple(['key1', 'key2', 'key3', 'key4']));
+        
+        $this->assertTrue($cache->expired('key-not-exists', 0));
+        $this->assertTrue($cache->expired('key-not-exists', PHP_INT_MAX));
+
+        $this->assertFalse($cache->deleteOutdated(100));
+        $this->assertFalse($cache->deleteOutdated(0));
     }
     
     public function testCacheArrayStorage()
@@ -107,6 +139,11 @@ class CacheTest extends \Codeception\Test\Unit
         $this->assertTrue($cache->deleteOutdated(0));
         
         $this->assertTrue($cache->clear());
+        
+        $cache = new class($config, new Debug()) extends Cache {
+            public $storage;
+        };
+        $this->assertEquals(PHP_INT_MAX, $cache->storage->getAge(''));
     }
     
     public function testCacheFilesStorage()
@@ -129,7 +166,14 @@ class CacheTest extends \Codeception\Test\Unit
         
         $this->testCacheCases($cache);
         
+        $this->assertFalse($cache->has(''));
+        $this->assertFalse($cache->has('asd@123.qwe!zxc#rty$456'));
+        
         rmdir($cacheDir);
+        
+        $config->cacheDir = '/tmp/unexistence-ufo-cache-test-dir';
+        $cache = new Cache($config, new Debug());
+        $this->testCacheCasesFail($cache);
     }
     
     public function testCacheSqliteStorage()
@@ -139,7 +183,20 @@ class CacheTest extends \Codeception\Test\Unit
         $config->rootPath = '';
         $config->cacheDir = dirname(__DIR__) . '/_data';
         $cache = new Cache($config, new Debug());
-        
         $this->testCacheCases($cache);
+        
+        $config->cacheSqliteTable = 'non-exists-table';
+        $cache = new Cache($config, new Debug());
+        $this->testCacheCasesFail($cache);
+    }
+    
+    public function testCacheUnsupportedStorage()
+    {
+        $config = new Config();
+        $config->cacheType = '';
+        $this->expectedException(
+            \Ufo\Cache\CacheStorageNotSupportedException::class, 
+            function() use($config) { $cache = new Cache($config, new Debug()); }
+        );
     }
 }
