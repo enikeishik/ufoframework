@@ -10,6 +10,7 @@
 namespace Ufo\Cache;
 
 use Ufo\Core\Config;
+use Ufo\Core\Db;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\TypeNotSupportedException;
 
@@ -57,9 +58,13 @@ class Cache implements CacheInterface
                 // break;
             // case $this->config::CACHE_TYPE_REDIS:
                 // break;
-            // case $this->config::CACHE_TYPE_MYSQL:
-                // $this->storage = new CacheMysqlStorage($this->config);
-                // break;
+            case $this->config::CACHE_TYPE_MYSQL:
+                $this->storage = new CacheMysqlStorage(
+                    $this->config, 
+                    Db::getInstance($this->debug), 
+                    $this->debug
+                );
+                break;
             
             case $this->config::CACHE_TYPE_ARRAY:
                 $this->storage = new CacheArrayStorage();
