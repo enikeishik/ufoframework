@@ -36,7 +36,7 @@ class Cache implements CacheInterface
     /**
      * @param \Ufo\Core\Config $config
      * @param \Ufo\Core\DebugInterface $debug = null
-     * @throws CacheStorageNotSupportedException
+     * @throws \Ufo\Cache\CacheStorageNotSupportedException
      */
     public function __construct(Config $config, DebugInterface $debug = null)
     {
