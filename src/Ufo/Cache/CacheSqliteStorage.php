@@ -67,6 +67,18 @@ class CacheSqliteStorage implements CacheStorageInterface
     {
         $this->config = $config;
         $this->debug = $debug;
+        if (isset($this->config->cacheSqliteTable)) {
+            $this->table =  $this->config->cacheSqliteTable;
+        }
+        if (isset($this->config->cacheSqliteKeyField)) {
+            $this->keyField =  $this->config->cacheSqliteKeyField;
+        }
+        if (isset($this->config->cacheSqliteValueField)) {
+            $this->valueField =  $this->config->cacheSqliteValueField;
+        }
+        if (isset($this->config->cacheSqliteTimeField)) {
+            $this->timeField =  $this->config->cacheSqliteTimeField;
+        }
         
         $this->db = new \SQLite3($this->config->projectPath . $this->config->cacheDir . '/' . $this->base);
     }
@@ -87,11 +99,13 @@ class CacheSqliteStorage implements CacheStorageInterface
     {
         $sql =  'SELECT COUNT(*) AS Cnt FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
-        $cnt = $this->db->querySingle($sql);
-        if (null === $cnt) {
+        $cnt = null;
+        try {
+            $cnt = $this->db->querySingle($sql);
+            return 0 < (int) $cnt;
+        } catch (\Exception $e) {
             return false;
         }
-        return 0 < (int) $cnt;
     }
     
     /**
@@ -103,7 +117,11 @@ class CacheSqliteStorage implements CacheStorageInterface
     {
         $sql =  'SELECT "' . $this->valueField . '" FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
-        return $this->db->querySingle($sql);
+        try {
+            return $this->db->querySingle($sql);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
     
     /**
@@ -115,7 +133,11 @@ class CacheSqliteStorage implements CacheStorageInterface
     {
         $sql =  'SELECT "' . $this->timeField . '" FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
-        return time() - (int) $this->db->querySingle($sql);
+        try {
+            return time() - (int) $this->db->querySingle($sql);
+        } catch (\Exception $e) {
+            return PHP_INT_MAX;
+        }
     }
     
     /**
@@ -132,18 +154,30 @@ class CacheSqliteStorage implements CacheStorageInterface
             throw new TypeNotSupportedException();
         }
         
-        $sql =  'INSERT INTO "' . $this->table . '"' . 
-                '(' . 
-                    '"' . $this->keyField .   '", ' . 
-                    '"' . $this->valueField . '", ' . 
-                    '"' . $this->timeField .  '"' . 
-                ')' . 
-                ' VALUES(' . 
-                    "'" . $this->db->escapeString($key) . "'," . 
-                    "'" . $this->db->escapeString($value) . "'," . 
+        if (!$this->has($key)) {
+            $sql =  'INSERT INTO "' . $this->table . '"' . 
+                    '(' . 
+                        '"' . $this->keyField .   '", ' . 
+                        '"' . $this->valueField . '", ' . 
+                        '"' . $this->timeField .  '"' . 
+                    ')' . 
+                    ' VALUES(' . 
+                        "'" . $this->db->escapeString($key) . "'," . 
+                        "'" . $this->db->escapeString($value) . "'," . 
+                        "'" . time() . "'" . 
+                    ')';
+        } else {
+            $sql =  'UPDATE "' . $this->table . '"' . 
+                    ' SET "' . $this->timeField .  '"=' . 
                     "'" . time() . "'" . 
-                ')';
-        return $this->db->exec($sql);
+                    ' WHERE "' . $this->keyField .   '"=' . 
+                    "'" . $this->db->escapeString($key) . "'";
+        }
+        try {
+            return $this->db->exec($sql);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
     
     /**
@@ -155,7 +189,11 @@ class CacheSqliteStorage implements CacheStorageInterface
     {
         $sql =  'DELETE FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
-        return $this->db->exec($sql);
+        try {
+            return $this->db->exec($sql);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
     
     /**
@@ -166,7 +204,11 @@ class CacheSqliteStorage implements CacheStorageInterface
     {
         $sql =  'DELETE FROM "' . $this->table . '"';
         //$sql2 =  'VACUUM'; too slow
-        return $this->db->exec($sql);
+        try {
+            return $this->db->exec($sql);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
     
     /**
@@ -185,6 +227,10 @@ class CacheSqliteStorage implements CacheStorageInterface
         $minTime = time() - $tts;
         $sql =  'DELETE FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->timeField . '"<' . "'" . $minTime . "'";
-        return $this->db->exec($sql);
+        try {
+            return $this->db->exec($sql);
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

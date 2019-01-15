@@ -126,7 +126,7 @@ class CacheFilesStorage implements CacheStorageInterface
      */
     public function delete(string $key): bool
     {
-        return unlink($this->getCashFilePath($key));
+        return @unlink($this->getCashFilePath($key));
     }
     
     /**
@@ -138,7 +138,7 @@ class CacheFilesStorage implements CacheStorageInterface
         //TODO: check the need to call
         clearstatcache();
         
-        $dh = opendir($this->cacheDir);
+        $dh = @opendir($this->cacheDir);
         if (false === $dh) {
             return false;
         }
@@ -171,7 +171,7 @@ class CacheFilesStorage implements CacheStorageInterface
         //TODO: check the need to call
         clearstatcache();
         
-        $dh = opendir($this->cacheDir);
+        $dh = @opendir($this->cacheDir);
         if (false === $dh) {
             return false;
         }
