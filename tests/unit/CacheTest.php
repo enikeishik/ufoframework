@@ -1,5 +1,6 @@
 <?php
 use \Ufo\Core\Config;
+use \Ufo\Core\Db;
 use \Ufo\Core\Debug;
 use \Ufo\Cache\Cache;
  
@@ -15,6 +16,14 @@ class CacheTest extends BaseUnitTest
         
         $this->assertTrue($cache->set('any-key', 'any-value'));
         $this->assertTrue($cache->set('any-key', 'any-value')); //add the same
+        $this->assertTrue($cache->set('any-key2', 'any-value2', 2));
+        $this->assertTrue($cache->set('any-key3', 'any-value3', 3, 30));
+        
+        $this->expectedException(
+            \Ufo\Core\TypeNotSupportedException::class, 
+            function() use($cache) { $cache->set('any-key4', 'any-value4', new DateInterval('PT0S')); }
+        );
+        
         $this->assertTrue($cache->has('any-key'));
         $this->assertEquals('any-value', $cache->get('any-key'));
         $this->assertEquals('any-value', $cache->get('any-key', 'default-value'));
@@ -56,7 +65,7 @@ class CacheTest extends BaseUnitTest
             \Ufo\Core\TypeNotSupportedException::class, 
             function() use($cache) { $cache->expired('key1', new DateInterval('PT0S')); }
         );
-
+        
         $this->assertTrue($cache->deleteOutdated(100));
         $this->assertTrue($cache->has('key1'));
         $this->assertTrue($cache->deleteOutdated(0));
@@ -185,7 +194,38 @@ class CacheTest extends BaseUnitTest
         $cache = new Cache($config, new Debug());
         $this->testCacheCases($cache);
         
-        $config->cacheSqliteTable = 'non-exists-table';
+        //test storage::getAge with wrong query
+        $this->assertTrue($cache->set('key-expired-test', 'value expired test'));
+        $config->cacheSqliteTimeField = 'non_exists_time_field';
+        $cache = new Cache($config, new Debug());
+        $this->assertTrue($cache->expired('key-expired-test', 0));
+        
+        $config->cacheSqliteTable = 'non_exists_time_field';
+        $config->cacheSqliteKeyField = 'non_exists_time_field';
+        $config->cacheSqliteValueField = 'non_exists_time_field';
+        $cache = new Cache($config, new Debug());
+        $this->testCacheCasesFail($cache);
+    }
+    
+    public function testCacheMysqlStorage()
+    {
+        require_once dirname(__DIR__) . '/_data/cctestsdb.php'; 
+        $config = new Config();
+        $config->cacheType = Config::CACHE_TYPE_MYSQL;
+        $cache = new Cache($config, new Debug());
+        $this->testCacheCases($cache);
+        
+        //test storage::getAge with wrong query
+        $this->assertTrue($cache->set('key-expired-test', 'value expired test'));
+        Db::getInstance()->close();
+        $config->cacheMysqlTimeField = 'non_exists_time_field';
+        $cache = new Cache($config, new Debug());
+        $this->assertTrue($cache->expired('key-expired-test', 0));
+        Db::getInstance()->close();
+        
+        $config->cacheMysqlTable = 'non_exists_time_field';
+        $config->cacheMysqlKeyField = 'non_exists_time_field';
+        $config->cacheMysqlValueField = 'non_exists_time_field';
         $cache = new Cache($config, new Debug());
         $this->testCacheCasesFail($cache);
     }
