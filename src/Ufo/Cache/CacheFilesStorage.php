@@ -91,6 +91,10 @@ class CacheFilesStorage implements CacheStorageInterface
      */
     public function set(string $key, $value, $ttl = null, $tts = null): bool
     {
+        if ($ttl instanceof \DateInterval || $tts instanceof \DateInterval) {
+            throw new TypeNotSupportedException();
+        }
+        
         $cacheFile = $this->getCashFilePath($key);
         
         if (file_exists($cacheFile)) {
