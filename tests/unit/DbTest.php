@@ -1,6 +1,5 @@
 <?php
-require_once dirname(__DIR__) . '/_data/cctestsdb.php';
-
+use \Ufo\Core\Config;
 use \Ufo\Core\Db;
 use \Ufo\Core\Debug;
 
@@ -8,27 +7,62 @@ class DbTest extends BaseUnitTest
 {
     protected function getDb($withDebug = true)
     {
-        return Db::getInstance($withDebug ? new Debug() : null);
+        $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
+        return Db::getInstance($config, $withDebug ? new Debug() : null);
     }
-
+    
     protected function _after()
     {
         $this->getDb()->close();
     }
-
+    
     // tests
     public function testGetInstance()
     {
-        $db1 = Db::getInstance();
-        $db2 = Db::getInstance();
-        $db3 = Db::getInstance(new Debug());
+        $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
+        
+        $db1 = Db::getInstance($config);
+        $db2 = Db::getInstance($config);
+        $db3 = Db::getInstance($config, new Debug());
+        
         $this->assertSame($db1, $db2);
         $this->assertSame($db1, $db3);
     }
     
+    public function testDb()
+    {
+        $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
+        $config->dbServer = 'non-existence-host';
+        $this->expectedException(
+            Ufo\Core\DbConnectException::class, 
+            function() use($config) { $db = Db::getInstance($config); }
+        );
+        $this->expectedException(
+            Ufo\Core\DbConnectException::class, 
+            function() use($config) { $db = Db::getInstance($config, new Debug()); }
+        );
+    }
+    
     public function testQuery()
     {
-        $this->assertNotFalse($this->getDb()->query('SHOW TABLES'));
+        $db = $this->getDb();
+        $this->assertNotFalse($db->query('SHOW TABLES'));
+        $db->close();
+        
+        $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
+        $config->dbReadonly = true;
+        $db = Db::getInstance($config);
+        $this->assertFalse($db->query('UPDATE `test_items_table` SET `id`=1 WHERE `id`=1'));
+        $this->assertEquals('Readonly mode for database is on', $db->getError());
+        $db->close();
+        
+        $db = Db::getInstance($config, new Debug());
+        $this->assertFalse($db->query('UPDATE `test_items_table` SET `id`=1 WHERE `id`=1'));
+        $this->assertEquals('', $db->getError());
     }
     
     public function testGetItem()
@@ -82,6 +116,8 @@ class DbTest extends BaseUnitTest
             $error = $e->getMessage();
         }
         $this->assertEquals('Undefined index: id2', $error);
+        
+        $this->assertNull($db->getValues('SELECT `id` FROM `test_items_table_non_existence` LIMIT 1', 'id'));
     }
     
     public function testGetItems()
@@ -116,6 +152,8 @@ class DbTest extends BaseUnitTest
             $error = $e->getMessage();
         }
         $this->assertEquals('Undefined index: id2', $error);
+        
+        $this->assertNull($db->getItems('SELECT `id` FROM `test_items_table_non_existence` LIMIT 1', 'id'));
     }
     
     public function testGetLastInsertedId()

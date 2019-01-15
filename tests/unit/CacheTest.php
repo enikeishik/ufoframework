@@ -209,19 +209,19 @@ class CacheTest extends BaseUnitTest
     
     public function testCacheMysqlStorage()
     {
-        require_once dirname(__DIR__) . '/_data/cctestsdb.php'; 
         $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
         $config->cacheType = Config::CACHE_TYPE_MYSQL;
         $cache = new Cache($config, new Debug());
         $this->testCacheCases($cache);
         
         //test storage::getAge with wrong query
         $this->assertTrue($cache->set('key-expired-test', 'value expired test'));
-        Db::getInstance()->close();
+        Db::getInstance($config)->close();
         $config->cacheMysqlTimeField = 'non_exists_time_field';
         $cache = new Cache($config, new Debug());
         $this->assertTrue($cache->expired('key-expired-test', 0));
-        Db::getInstance()->close();
+        Db::getInstance($config)->close();
         
         $config->cacheMysqlTable = 'non_exists_time_field';
         $config->cacheMysqlKeyField = 'non_exists_time_field';
