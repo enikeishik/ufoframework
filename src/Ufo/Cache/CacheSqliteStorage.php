@@ -115,7 +115,8 @@ class CacheSqliteStorage implements CacheStorageInterface
      */
     public function get(string $key)
     {
-        $sql =  'SELECT "' . $this->valueField . '" FROM "' . $this->table . '"' . 
+        //used ` instead of " to gets error if field wrong, not "wrong_field" string
+        $sql =  'SELECT `' . $this->valueField . '` FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
         try {
             return $this->db->querySingle($sql);
@@ -131,7 +132,8 @@ class CacheSqliteStorage implements CacheStorageInterface
      */
     public function getAge(string $key): int
     {
-        $sql =  'SELECT "' . $this->timeField . '" FROM "' . $this->table . '"' . 
+        //used ` instead of " to gets error if field wrong, not "wrong_field" string
+        $sql =  'SELECT `' . $this->timeField . '` FROM "' . $this->table . '"' . 
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
         try {
             return time() - (int) $this->db->querySingle($sql);
