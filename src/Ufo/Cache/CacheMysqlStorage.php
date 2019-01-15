@@ -115,7 +115,11 @@ class CacheMysqlStorage implements CacheStorageInterface
     {
         $sql =  'SELECT `' . $this->timeField . '` FROM #__' . $this->table . 
                 " WHERE `" . $this->keyField . "`='" . $this->db->addEscape($key) . "'";
-        return time() - (int) $this->db->getValue($sql, $this->timeField);
+        $value = $this->db->getValue($sql, $this->timeField);
+        if (null === $value) {
+            return PHP_INT_MAX;
+        }
+        return time() - (int) $value;
     }
     
     /**
@@ -132,17 +136,25 @@ class CacheMysqlStorage implements CacheStorageInterface
             throw new TypeNotSupportedException();
         }
         
+        if (!$this->has($key)) {
         $sql =  'INSERT INTO #__' . $this->table . 
                 '(' . 
-                    $this->keyField . ', ' . 
-                    $this->valueField . ', ' . 
-                    $this->timeField . 
+                    '`' . $this->keyField . '`, ' . 
+                    '`' . $this->valueField . '`, ' . 
+                    '`' . $this->timeField . '`' . 
                 ')' . 
                 ' VALUES(' . 
                     "'" . $this->db->addEscape($key) . "'," . 
                     "'" . $this->db->addEscape($value) . "'," . 
                     "'" . time() . "'" . 
                 ')';
+        } else {
+            $sql =  'UPDATE #__' . $this->table . 
+                    ' SET `' . $this->timeField .  '`=' . 
+                    "'" . time() . "'" . 
+                    ' WHERE `' . $this->keyField .   '`=' . 
+                    "'" . $this->db->addEscape($key) . "'";
+        }
         return $this->db->query($sql);
     }
     
