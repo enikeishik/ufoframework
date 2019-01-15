@@ -20,6 +20,11 @@ class Db extends \mysqli
     protected static $instance = null;
     
     /**
+     * @var \Ufo\Core\ConfigInterface
+     */
+    protected $config = null;
+    
+    /**
      * @var \Ufo\Core\Debug
      */
     protected $debug = null;
@@ -31,13 +36,14 @@ class Db extends \mysqli
     
     /**
      * Implementation of singleton pattern.
+     * @param \Ufo\Core\ConfigInterface $config
      * @param \Ufo\Core\DebugInterface $debug = null
      * @return \Ufo\Core\Db
      */
-    public static function getInstance(DebugInterface $debug = null): self
+    public static function getInstance(ConfigInterface $config, DebugInterface $debug = null): self
     {
         if (null === static::$instance) {
-            static::$instance = new static($debug);
+            static::$instance = new static($config, $debug);
         }
         
         return static::$instance;
@@ -57,23 +63,29 @@ class Db extends \mysqli
      * @param \Ufo\Core\Debug &$debug = null
      * @throws \Ufo\Core\DbConnectException
      */
-    protected function __construct(DebugInterface $debug = null)
+    protected function __construct(ConfigInterface $config, DebugInterface $debug = null)
     {
+        $this->config = $config;
         $this->debug = $debug;
         if (null !== $this->debug) {
             $this->debug->trace(__METHOD__);
         }
         
-        //подавляем вывод ошибок, т.к. иначе (даже при try-catch) выдается Warning
-        @parent::__construct(C_DB_SERVER, C_DB_USER, C_DB_PASSWD, C_DB_NAME);
+        //suppressing errors, because (even in try-catch) Warning will showed
+        @parent::__construct(
+            $this->config->dbServer, 
+            $this->config->dbUser, 
+            $this->config->dbPassword, 
+            $this->config->dbName
+        );
         if (0 != $this->connect_errno) {
             if (null !== $this->debug) {
                 $this->debug->traceClose(null, $this->connect_errno, $this->connect_error);
             }
             throw new DbConnectException(preg_replace('/[^a-z0-1\s\.\-;:,_~]+/i', '', $this->connect_error));
         }
-        if ('' != C_DB_CHARSET) {
-            $this->query('SET NAMES ' . C_DB_CHARSET);
+        if ('' != $this->config->dbCharset) {
+            $this->query('SET NAMES ' . $this->config->dbCharset);
         }
         if (null !== $this->debug) {
             $this->debug->traceClose();
@@ -85,9 +97,9 @@ class Db extends \mysqli
      */
     public function query($query, $resultmode = null)
     {
-        $query = str_replace('#__', C_DB_TABLE_PREFIX, $query);
+        $query = str_replace('#__', $this->config->dbTablePrefix, $query);
         
-        if (C_DB_READONLY 
+        if ($this->config->dbReadonly 
         && 0 !== stripos($query, 'SELECT ') 
         && 0 !== stripos($query, 'SET NAMES ')) {
             if (null === $this->debug) {

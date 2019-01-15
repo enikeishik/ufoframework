@@ -420,7 +420,7 @@ class App
         if (null !== $this->db) {
             return;
         }
-        $this->db = Db::getInstance($this->debug);
+        $this->db = Db::getInstance($this->config, $this->debug);
     }
     
     /**
