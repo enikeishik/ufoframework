@@ -176,7 +176,7 @@ class View extends DIObject implements ViewInterface
             // /templates/module/template.php
             $templatePath = 
                 $templatesPath . 
-                '/' . strtolower($moduleName) . 
+                (!empty($moduleName) ? '/' . strtolower($moduleName) : '') . 
                 '/' . str_replace('.', '/', $templateName) . $this->extension;
             if (file_exists($templatePath)) {
                 return $templatePath;
