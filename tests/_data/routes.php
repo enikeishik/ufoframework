@@ -3,7 +3,7 @@ return [
     '/' => [
         'title' => 'Main page', 
         'module' => [
-            'id' => -1, 
+            'vendor' => 'Ufo', 
             'name' => 'Mainpage', 
             'dbless' => true, 
         ], 
@@ -11,7 +11,7 @@ return [
     '/section-disabled' => [
         'title' => 'ASD page', 
         'module' => [
-            'id' => 1, 
+            'vendor' => 'Ufo', 
             'name' => 'Documents', 
             'dbless' => true, 
         ], 
@@ -20,7 +20,7 @@ return [
     '/module/disabled' => [
         'title' => 'ASD QWE page', 
         'module' => [
-            'id' => 2, 
+            'vendor' => 'Ufo', 
             'name' => 'Documents', 
             'dbless' => true, 
             'disabled' => true, 
@@ -29,7 +29,7 @@ return [
     '/document' => [
         'title' => 'Document page', 
         'module' => [
-            'id' => 3, 
+            'vendor' => 'Ufo', 
             'name' => 'Documents', 
             'dbless' => true, 
         ], 
@@ -37,7 +37,7 @@ return [
     '/section-with/callback' => [
         'title' => 'QWE ASD page', 
         'module' => [
-            'id' => 333, 
+            'vendor' => 'Ufo', 
             'name' => 'Simple callback', 
             'callback' => function($container) {
                 return 'content of callback for section ' . $container->section->path;
@@ -50,7 +50,7 @@ return [
     '/some/another/document' => [
         'title' => 'QWE ASD ZXC page', 
         'module' => [
-            'id' => 4, 
+            'vendor' => 'Ufo', 
             'name' => 'Documents', 
             'dbless' => true, 
         ], 
