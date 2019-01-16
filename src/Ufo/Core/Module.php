@@ -12,9 +12,9 @@ namespace Ufo\Core;
 class Module extends Struct
 {
     /**
-     * @var int
+     * @var string
      */
-    public $id = 0;
+    public $vendor = '';
     
     /**
      * @var string
