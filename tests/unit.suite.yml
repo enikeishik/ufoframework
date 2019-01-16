@@ -10,9 +10,9 @@ modules:
         - Db
     config:
         Db:
-            dsn: 'mysql:host=localhost;dbname=cctestsdb'
+            dsn: 'mysql:host=localhost;dbname=ufmtestsdb'
             user: 'root'
             password: ''
-            dump: 'tests/_data/cctestsdb.sql'
+            dump: 'tests/_data/ufmtestsdb.sql'
             populate: true
             cleanup: false
