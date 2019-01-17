@@ -8,6 +8,8 @@ use \Ufo\Core\ModuleParameterFormatException;
 use \Ufo\Core\ModuleParameterUnknownException;
 use \Ufo\Core\Section;
 use \Ufo\Modules\Controller;
+use \Ufo\Modules\Model;
+use \Ufo\Modules\ModelInterface;
 use \Ufo\Modules\Parameter;
  
 class ControllerTest extends \Codeception\Test\Unit
@@ -64,6 +66,35 @@ class ControllerTest extends \Codeception\Test\Unit
                 '<title>Document page</title>'
             )
         );
+    }
+    
+    public function testSetData()
+    {
+        $controller = new class() extends Controller {
+            public $data = [];
+            
+            public function setData(Section $section = null): void
+            {
+                parent::setData($section);
+            }
+            
+            protected function getModel(): ModelInterface
+            {
+                $model = new class() extends Model {
+                    public function getItems()
+                    {
+                        return [];
+                    }
+                };
+                $model->inject($this->container);
+                return $model;
+            }
+        };
+        $controller->inject(new Container(['config' => $this->getConfig()]));
+        
+        $this->assertEquals([], $controller->data);
+        $controller->setData();
+        $this->assertEquals(['items' => [], 'section' => null], $controller->data);
     }
     
     public function testComposeWidgets()
@@ -299,12 +330,15 @@ class ControllerTest extends \Codeception\Test\Unit
         $controller->params = [];
         $controller->paramsAssigned = [];
         $controller->initParams();
-        $controller->params['somegetparam'] = Parameter::make('somegetparam', 'int', 'somegetparam', 'get', false, 0);
-        $_GET['somegetparam'] = 5;
+        $controller->params['somegetintparam'] = Parameter::make('somegetintparam', 'int', 'somegetintparam', 'get', false, 0);
+        $controller->params['somegetblnparam'] = Parameter::make('somegetblnparam', 'bool', 'somegetblnparam', 'get', true, false);
+        $_GET['somegetintparam'] = 5;
+        $_GET['somegetblnparam'] = 1;
         $this->assertNull($controller->params['isRoot']->value);
         $this->assertNull($controller->params['isRss']->value);
         $controller->setParams([]);
-        $this->assertEquals(5, $controller->params['somegetparam']->value);
+        $this->assertEquals(5, $controller->params['somegetintparam']->value);
+        $this->assertTrue($controller->params['somegetblnparam']->value);
         $this->assertFalse($controller->params['isRoot']->value);
         $this->assertFalse($controller->params['isRss']->value);
         
