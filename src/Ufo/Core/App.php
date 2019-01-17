@@ -468,7 +468,11 @@ class App
     {
         $controllerClass = $module->callback;
         if (empty($controllerClass) || false === strpos($controllerClass, '\\')) {
-            $controllerClass = '\Ufo\Modules\\' . $module->vendor . '\\' . $module->name . '\Controller';
+            $controllerClass = 
+                '\Ufo\Modules' . 
+                '\\' . ucfirst($module->vendor) . 
+                '\\' . ucfirst($module->name) . 
+                '\Controller';
         }
         
         if (class_exists($controllerClass)) {

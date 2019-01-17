@@ -161,14 +161,22 @@ class Controller extends DIObject implements ControllerInterface
             foreach ($placeWidgets as $widget) {
                 $container->set('data', $widget);
                 
+                if (empty($widget['vendor'])) {
+                    continue;
+                }
                 if (empty($widget['module'])) {
                     $widgetControllerClass = 
-                        '\Ufo\Modules\Widgets\\' . 
-                        ucfirst($widget['name']) . '\Controller';
+                        '\Ufo\Modules' . 
+                        '\\' . ucfirst($widget['vendor']) . 
+                        '\Widgets' . 
+                        '\\' . ucfirst($widget['name']) . 
+                        '\Controller';
                 } else {
                     $widgetControllerClass = 
-                        '\Ufo\Modules\\' . ucfirst($widget['module']) . '\\' . 
-                        'Widget' . ucfirst($widget['name']) . 'Controller';
+                        '\Ufo\Modules' . 
+                        '\\' . ucfirst($widget['vendor']) . 
+                        '\\' . ucfirst($widget['module']) . 
+                        '\Widget' . ucfirst($widget['name']) . 'Controller';
                 }
                 
                 if (class_exists($widgetControllerClass)) {
