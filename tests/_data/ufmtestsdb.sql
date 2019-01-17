@@ -40,3 +40,16 @@ CREATE TABLE IF NOT EXISTS `modules` (
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 TRUNCATE TABLE `modules`; /* cleanup from previous tests */
+
+CREATE TABLE IF NOT EXISTS `widgets` (
+  `id` int(11) NOT NULL auto_increment,
+  `section_id` int(11) NOT NULL default '0',
+  `place` varchar(255) NOT NULL default '',
+  `order_id` int(11) NOT NULL default '0',
+  `title` varchar(255) NOT NULL default '',
+  `description` text NOT NULL,
+  `widget` text NOT NULL,
+  `disabled` tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+TRUNCATE TABLE `widgets`; /* cleanup from previous tests */

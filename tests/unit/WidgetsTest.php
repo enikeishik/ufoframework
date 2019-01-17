@@ -1,6 +1,9 @@
 <?php
+use \Ufo\Core\Config;
+use \Ufo\Core\Db;
 use \Ufo\Core\Section;
 use \Ufo\Widgets\WidgetsArrayStorage;
+use \Ufo\Widgets\WidgetsDbStorage;
  
 class WidgetsTest extends BaseUnitTest
 {
@@ -51,5 +54,15 @@ class WidgetsTest extends BaseUnitTest
             ], 
             $storage->getWidgets(new Section(['path' => '/']))
         );
+    }
+
+    public function testDbStorage()
+    {
+        $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
+        $db = Db::getInstance($config);
+        $storage = new WidgetsDbStorage($db);
+        $this->assertEquals([], $storage->getWidgets(new Section()));
+        $this->assertEquals([], $storage->getWidgets(new Section(['path' => '/'])));
     }
 }
