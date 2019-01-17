@@ -13,8 +13,14 @@ use Ufo\Core\Section;
 
 class WidgetsArrayStorage extends WidgetsStorage
 {
+    /**
+     * @var array
+     */
     protected $storage = [];
     
+    /**
+     * @param array $storage
+     */
     public function __construct(array $storage)
     {
         $this->storage = $storage;
@@ -24,6 +30,10 @@ class WidgetsArrayStorage extends WidgetsStorage
         }
     }
     
+    /**
+     * @param \Ufo\Core\Section $section
+     * @return array
+     */
     public function getWidgets(Section $section): array
     {
         if (array_key_exists($section->path, $this->storage)) {
