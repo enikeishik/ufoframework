@@ -156,11 +156,16 @@ class Debug implements DebugInterface
         }
         // @codeCoverageIgnoreEnd
         
-        echo '<pre' . ($float ? ' class="debugfloat"' : '') . '>';
         ob_start();
-        $dump ? var_dump($var) : print_r($var);
-        echo htmlspecialchars(str_replace("=>\n", '  =>', ob_get_clean()));
-        echo '</pre>';
+        if (empty($_SERVER['DOCUMENT_ROOT'])) {
+            $dump ? var_dump($var) : print_r($var);
+            echo PHP_EOL . str_replace("=>\n", '  =>', ob_get_clean());
+        } else {
+            echo '<pre' . ($float ? ' class="debugfloat"' : '') . '>';
+            $dump ? var_dump($var) : print_r($var);
+            echo htmlspecialchars(str_replace("=>\n", '  =>', ob_get_clean()));
+            echo '</pre>';
+        }
         
         // @codeCoverageIgnoreStart
         if ($exit) {
