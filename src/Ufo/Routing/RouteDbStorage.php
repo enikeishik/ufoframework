@@ -21,6 +21,7 @@ class RouteDbStorage extends RouteStorage
     
     /**
      * @param \Ufo\Core\Db $db
+     * @throws \Ufo\Routing\RouteStorageEmptyException
      */
     public function __construct(Db $db)
     {

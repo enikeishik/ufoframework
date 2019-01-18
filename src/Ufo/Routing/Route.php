@@ -16,6 +16,11 @@ use Ufo\Core\Section;
  */
 class Route
 {
+    /**
+     * @param string $path
+     * @param \Ufo\Routing\RouteStorageInterface $routeStorage
+     * @return ?\Ufo\Core\Section
+     */
     public static function parse(string $path, RouteStorageInterface $routeStorage): ?Section
     {
         if (empty($path) || '/' == $path) {

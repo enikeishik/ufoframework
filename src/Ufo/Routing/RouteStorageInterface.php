@@ -13,7 +13,15 @@ use Ufo\Core\Section;
 
 interface RouteStorageInterface
 {
+    /**
+     * @param string $path
+     * @return ?\Ufo\Core\Section
+     */
     public function get(string $path): ?Section;
     
+    /**
+     * @param string $path
+     * @return ?\Ufo\Core\Section
+     */
     public function find(string $path): ?Section;
 }
