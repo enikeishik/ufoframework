@@ -11,6 +11,7 @@ use \Ufo\Modules\Controller;
 use \Ufo\Modules\Model;
 use \Ufo\Modules\ModelInterface;
 use \Ufo\Modules\Parameter;
+use \Ufo\Modules\View;
  
 class ControllerTest extends \Codeception\Test\Unit
 {
@@ -102,13 +103,38 @@ class ControllerTest extends \Codeception\Test\Unit
         $controller = $this->getController();
         $widgets = $controller->composeWidgets([]);
         $this->assertTrue(is_array($widgets));
-        $this->assertEquals(0, count($widgets));
+        $this->assertCount(0, $widgets);
         
         $widgets = $controller->composeWidgets($this->getConfig()->widgetsStorageData['/']);
-        $this->assertEquals(2, count($widgets));
+        $this->assertCount(2, $widgets);
+        $this->assertArrayHasKey('left col top', $widgets);
+        $this->assertArrayHasKey('right col bottom', $widgets);
+        $this->assertInstanceOf(View::class, $widgets['left col top']);
+        $this->assertInstanceOf(View::class, $widgets['right col bottom']);
         
         $widgets = $controller->composeWidgets($this->getConfig()->widgetsStorageData['/document']);
-        $this->assertEquals(3, count($widgets));
+        $this->assertCount(3, $widgets);
+        
+        $controller = new Controller();
+        $config = $this->getConfig();
+        $config->widgetsStorageData['/document']['middle col top'][] = 
+            ['vendor' => 'somevendor', 'module' => '', 'name' => 'somewidget', 'title' => 'some vendor widget', 'text' => 'some vendor wdg text'];
+        $config->widgetsStorageData['/document']['middle col top'][] = 
+            ['vendor' => '', 'module' => '', 'name' => '', 'title' => 'bad widget', 'text' => 'bad wdg text'];
+        $controller->inject(new Container(['config' => $config]));
+$tpl = <<<EOD
+namespace Ufo\Modules\Somevendor\Widgets\Somewidget;
+class Controller extends \Ufo\Core\DIObject
+{
+    public function compose()
+    {
+        return new \Ufo\Core\Result(new \Ufo\Modules\Renderable('some vendor widget content'));
+    }
+}
+EOD;
+        eval($tpl);
+        $widgets = $controller->composeWidgets($config->widgetsStorageData['/document']);
+        $this->assertCount(4, $widgets);
     }
     
     protected function getControllerForParamsFromPath()
@@ -254,10 +280,14 @@ class ControllerTest extends \Codeception\Test\Unit
         $controller->params['test12'] = Parameter::make('test12', 'int', '', 'path', false, 0);
         $controller->params['test13'] = Parameter::make('test13', 'date', 'dt', 'path', false, 0);
         $controller->params['test14'] = Parameter::make('test14', 'string', 'prefix', 'path', false, '');
+        $controller->params['test15'] = Parameter::make('test15', 'string', '', 'path', false, '');
+        $controller->params['test16'] = Parameter::make('test16', 'date', '', 'path', false, 0);
         $this->assertNull($controller->params['test11']->value);
         $this->assertNull($controller->params['test12']->value);
         $this->assertNull($controller->params['test13']->value);
         $this->assertNull($controller->params['test14']->value);
+        $this->assertNull($controller->params['test15']->value);
+        $this->assertNull($controller->params['test16']->value);
         
         $controller->paramsAssigned = [];
         $controller->setParamsFromPath(['789']);
@@ -270,6 +300,10 @@ class ControllerTest extends \Codeception\Test\Unit
         $controller->paramsAssigned = [];
         $controller->setParamsFromPath(['prefixQWE']);
         $this->assertEquals('QWE', $controller->params['test14']->value);
+        
+        $controller->paramsAssigned = [];
+        $controller->setParamsFromPath(['strparam-without-prefix']);
+        $this->assertEquals('strparam-without-prefix', $controller->params['test15']->value);
         
         $controller->paramsAssigned = [];
         $this->expectedException(
@@ -287,6 +321,25 @@ class ControllerTest extends \Codeception\Test\Unit
         $this->expectedException(
             \Ufo\Core\ModuleParameterConflictException::class, 
             function() use($controller) { $controller->setParamsFromPath([123, 'prefixQWE']); }
+        );
+        
+        $controller->paramsAssigned = [];
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterConflictException::class, 
+            function() use($controller) { $controller->setParamsFromPath([123, '456']); }
+        );
+        
+        $controller->paramsAssigned = [];
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterConflictException::class, 
+            function() use($controller) { $controller->setParamsFromPath([123, '1970-01-01']); }
+        );
+        
+        $controller->paramsAssigned = [];
+        $controller->params['test15']->value = null;
+        $this->expectedException(
+            \Ufo\Core\ModuleParameterConflictException::class, 
+            function() use($controller) { $controller->setParamsFromPath([123, 'strparam-without-prefix']); }
         );
     }
     
