@@ -8,13 +8,32 @@ use \Ufo\Modules\Renderable;
  
 class AppTest extends BaseUnitTest
 {
-    protected function getApp($withDebug = true)
+    protected function getApp($withDebug = true, $withCache = false)
     {
         $config = new Config();
         $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
         $config->templatesPath = dirname(__DIR__) . '/integration/templates';
         $config->templatesDefault = '';
+        if ($withCache) {
+            $config->cache = true;
+            $config->cacheType = Config::CACHE_TYPE_ARRAY;
+        }
+        return new App($config, $withDebug ? new Debug() : null);
+    }
+    
+    protected function getAppDb($withDebug = true, $withCache = false)
+    {
+        $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
+        $config->routeStorageType = Config::STORAGE_TYPE_DB;
+        $config->widgetsStorageType = Config::STORAGE_TYPE_DB;
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
+        if ($withCache) {
+            $config->cache = true;
+            $config->cacheType = Config::CACHE_TYPE_ARRAY;
+        }
         return new App($config, $withDebug ? new Debug() : null);
     }
     
@@ -25,36 +44,64 @@ class AppTest extends BaseUnitTest
         $this->assertInstanceOf(App::class, $app);
     }
     
-    protected function assertContentContains($needle)
+    protected function assertArrayContentContains($needle, $withDebug = true, $withCache = false)
     {
-        $app = $this->getApp();
+        $app = $this->getApp($withDebug, $withCache);
         ob_start();
         $app->execute();
         $content = ob_get_clean();
         $this->assertContains($needle, $content);
     }
     
-    public function testExecute()
+    protected function assertDbContentContains($needle, $withDebug = true, $withCache = false)
     {
-        $this->assertContentContains('<title>Main page</title>');
+        $app = $this->getAppDb($withDebug, $withCache);
+        ob_start();
+        $app->execute();
+        $content = ob_get_clean();
+        $this->assertContains($needle, $content);
+    }
+    
+    public function testExecuteWithArray()
+    {
+        $this->assertArrayContentContains('<title>Main page</title>');
+        $this->assertArrayContentContains('<title>Main page</title>', false);
+        $this->assertArrayContentContains('<title>Main page</title>', false, true);
+        $this->assertArrayContentContains('<title>Main page</title>', true, true);
         
         $_GET['path'] = '/!document';
-        $this->assertContentContains('Bad path');
+        $this->assertArrayContentContains('Bad path');
         
         $_GET['path'] = '/not2exists2path2qwe/asd';
-        $this->assertContentContains('Section not exists');
+        $this->assertArrayContentContains('Section not exists');
         
         $_GET['path'] = '/section-disabled';
-        $this->assertContentContains('Section disabled');
+        $this->assertArrayContentContains('Section disabled');
         
         $_GET['path'] = '/module/disabled';
-        $this->assertContentContains('Section module disabled');
+        $this->assertArrayContentContains('Section module disabled');
         
         $_GET['path'] = '/document/123/rss';
-        $this->assertContentContains('Module parameter conflict with another');
+        $this->assertArrayContentContains('Module parameter conflict with another');
         
         $_GET['path'] = '/document/123/asd';
-        $this->assertContentContains('Module parameter unknown');
+        $this->assertArrayContentContains('Module parameter unknown');
+    }
+    
+    public function testExecuteWithDb()
+    {
+        $this->assertDbContentContains('Route storage empty');
+        
+        $this->tester->haveInDatabase(
+            'sections', 
+            [
+                'id'        => 1000, 
+                'path'      => '/', 
+                'title'     => 'Main page', 
+                'module'    => 'UfoMainpage', 
+            ]
+        );
+        $this->assertArrayContentContains('<title>Main page</title>');
     }
     
     public function testGetPath()
