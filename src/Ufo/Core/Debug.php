@@ -161,10 +161,12 @@ class Debug implements DebugInterface
             $dump ? var_dump($var) : print_r($var);
             echo PHP_EOL . str_replace("=>\n", '  =>', ob_get_clean());
         } else {
+            // @codeCoverageIgnoreStart
             echo '<pre' . ($float ? ' class="debugfloat"' : '') . '>';
             $dump ? var_dump($var) : print_r($var);
             echo htmlspecialchars(str_replace("=>\n", '  =>', ob_get_clean()));
             echo '</pre>';
+            // @codeCoverageIgnoreEnd
         }
         
         // @codeCoverageIgnoreStart
