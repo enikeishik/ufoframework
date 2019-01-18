@@ -21,6 +21,8 @@ use Ufo\Routing\Route;
 use Ufo\Routing\RouteArrayStorage;
 use Ufo\Routing\RouteDbStorage;
 use Ufo\Routing\RouteStorageInterface;
+use Ufo\Routing\RouteStorageNotSetException;
+use Ufo\Routing\RouteStorageEmptyException;
 use Ufo\Widgets\WidgetsArrayStorage;
 use Ufo\Widgets\WidgetsDbStorage;
 
@@ -106,6 +108,12 @@ class App
         } catch (BadPathException $e) {
             $result = $this->getError(500, 'Bad path');
             
+        } catch (RouteStorageNotSetException $e) {
+            $result = $this->getError(500, 'Route storage not set');
+            
+        } catch (RouteStorageEmptyException $e) {
+            $result = $this->getError(500, 'Route storage empty');
+            
         } catch (DbConnectException $e) {
             if (null !== $this->cache && $this->cache->has($path)) {
                 $result = $this->getCacheResult($this->cache->get($path));
@@ -132,7 +140,7 @@ class App
             $result = $this->getError(404, 'Module parameter unknown');
             
         } catch (\Exception $e) {
-            $result = $this->getError(500, 'Unexpected exception');
+            $result = $this->getError(500, 'Unexpected exception: ' . $e->getMessage());
             
         }
         
@@ -171,6 +179,8 @@ class App
      * @return \Ufo\Core\Section
      * @throws \Ufo\Core\DbConnectException
      * @throws \Ufo\Core\SectionNotExistsException
+     * @throws \Ufo\Core\RouteStorageNotSetException
+     * @throws \Ufo\Routing\RouteStorageEmptyException
      */
     public function parse(string $path): Section
     {
@@ -392,6 +402,7 @@ class App
     /**
      * @return \Ufo\Core\RouteStorageInterface
      * @throws \Ufo\Core\RouteStorageNotSetException
+     * @throws \Ufo\Routing\RouteStorageEmptyException
      */
     protected function getRouteStorage(): RouteStorageInterface
     {
