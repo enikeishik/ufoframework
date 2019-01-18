@@ -148,11 +148,20 @@ class Debug implements DebugInterface
      */
     public static function varDump($var, bool $dump = true, bool $exit = true, bool $float = false): void
     {
+        // @codeCoverageIgnoreStart
+        if ($exit) {
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+        }
+        // @codeCoverageIgnoreEnd
+        
         echo '<pre' . ($float ? ' class="debugfloat"' : '') . '>';
         ob_start();
         $dump ? var_dump($var) : print_r($var);
         echo htmlspecialchars(str_replace("=>\n", '  =>', ob_get_clean()));
         echo '</pre>';
+        
         // @codeCoverageIgnoreStart
         if ($exit) {
             exit();
