@@ -55,4 +55,12 @@ return [
             'dbless' => true, 
         ], 
     ], 
+    '/some-vendor-some-module' => [
+        'title' => 'Some vendor module page', 
+        'module' => [
+            'vendor' => 'Somevendor', 
+            'name' => 'Somemodule', 
+            'dbless' => true, 
+        ], 
+    ], 
 ];

@@ -205,6 +205,24 @@ class AppTest extends BaseUnitTest
             \Ufo\Core\ModuleParameterUnknownException::class, 
             function() use($app) { $result = $app->compose($app->parse($app->getPath())); }
         );
+        
+$tpl = <<<EOD
+namespace Ufo\Modules\Somevendor\Somemodule;
+class Controller extends \Ufo\Core\DIObject implements \Ufo\Modules\ControllerInterface
+{
+    public function compose(?\Ufo\Core\Section \$section = null): \Ufo\Core\Result
+    {
+        return new \Ufo\Core\Result(new \Ufo\Modules\Renderable('some vendor module content'));
+    }
+}
+EOD;
+        eval($tpl);
+        $_GET['path'] = '/some-vendor-some-module';
+        $app = $this->getApp();
+        $result = $app->compose($app->parse($app->getPath()));
+        $this->assertNotNull($result);
+        $this->assertEquals([], $result->getHeaders());
+        $this->assertContains('some vendor module content', $result->getView()->render());
     }
     
     public function testComposeCallback()
