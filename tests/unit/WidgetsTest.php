@@ -22,16 +22,16 @@ class WidgetsTest extends BaseUnitTest
         $storage = new WidgetsArrayStorage([
             '/' => [
                 'test location 1' => [
-                    ['module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items'], 
-                    ['module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items'], 
+                    ['vendor' => 'ufo', 'module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items'], 
+                    ['vendor' => 'ufo', 'module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items'], 
                 ], 
             ], 
         ]);
         $this->assertEquals(
             [
                 'test location 1' => [
-                    ['module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items'], 
-                    ['module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items'], 
+                    new Widget(['vendor' => 'ufo', 'module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items']), 
+                    new Widget(['vendor' => 'ufo', 'module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items']), 
                 ], 
             ], 
             $storage->getWidgets(new Section(['path' => '/']))
@@ -40,22 +40,22 @@ class WidgetsTest extends BaseUnitTest
         $storage = new WidgetsArrayStorage([
             '/' => [
                 'test location 1' => [
-                    ['module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items'], 
-                    ['module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items'], 
+                    ['vendor' => 'ufo', 'module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items'], 
+                    ['vendor' => '', 'module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items'], 
                 ], 
             ], 
             '' => [
                 'test location 1' => [
-                    ['module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => 'gallery widget items'], 
+                    ['vendor' => 'ufo', 'module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => 'gallery widget items'], 
                 ], 
             ], 
         ]);
         $this->assertEquals(
             [
                 'test location 1' => [
-                    ['module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => 'gallery widget items'], 
-                    ['module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items'], 
-                    ['module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items'], 
+                    new Widget(['vendor' => 'ufo', 'module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => 'gallery widget items']), 
+                    new Widget(['vendor' => 'ufo', 'module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => 'news widget items']), 
+                    new Widget(['vendor' => '', 'module' => 'articles', 'name' => '', 'title' => 'articles widget', 'text' => 'articles widget items']), 
                 ], 
             ], 
             $storage->getWidgets(new Section(['path' => '/']))
