@@ -13,5 +13,22 @@ use Ufo\Core\Section;
 
 interface WidgetsStorageInterface
 {
+    /**
+     * @param \Ufo\Core\Section $section
+     * @return array
+     * 
+     * return array structure:
+     * [
+     *      'place 1 name' => [
+     *          Widget $widget1, 
+     *          Widget $widget2, 
+     *          ...
+     *      ], 
+     *      'place 2 name' => [
+     *          ...
+     *      ], 
+     *      ...
+     * ]
+     */
     public function getWidgets(Section $section): array;
 }
