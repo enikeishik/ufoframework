@@ -19,6 +19,7 @@ use Ufo\Core\ModuleParameterUnknownException;
 use Ufo\Core\Result;
 use Ufo\Core\Section;
 use Ufo\Core\Tools;
+use Ufo\Core\Widget;
 
 /**
  * Module level controller base class.
@@ -159,25 +160,26 @@ class Controller extends DIObject implements ControllerInterface
             $results = [];
             
             foreach ($placeWidgets as $widget) {
-                $container->set('data', $widget);
-                
-                if (empty($widget['vendor'])) {
+                if (!($widget instanceof Widget) || empty($widget->vendor)) {
                     continue;
                 }
-                if (empty($widget['module'])) {
+                
+                if (empty($widget->module)) {
                     $widgetControllerClass = 
                         '\Ufo\Modules' . 
-                        '\\' . ucfirst($widget['vendor']) . 
+                        '\\' . ucfirst($widget->vendor) . 
                         '\Widgets' . 
-                        '\\' . ucfirst($widget['name']) . 
+                        '\\' . ucfirst($widget->name) . 
                         '\Controller';
                 } else {
                     $widgetControllerClass = 
                         '\Ufo\Modules' . 
-                        '\\' . ucfirst($widget['vendor']) . 
-                        '\\' . ucfirst($widget['module']) . 
-                        '\Widget' . ucfirst($widget['name']) . 'Controller';
+                        '\\' . ucfirst($widget->vendor) . 
+                        '\\' . ucfirst($widget->module) . 
+                        '\Widget' . ucfirst($widget->name) . 'Controller';
                 }
+                
+                $container->set('data', get_object_vars($widget));
                 
                 if (class_exists($widgetControllerClass)) {
                     $widgetController = new $widgetControllerClass();
