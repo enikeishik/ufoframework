@@ -4,10 +4,16 @@ use \Ufo\Core\Debug;
 use \Ufo\Core\App;
 use \Ufo\Core\Result;
 use \Ufo\Core\Section;
+use \Ufo\Core\Widget;
 use \Ufo\Modules\Renderable;
  
 class AppTest extends BaseUnitTest
 {
+    /**
+     * @var \UnitTester
+     */
+    protected $tester;
+    
     protected function getApp($withDebug = true, $withCache = false)
     {
         $config = new Config();
@@ -101,7 +107,34 @@ class AppTest extends BaseUnitTest
                 'module'    => 'UfoMainpage', 
             ]
         );
-        $this->assertArrayContentContains('<title>Main page</title>');
+        $this->tester->haveInDatabase(
+            'modules', 
+            [
+                'id'            => 1000, 
+                'vendor'        => 'Ufo', 
+                'name'          => 'Mainpage', 
+                'package'       => 'UfoMainpage', 
+                'title'         => 'mainpage', 
+                'description'   => 'Simple Mainpage module', 
+            ]
+        );
+        $this->tester->haveInDatabase(
+            'widgets', 
+            [
+                'id'            => 1000, 
+                'section_id'    => 0, 
+                'place'         => 'left col top', 
+                'widget'        => json_encode(new Widget([
+                    'vendor' => 'ufo', 
+                    'module' => '', 
+                    'name'   => 'gismeteo', 
+                    'title'  => 'gismeteo db widget title', 
+                    'text'   => 'gismeteo db widget content', 
+                ])), 
+            ]
+        );
+        $this->assertDbContentContains('<title>Main page</title>');
+        $this->assertDbContentContains('gismeteo db widget title');
     }
     
     public function testGetPath()
@@ -248,6 +281,10 @@ class AppTest extends BaseUnitTest
         );
         $this->assertContains(
             'news widget', 
+            $result->getView()->render()
+        );
+        $this->assertNotContains(
+            'bad widget', 
             $result->getView()->render()
         );
         
