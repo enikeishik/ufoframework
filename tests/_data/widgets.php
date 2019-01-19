@@ -4,6 +4,7 @@ return [
         'left col top' => [
             ['vendor' => 'ufo', 'module' => '', 'name' => 'gismeteo', 'title' => 'gismeteo widget', 'text' => '1 first wdg text'], 
             ['vendor' => 'ufo', 'module' => 'news', 'name' => '', 'title' => 'news widget', 'text' => '1 second wdg text'], 
+            ['vendor' => '', 'module' => '', 'name' => '', 'title' => 'bad widget', 'text' => 'bad wdg text'], 
         ], 
         'right col bottom' => [
             ['vendor' => 'ufo', 'module' => 'gallery', 'name' => '', 'title' => 'gallery widget', 'text' => '2 first wdg text'], 
