@@ -10,6 +10,7 @@
 namespace Ufo\Widgets;
 
 use Ufo\Core\Section;
+use Ufo\Core\Widget;
 
 class WidgetsArrayStorage extends WidgetsStorage
 {
@@ -38,14 +39,23 @@ class WidgetsArrayStorage extends WidgetsStorage
     {
         if (array_key_exists($section->path, $this->storage)) {
             if (array_key_exists('', $this->storage)) {
-                return array_merge_recursive($this->storage[''], $this->storage[$section->path]);
+                $items = array_merge_recursive($this->storage[''], $this->storage[$section->path]);
             } else {
-                return $this->storage[$section->path];
+                $items = $this->storage[$section->path];
             }
         } elseif (array_key_exists('', $this->storage)) {
-            return $this->storage[''];
+            $items = $this->storage[''];
+        } else {
+            return [];
         }
         
-        return [];
+        $widgets = [];
+        foreach ($items as $place => $placeItems) {
+            foreach ($placeItems as $item) {
+                $widgets[$place][] = new Widget($item);
+            }
+        }
+        
+        return $widgets;
     }
 }
