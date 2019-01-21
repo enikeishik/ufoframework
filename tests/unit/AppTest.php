@@ -43,13 +43,6 @@ class AppTest extends BaseUnitTest
         return new App($config, $withDebug ? new Debug() : null);
     }
     
-    // tests
-    public function testApp()
-    {
-        $app = $this->getApp();
-        $this->assertInstanceOf(App::class, $app);
-    }
-    
     protected function assertArrayContentContains($needle, $withDebug = true, $withCache = false)
     {
         $app = $this->getApp($withDebug, $withCache);
@@ -66,6 +59,13 @@ class AppTest extends BaseUnitTest
         $app->execute();
         $content = ob_get_clean();
         $this->assertContains($needle, $content);
+    }
+    
+    // tests
+    public function testApp()
+    {
+        $app = $this->getApp();
+        $this->assertInstanceOf(App::class, $app);
     }
     
     public function testExecuteWithArray()
@@ -137,6 +137,23 @@ class AppTest extends BaseUnitTest
         $this->assertDbContentContains('gismeteo db widget title');
     }
     
+    public function testExecuteWithCache()
+    {
+        $config = new Config();
+        $config->cache = true;
+        $config->cacheType = 'unsupported type';
+        $app = new class($config) extends App {
+            public $cache = null;
+        };
+        $this->expectedException(
+            '', 
+            function() use ($app) { $app->execute(); }
+        );
+        $this->assertNull($app->cache);
+        
+        
+    }
+    
     public function testGetPath()
     {
         $app = $this->getApp(false);
@@ -152,6 +169,26 @@ class AppTest extends BaseUnitTest
             \Ufo\Core\BadPathException::class, 
             function() use($app) { $app->getPath(); }
         );
+    }
+    
+    public function testParse()
+    {
+        $config = new Config();
+        $config->routeStorageType = null;
+        $app = new App($config);
+        $this->expectedException(
+            \Ufo\Core\RouteStorageNotSetException::class, 
+            function() use($app) { $app->parse('/'); }
+        );
+        
+        $config = new Config();
+        $config->routeStorageType = Config::STORAGE_TYPE_ARRAY;
+        $config->projectPath = '';
+        $config->routeStoragePath = dirname(__DIR__) . '/_data/routes.php';
+        $app = new App($config);
+        $section = $app->parse('/document');
+        $this->assertInstanceOf(Section::class, $section);
+        $this->assertEquals('/document', $section->path);
     }
     
     public function testCompose()
@@ -323,5 +360,19 @@ EOD;
                 'news widget'
             )
         );
+        
+        $config = new Config();
+        $config->widgetsStorageType = 'unsupported storage';
+        $app = new App($config);
+        $this->assertEquals([], $app->getWidgets(new Section()));
+        
+        $config = new Config();
+        $config->projectPath = '';
+        $config->widgetsStorageType = Config::STORAGE_TYPE_ARRAY;
+        $config->widgetsStoragePath = dirname(__DIR__) . '/_data/widgets.php';
+        $app = new App($config);
+        $widgets = $app->getWidgets(new Section(['path' => '/document']));
+        $this->assertTrue(is_array($widgets));
+        $this->assertCount(3, $widgets);
     }
 }

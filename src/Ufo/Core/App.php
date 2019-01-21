@@ -345,7 +345,7 @@ class App
             case $this->config::STORAGE_TYPE_ARRAY:
                 if (!empty($this->config->widgetsStoragePath) 
                 && file_exists($this->config->projectPath . $this->config->widgetsStoragePath)) {
-                    $storageData = require_once $this->config->projectPath . $this->config->widgetsStoragePath;
+                    $storageData = require $this->config->projectPath . $this->config->widgetsStoragePath;
                 } else {
                     $storageData = $this->config->widgetsStorageData;
                 }
@@ -411,7 +411,7 @@ class App
             case $this->config::STORAGE_TYPE_ARRAY:
                 if (!empty($this->config->routeStoragePath) 
                 && file_exists($this->config->projectPath . $this->config->routeStoragePath)) {
-                    $storageData = require_once $this->config->projectPath . $this->config->routeStoragePath;
+                    $storageData = require $this->config->projectPath . $this->config->routeStoragePath;
                 } else {
                     $storageData = $this->config->routeStorageData;
                 }
