@@ -12,6 +12,7 @@ use \Ufo\Modules\Model;
 use \Ufo\Modules\ModelInterface;
 use \Ufo\Modules\Parameter;
 use \Ufo\Modules\View;
+use \Ufo\Widgets\WidgetsArrayStorage;
  
 class ControllerTest extends \Codeception\Test\Unit
 {
@@ -105,14 +106,22 @@ class ControllerTest extends \Codeception\Test\Unit
         $this->assertTrue(is_array($widgets));
         $this->assertCount(0, $widgets);
         
-        $widgets = $controller->composeWidgets($this->getConfig()->widgetsStorageData['/']);
+        $widgets = 
+            $controller->composeWidgets(
+                (new WidgetsArrayStorage($this->getConfig()->widgetsStorageData))
+                ->getWidgets(new Section(['path' => '/']))
+            );
         $this->assertCount(2, $widgets);
         $this->assertArrayHasKey('left col top', $widgets);
         $this->assertArrayHasKey('right col bottom', $widgets);
         $this->assertInstanceOf(View::class, $widgets['left col top']);
         $this->assertInstanceOf(View::class, $widgets['right col bottom']);
         
-        $widgets = $controller->composeWidgets($this->getConfig()->widgetsStorageData['/document']);
+        $widgets = 
+            $controller->composeWidgets(
+                (new WidgetsArrayStorage($this->getConfig()->widgetsStorageData))
+                ->getWidgets(new Section(['path' => '/document']))
+            );
         $this->assertCount(3, $widgets);
         
         $controller = new Controller();
@@ -133,7 +142,11 @@ class Controller extends \Ufo\Core\DIObject
 }
 EOD;
         eval($tpl);
-        $widgets = $controller->composeWidgets($config->widgetsStorageData['/document']);
+        $widgets = 
+            $controller->composeWidgets(
+                (new WidgetsArrayStorage($config->widgetsStorageData))
+                ->getWidgets(new Section(['path' => '/document']))
+            );
         $this->assertCount(4, $widgets);
     }
     
