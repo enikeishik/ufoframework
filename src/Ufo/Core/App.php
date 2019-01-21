@@ -21,7 +21,6 @@ use Ufo\Routing\Route;
 use Ufo\Routing\RouteArrayStorage;
 use Ufo\Routing\RouteDbStorage;
 use Ufo\Routing\RouteStorageInterface;
-use Ufo\Routing\RouteStorageNotSetException;
 use Ufo\Routing\RouteStorageEmptyException;
 use Ufo\Widgets\WidgetsArrayStorage;
 use Ufo\Widgets\WidgetsDbStorage;
