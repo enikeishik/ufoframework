@@ -439,9 +439,10 @@ class App
      */
     protected function setCache(): void
     {
-        if (null !== $this->cache) {
-            return;
-        }
+        // only one call of this method, so no need to cache
+        // if (null !== $this->cache) {
+            // return;
+        // }
         $this->cache = new Cache($this->config, $this->debug);
     }
     
