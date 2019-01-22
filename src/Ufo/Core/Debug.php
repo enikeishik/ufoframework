@@ -139,14 +139,14 @@ class Debug implements DebugInterface
     }
     
     /**
-     * Вывод информации о переменной.
+     * Show variable debug info.
      * @param mixed $var
      * @param bool $dump = true
      * @param bool $exit = true
      * @param bool $float = false
      * @return void
      */
-    public static function varDump($var, bool $dump = true, bool $exit = true, bool $float = false): void
+    public static function vd($var, bool $dump = true, bool $exit = true, bool $float = false): void
     {
         // @codeCoverageIgnoreStart
         if ($exit) {
@@ -174,13 +174,5 @@ class Debug implements DebugInterface
             exit();
         }
         // @codeCoverageIgnoreEnd
-    }
-    
-    /**
-     * @see varDump
-     */
-    public static function vd($var, bool $dump = true, bool $exit = true, bool $float = false): void
-    {
-        self::varDump($var, $dump, $exit, $float);
     }
 }
