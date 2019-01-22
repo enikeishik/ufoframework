@@ -89,8 +89,7 @@ class AppTest extends BaseUnitTest
         $this->assertContains('DataBase connection error', $content);
         
         $config = new Config();
-        $config->routeStorageType = Config::STORAGE_TYPE_DB;
-        $config->dbServer = 'localhost';
+        unset($config->routeStorageType);
         $config->cache = false;
         $app = new App($config);
         ob_start();
