@@ -68,6 +68,37 @@ class AppTest extends BaseUnitTest
         $this->assertInstanceOf(App::class, $app);
     }
     
+    public function testExecute()
+    {
+        $config = new Config();
+        $config->routeStorageType = null;
+        $app = new App($config);
+        ob_start();
+        $app->execute();
+        $content = ob_get_clean();
+        $this->assertContains('Route storage not set', $content);
+        
+        $config = new Config();
+        $config->routeStorageType = Config::STORAGE_TYPE_DB;
+        $config->dbServer = 'unreacheble.host.local';
+        $config->cache = false;
+        $app = new App($config);
+        ob_start();
+        $app->execute();
+        $content = ob_get_clean();
+        $this->assertContains('DataBase connection error', $content);
+        
+        $config = new Config();
+        $config->routeStorageType = Config::STORAGE_TYPE_DB;
+        $config->dbServer = 'localhost';
+        $config->cache = false;
+        $app = new App($config);
+        ob_start();
+        $app->execute();
+        $content = ob_get_clean();
+        $this->assertContains('Unexpected exception', $content);
+    }
+    
     public function testExecuteWithArray()
     {
         $this->assertArrayContentContains('<title>Main page</title>');
