@@ -115,7 +115,10 @@ class App
             
         } catch (DbConnectException $e) {
             if (null !== $this->cache && $this->cache->has($path)) {
+                // @codeCoverageIgnoreStart
+                // passed in local tests, but skipped in travis
                 $result = $this->getCacheResult($this->cache->get($path));
+                // @codeCoverageIgnoreEnd
             } else {
                 $result = $this->getError(500, 'DataBase connection error');
             }
