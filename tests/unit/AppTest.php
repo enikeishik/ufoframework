@@ -5,6 +5,8 @@ use \Ufo\Core\App;
 use \Ufo\Core\Result;
 use \Ufo\Core\Section;
 use \Ufo\Core\Widget;
+use \Ufo\Modules\Controller;
+use \Ufo\Modules\Parameter;
 use \Ufo\Modules\Renderable;
  
 class AppTest extends BaseUnitTest
@@ -89,6 +91,23 @@ class AppTest extends BaseUnitTest
         $this->assertContains('DataBase connection error', $content);
         
         $config = new Config();
+        $config->routeStorageType = Config::STORAGE_TYPE_DB;
+        $config->dbServer = 'unreacheble.host.local';
+        $config->cache = true;
+        $config->cacheType = Config::CACHE_TYPE_SQLITE;
+        $config->rootPath = '';
+        $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+        $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
+        $app = new App($config);
+        ob_start();
+        $app->execute();
+        $content = ob_get_clean();
+        $this->assertContains('<title>Main page</title>', $content);
+        
+        $config = new Config();
         unset($config->routeStorageType);
         $config->cache = false;
         $app = new App($config);
@@ -119,6 +138,30 @@ class AppTest extends BaseUnitTest
         
         $_GET['path'] = '/document/123/rss';
         $this->assertArrayContentContains('Module parameter conflict with another');
+        
+        $_GET['path'] = '/document/dt1970-01-aa';
+        $config = new Config();
+        $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+        $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
+        $app = new class($config) extends App {
+            protected function getDefaultController(): Controller
+            {
+                return new class() extends Controller {
+                    protected function initParams(): void
+                    {
+                        parent::initParams();
+                        $this->params['testBadDate'] = 
+                            Parameter::make('testBadDate', 'date', 'dt', 'path', true, 0);
+                    }
+                };
+            }
+        };
+        ob_start();
+        $app->execute();
+        $content = ob_get_clean();
+        $this->assertContains('Module parameter bad format', $content);
         
         $_GET['path'] = '/document/123/asd';
         $this->assertArrayContentContains('Module parameter unknown');
@@ -182,6 +225,29 @@ class AppTest extends BaseUnitTest
         $this->assertNull($app->cache);
         
         
+        $config = new Config();
+        $config->cache = true;
+        $config->cacheType = Config::CACHE_TYPE_SQLITE;
+        $config->rootPath = '';
+        $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+        $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
+        $app = new class($config) extends App {
+            public $cache = null;
+            protected function getCacheResult(string $value): Result
+            {
+                return parent::getCacheResult($value . PHP_EOL . 'cache result');
+            }
+        };
+        ob_start();
+        $app->execute();
+        $content1 = ob_get_clean();
+        ob_start();
+        $app->execute();
+        $content2 = ob_get_clean();
+        $this->assertEquals($content1 . PHP_EOL . 'cache result', $content2);
     }
     
     public function testGetPath()
