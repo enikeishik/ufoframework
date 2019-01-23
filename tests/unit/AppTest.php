@@ -96,11 +96,23 @@ class AppTest extends BaseUnitTest
         $config->cacheType = Config::CACHE_TYPE_SQLITE;
         $config->rootPath = '';
         $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->cacheTtlWholePage = 0;
         $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
         $config->templatesPath = dirname(__DIR__) . '/integration/templates';
         $config->templatesDefault = '';
-        $app = new App($config);
+        $app = new class($config) extends App {
+            protected function getCacheResult(string $value): Result
+            {
+                return parent::getCacheResult($value . PHP_EOL . 'cache result');
+            }
+            public function cacheClear()
+            {
+                $this->cache->clear();
+            }
+        };
+        $app->execute();
+        $app->cacheClear();
         $app->execute();
         $config = new Config();
         $config->routeStorageType = Config::STORAGE_TYPE_DB;
@@ -109,15 +121,22 @@ class AppTest extends BaseUnitTest
         $config->cacheType = Config::CACHE_TYPE_SQLITE;
         $config->rootPath = '';
         $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->cacheTtlWholePage = 0;
         $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
         $config->templatesPath = dirname(__DIR__) . '/integration/templates';
         $config->templatesDefault = '';
-        $app = new App($config);
+        $app = new class($config) extends App {
+            protected function getCacheResult(string $value): Result
+            {
+                return parent::getCacheResult($value . PHP_EOL . 'cache result');
+            }
+        };
         ob_start();
         $app->execute();
         $content = ob_get_clean();
         $this->assertContains('<title>QWE ASD ZXC page</title>', $content);
+        $this->assertContains('cache result', $content);
         unset($_GET['path']);
         
         $config = new Config();
