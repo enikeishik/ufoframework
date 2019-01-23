@@ -90,6 +90,18 @@ class AppTest extends BaseUnitTest
         $content = ob_get_clean();
         $this->assertContains('DataBase connection error', $content);
         
+        $_GET['path'] = '/some/another/document';
+        $config = new Config();
+        $config->cache = true;
+        $config->cacheType = Config::CACHE_TYPE_SQLITE;
+        $config->rootPath = '';
+        $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
+        $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
+        $config->templatesDefault = '';
+        $app = new App($config);
+        $app->execute();
         $config = new Config();
         $config->routeStorageType = Config::STORAGE_TYPE_DB;
         $config->dbServer = 'unreacheble.host.local';
@@ -105,7 +117,8 @@ class AppTest extends BaseUnitTest
         ob_start();
         $app->execute();
         $content = ob_get_clean();
-        $this->assertContains('<title>Main page</title>', $content);
+        $this->assertContains('<title>QWE ASD ZXC page</title>', $content);
+        unset($_GET['path']);
         
         $config = new Config();
         unset($config->routeStorageType);
@@ -240,7 +253,13 @@ class AppTest extends BaseUnitTest
             {
                 return parent::getCacheResult($value . PHP_EOL . 'cache result');
             }
+            public function cacheClear()
+            {
+                $this->cache->clear();
+            }
         };
+        $app->execute();
+        $app->cacheClear();
         ob_start();
         $app->execute();
         $content1 = ob_get_clean();
