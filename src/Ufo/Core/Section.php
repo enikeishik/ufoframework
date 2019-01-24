@@ -40,4 +40,13 @@ class Section extends Struct
      * @var bool
      */
     public $disabled = false;
+    
+    public function __construct($vars = null, bool $cast = true)
+    {
+        parent::__construct($vars, $cast);
+        
+        if (is_array($this->module)) {
+            $this->module = new Module($this->module);
+        }
+    }
 }
