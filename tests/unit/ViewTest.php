@@ -60,11 +60,11 @@ class ViewTest extends BaseUnitTest
         $this->assertContains('test content', $content);
         
         $config = new Config();
-        $config->templatesPath = dirname(__DIR__) . '/integration';
+        $config->templatesPath = dirname(__DIR__) . '/integration/templates';
         $config->templatesDefault = '';
         $section = new Section([
             'title' => 'test title', 
-            'module' => new Module(['name' => 'templates'])
+            'module' => new Module(['vendor' => '', 'name' => ''])
         ]);
         $view = $this->getView(
             'index', 

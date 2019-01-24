@@ -128,10 +128,14 @@ class View extends DIObject implements ViewInterface
         
         extract($this->data);
         
+        $modulePackage = '';
+        if (!empty($this->section->module)) {
+            $modulePackage = $this->section->module->vendor . '/' . $this->section->module->name;
+        }
         try {
             include $this->findTemplate(
                 $this->config->projectPath . $this->config->templatesPath, 
-                $this->section->module->name ?? '', 
+                $modulePackage, 
                 $this->template
             );
         } catch (\Exception $e) {
@@ -166,17 +170,18 @@ class View extends DIObject implements ViewInterface
     /**
      * Find full path for requested template. Returned path may not exists.
      * @param string $templatesPath
-     * @param string $moduleName
+     * @param string $modulePackage
      * @param string $templateName
      * @return string
      */
-    protected function findTemplate(string $templatesPath, string $moduleName, string $templateName): string
+    protected function findTemplate(string $templatesPath, string $modulePackage, string $templateName): string
     {
-        if (!empty($moduleName)) {
-            // /templates/module/template.php
+        if (!empty($modulePackage)) {
+            // /templates/default/vendor/module/template.php
             $templatePath = 
                 $templatesPath . 
-                (!empty($moduleName) ? '/' . strtolower($moduleName) : '') . 
+                $this->config->templatesDefault . 
+                '/' . strtolower($modulePackage) . 
                 '/' . str_replace('.', '/', $templateName) . $this->extension;
             if (file_exists($templatePath)) {
                 return $templatePath;
