@@ -90,6 +90,7 @@ class Controller extends DIObject implements ControllerInterface
         if (null !== $section) {
             $this->initParams();
             $this->setParams($section->params);
+            $this->container->set('params', $this->params);
         }
         
         $this->setData($section);

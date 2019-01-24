@@ -34,4 +34,10 @@ class Model extends DIObject implements ModelInterface
      * @var \Ufo\Core\Section
      */
     protected $section;
+    
+    /**
+     * Module parameters coming from URL|GET|POST|COOKIE.
+     * @var array
+     */
+    protected $params = [];
 }
