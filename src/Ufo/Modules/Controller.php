@@ -110,10 +110,21 @@ class Controller extends DIObject implements ControllerInterface
             return;
         }
         
-        $model = $this->getModel();
-        $this->container->set('model', $model);
-        
         $this->data['section'] = $section;
+        
+        $this->setDataFromModel($this->getModel());
+    }
+    
+    /**
+     * This implementation calls all methods with prefix `get` from model.
+     * Implementation may be overridden in inherited method 
+     * to call only necessary model methods dependently from parameters.
+     * @param \Ufo\Modules\ModelInterface $model
+     * @return void
+     */
+    protected function setDataFromModel(ModelInterface $model): void
+    {
+        $this->container->set('model', $model);
         
         foreach (get_class_methods($model) as $method) {
             if (0 !== strpos($method, 'get')) {
