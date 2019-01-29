@@ -60,11 +60,38 @@ class Controller extends DIObject implements ControllerInterface
     protected $paramsAssigned = [];
     
     /**
+     * Main controller method, compose all content.
+     * @param \Ufo\Core\Section $section = null
+     * @return \Ufo\Core\Result
+     * @throws \Ufo\Core\ModuleParameterUnknownException
+     */
+    public function compose(Section $section = null): Result
+    {
+        $this->container->set('section', $section);
+        
+        if (null !== $section) {
+            $this->initParams();
+            $this->setParams($section->params);
+            $this->container->set('params', $this->params);
+        }
+        
+        $this->setData($section);
+        
+        $view = $this->getView();
+        
+        return new Result($view);
+    }
+    
+    /**
      * Initialization of structures of module parameters with default values.
      * @return void
      */
     protected function initParams(): void
     {
+        if (0 != count($this->params)) {
+            return;
+        }
+        
         $params = [
             Parameter::make('isRoot', 'bool', '', 'none', false, true), 
             Parameter::make('isRss', 'bool', 'rss', 'path', false, false), 
@@ -78,26 +105,25 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * Main controller method, compose all content.
-     * @param \Ufo\Core\Section $section = null
-     * @return \Ufo\Core\Result
+     * @param array $pathParams
+     * @return void
+     * @throws \Ufo\Core\ModuleParameterConflictException
+     * @throws \Ufo\Core\ModuleParameterFormatException;
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
-    public function compose(Section $section = null): Result
+    protected function setParams(array $pathParams): void
     {
-        $this->container->set('section', $section);
-        
-        if (null !== $section && 0 == count($this->params)) {
-            $this->initParams();
-            $this->setParams($section->params);
-            $this->container->set('params', $this->params);
+        if (0 != count($this->paramsAssigned)) {
+            return;
         }
         
-        $this->setData($section);
+        $this->setParamsFromPath($pathParams);
         
-        $view = $this->getView();
+        $this->setParamsFromQs();
         
-        return new Result($view);
+        $this->setIsRootParam(); //set before setBoolParams!
+        
+        $this->setBoolParams();
     }
     
     /**
@@ -225,24 +251,6 @@ class Controller extends DIObject implements ControllerInterface
      * @throws \Ufo\Core\ModuleParameterFormatException;
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
-    protected function setParams(array $pathParams): void
-    {
-        $this->setParamsFromPath($pathParams);
-        
-        $this->setParamsFromQs();
-        
-        $this->setIsRootParam(); //set before setBoolParams!
-        
-        $this->setBoolParams();
-    }
-    
-    /**
-     * @param array $pathParams
-     * @return void
-     * @throws \Ufo\Core\ModuleParameterConflictException
-     * @throws \Ufo\Core\ModuleParameterFormatException;
-     * @throws \Ufo\Core\ModuleParameterUnknownException
-     */
     protected function setParamsFromPath(array $pathParams): void
     {
         foreach ($pathParams as $pathParam) {
@@ -269,6 +277,7 @@ class Controller extends DIObject implements ControllerInterface
                 default:
                     $this->params[$paramName]->value = $_GET[$paramSet->prefix];
             }
+            $this->setParamAssigned($paramSet);
         }
     }
     
