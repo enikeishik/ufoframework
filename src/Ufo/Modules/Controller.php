@@ -87,7 +87,7 @@ class Controller extends DIObject implements ControllerInterface
     {
         $this->container->set('section', $section);
         
-        if (null !== $section) {
+        if (null !== $section && 0 == count($this->params)) {
             $this->initParams();
             $this->setParams($section->params);
             $this->container->set('params', $this->params);
