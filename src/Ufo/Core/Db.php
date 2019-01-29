@@ -125,6 +125,10 @@ class Db extends \mysqli
         return $result;
     }
     
+    /**
+     * @param string $sql
+     * @return ?array
+     */
     public function getItem(string $sql): ?array
     {
         $result = $this->query($sql);
@@ -140,6 +144,31 @@ class Db extends \mysqli
         }
     }
     
+    /**
+     * @param string $sql
+     * @param string $objectType = 'stdClass'
+     * @return ?object
+     */
+    public function getItemObject(string $sql, string $objectType = 'stdClass'): ?object
+    {
+        $result = $this->query($sql);
+        if (!$result) {
+            return null;
+        }
+        if ($row = $result->fetch_object($objectType)) {
+            $result->free();
+            return $row;
+        } else {
+            $result->free();
+            return null;
+        }
+    }
+    
+    /**
+     * @param string $sql
+     * @param string $field
+     * @return ?string
+     */
     public function getValue(string $sql, string $field): ?string
     {
         $item = $this->getItem($sql);
@@ -150,6 +179,12 @@ class Db extends \mysqli
         }
     }
     
+    /**
+     * @param string $sql
+     * @param string $field
+     * @param string $indexField = null
+     * @return ?array
+     */
     public function getValues(string $sql, string $field, string $indexField = null): ?array
     {
         $result = $this->query($sql);
@@ -170,6 +205,11 @@ class Db extends \mysqli
         return $items;
     }
     
+    /**
+     * @param string $sql
+     * @param string $indexField = null
+     * @return ?array
+     */
     public function getItems(string $sql, string $indexField = null): ?array
     {
         $result = $this->query($sql);
@@ -191,11 +231,37 @@ class Db extends \mysqli
         return $items;
     }
     
+    /**
+     * @param string $sql
+     * @param string $objectType = 'stdClass'
+     * @return ?array
+     */
+    public function getItemsObjects(string $sql, string $objectType = 'stdClass'): ?array
+    {
+        $result = $this->query($sql);
+        if (!$result) {
+            return null;
+        }
+        $items = array();
+        while ($row = $result->fetch_object($objectType)) {
+            $items[] = $row;
+        }
+        $result->free();
+        return $items;
+    }
+    
+    /**
+     * @return int|string
+     */
     public function getLastInsertedId()
     {
         return $this->insert_id;
     }
     
+    /**
+     * @param string $str
+     * @return string
+     */
     public function addEscape(string $str): string
     {
         return $this->real_escape_string($str);

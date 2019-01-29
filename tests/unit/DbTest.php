@@ -3,6 +3,16 @@ use \Ufo\Core\Config;
 use \Ufo\Core\Db;
 use \Ufo\Core\Debug;
 
+class DbItem
+{
+    public $id;
+    public $disabled;
+    public $createdAt;
+    public $title;
+    public $content;
+    public $notDbField;
+}
+
 class DbTest extends BaseUnitTest
 {
     protected function getDb($withDebug = true)
@@ -74,6 +84,26 @@ class DbTest extends BaseUnitTest
         $this->assertEquals(1, $item['id']);
         
         $item = $db->getItem('SELECT `id` FROM `test_items_table` WHERE `id`=0');
+        $this->assertNull($item);
+    }
+    
+    public function testGetItemObject()
+    {
+        $db = $this->getDb();
+        $item = $db->getItemObject(
+            'SELECT `id`, `disabled`, `created_at` AS `createdAt`, `title`, `content`' . 
+                ' FROM `test_items_table` WHERE `id`=1', 
+            'DbItem'
+        );
+        $this->assertNotNull($item);
+        $this->assertInstanceOf(DbItem::class, $item);
+        $this->assertTrue(property_exists($item, 'id'));
+        $this->assertEquals(1, $item->id);
+        
+        $item = $db->getItemObject('SELECT `id` FROM `test_items_table` WHERE `id`=0', 'DbItem');
+        $this->assertNull($item);
+        
+        $item = $db->getItemObject('SELECT `id` FROM `test_items_table_non_existence` LIMIT 1', 'DbItem');
         $this->assertNull($item);
     }
     
@@ -154,6 +184,25 @@ class DbTest extends BaseUnitTest
         $this->assertEquals('Undefined index: id2', $error);
         
         $this->assertNull($db->getItems('SELECT `id` FROM `test_items_table_non_existence` LIMIT 1', 'id'));
+    }
+    
+    public function testGetItemsObjects()
+    {
+        $db = $this->getDb();
+        $items = $db->getItemsObjects('SELECT `id` FROM `test_items_table` WHERE `id`=1', 'DbItem');
+        $this->assertNotNull($items);
+        $this->assertTrue(is_array($items));
+        $this->assertCount(1, $items);
+        $this->assertInstanceOf(DbItem::class, $items[0]);
+        $this->assertTrue(property_exists($items[0], 'id'));
+        $this->assertEquals(1, $items[0]->id);
+        
+        $items = $db->getItemsObjects('SELECT `id` FROM `test_items_table` WHERE `id`=0', 'DbItem');
+        $this->assertNotNull($items);
+        $this->assertTrue(is_array($items));
+        $this->assertCount(0, $items);
+        
+        $this->assertNull($db->getItemsObjects('SELECT `id` FROM `test_items_table_non_existence` LIMIT 1', 'DbItem'));
     }
     
     public function testGetLastInsertedId()
