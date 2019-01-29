@@ -398,15 +398,27 @@ EOD;
         $controller->initParams();
         $controller->params['somegetintparam'] = Parameter::make('somegetintparam', 'int', 'somegetintparam', 'get', false, 0);
         $controller->params['somegetblnparam'] = Parameter::make('somegetblnparam', 'bool', 'somegetblnparam', 'get', true, false);
+        $controller->params['somegetstrparam'] = Parameter::make('somegetstrparam', 'string', 'somegetstrparam', 'get', true, '');
         $_GET['somegetintparam'] = 5;
         $_GET['somegetblnparam'] = 1;
+        $_GET['somegetstrparam'] = 'str-value';
+        $controller->initParams(); //to ensure reinit not work
         $this->assertNull($controller->params['isRoot']->value);
         $this->assertNull($controller->params['isRss']->value);
+        $this->assertEquals(0, $controller->params['somegetintparam']->value);
+        $this->assertEquals(false, $controller->params['somegetblnparam']->value);
+        $this->assertEquals('', $controller->params['somegetstrparam']->value);
         $controller->setParams([]);
         $this->assertEquals(5, $controller->params['somegetintparam']->value);
         $this->assertTrue($controller->params['somegetblnparam']->value);
+        $this->assertEquals('str-value', $controller->params['somegetstrparam']->value);
         $this->assertFalse($controller->params['isRoot']->value);
         $this->assertFalse($controller->params['isRss']->value);
+        $_GET['somegetintparam'] = 10;
+        $controller->setParams([]); //to ensure reset not work
+        $this->assertEquals(5, $controller->params['somegetintparam']->value);
+        $this->assertTrue($controller->params['somegetblnparam']->value);
+        $this->assertEquals('str-value', $controller->params['somegetstrparam']->value);
         
         $controller->params = [];
         $controller->paramsAssigned = [];
