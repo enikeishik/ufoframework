@@ -99,7 +99,7 @@ class App
             
             if (null !== $this->cache 
             && !$this->cache->expired($path, $this->config->cacheTtlWholePage)) {
-                $result = $this->getCacheResult($this->cache->get($path));
+                $result = $this->getCacheResult($this->cache->get($path, ''));
             } else {
                 $result = $this->compose($this->parse($path));
             }
@@ -117,7 +117,7 @@ class App
             if (null !== $this->cache && $this->cache->has($path)) {
                 // @codeCoverageIgnoreStart
                 // passed in local tests, but skipped in travis
-                $result = $this->getCacheResult($this->cache->get($path));
+                $result = $this->getCacheResult($this->cache->get($path, ''));
                 // @codeCoverageIgnoreEnd
             } else {
                 $result = $this->getError(500, 'DataBase connection error');
@@ -141,7 +141,7 @@ class App
         } catch (ModuleParameterUnknownException $e) {
             $result = $this->getError(404, 'Module parameter unknown');
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $result = $this->getError(500, 'Unexpected exception: ' . $e->getMessage());
             
         }
@@ -323,7 +323,8 @@ class App
             $this->cache->set(
                 $this->getPath(), 
                 $content, 
-                $this->config->cacheTtlWholePage
+                $this->config->cacheTtlWholePage, 
+                $this->config->cacheTtsWholePage
             );
         } else {
             echo $view->render();
