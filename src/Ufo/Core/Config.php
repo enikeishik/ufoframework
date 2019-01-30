@@ -79,6 +79,12 @@ class Config extends Struct implements ConfigInterface
     public $cacheTtlWholePage = 3;
     
     /**
+     * Cache TTS for whole page content.
+     * @var int
+     */
+    public $cacheTtsWholePage = 86400;
+    
+    /**
      * Cache TTL for widgets.
      * @var int
      */
@@ -215,7 +221,7 @@ class Config extends Struct implements ConfigInterface
         $iniArr = null;
         try {
             $iniArr = parse_ini_file($iniPath, false, INI_SCANNER_TYPED);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
         if (!is_array($iniArr)) {
             return;

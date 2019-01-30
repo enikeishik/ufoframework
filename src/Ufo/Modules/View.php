@@ -138,7 +138,7 @@ class View extends DIObject implements ViewInterface
                 $modulePackage, 
                 $this->template
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->handleRenderException($e, $obLevel);
         }
         
@@ -197,12 +197,12 @@ class View extends DIObject implements ViewInterface
     }
     
     /**
-     * @param \Exception $e
+     * @param \Throwable $e
      * @param int $obLevel
      * @return void
-     * @throws \Exception
+     * @throws \Throwable
      */
-    protected function handleRenderException(\Exception $e, $obLevel)
+    protected function handleRenderException(\Throwable $e, $obLevel)
     {
         while (ob_get_level() > $obLevel) {
             ob_end_clean();

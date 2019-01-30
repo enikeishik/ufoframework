@@ -103,7 +103,7 @@ class CacheSqliteStorage implements CacheStorageInterface
         try {
             $cnt = $this->db->querySingle($sql);
             return 0 < (int) $cnt;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -120,7 +120,7 @@ class CacheSqliteStorage implements CacheStorageInterface
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
         try {
             return $this->db->querySingle($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }
@@ -137,7 +137,7 @@ class CacheSqliteStorage implements CacheStorageInterface
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
         try {
             return time() - (int) $this->db->querySingle($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return PHP_INT_MAX;
         }
     }
@@ -177,7 +177,7 @@ class CacheSqliteStorage implements CacheStorageInterface
         }
         try {
             return $this->db->exec($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -193,7 +193,7 @@ class CacheSqliteStorage implements CacheStorageInterface
                 ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->escapeString($key) . "'";
         try {
             return $this->db->exec($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -208,7 +208,7 @@ class CacheSqliteStorage implements CacheStorageInterface
         //$sql2 =  'VACUUM'; too slow
         try {
             return $this->db->exec($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -231,7 +231,7 @@ class CacheSqliteStorage implements CacheStorageInterface
                 ' WHERE "' . $this->timeField . '"<' . "'" . $minTime . "'";
         try {
             return $this->db->exec($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
