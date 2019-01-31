@@ -498,14 +498,14 @@ EOD;
         $config = new Config();
         $config->widgetsStorageType = 'unsupported storage';
         $app = new App($config);
-        $this->assertEquals([], $app->getWidgets(new Section()));
+        $this->assertEquals([], $app->getWidgetsData(new Section()));
         
         $config = new Config();
         $config->projectPath = '';
         $config->widgetsStorageType = Config::STORAGE_TYPE_ARRAY;
         $config->widgetsStoragePath = dirname(__DIR__) . '/_data/widgets.php';
         $app = new App($config);
-        $widgets = $app->getWidgets(new Section(['path' => '/document']));
+        $widgets = $app->getWidgetsData(new Section(['path' => '/document']));
         $this->assertTrue(is_array($widgets));
         $this->assertCount(3, $widgets);
     }

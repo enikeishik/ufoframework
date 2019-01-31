@@ -287,7 +287,7 @@ class App
         $controller = $this->getDefaultController();
         $controller->inject($this->getContainer());
         
-        $view->setWidgets($controller->composeWidgets($this->getWidgets($section)));
+        $view->setWidgets($controller->composeWidgets($this->getWidgetsData($section)));
         
         $result->setView($view);
         
@@ -338,7 +338,7 @@ class App
      * @param \Ufo\Core\Section $section
      * @return array
      */
-    public function getWidgets(Section $section): array
+    public function getWidgetsData(Section $section): array
     {
         switch ($this->config->widgetsStorageType) {
             

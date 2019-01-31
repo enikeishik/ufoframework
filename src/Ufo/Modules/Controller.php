@@ -198,11 +198,11 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
-     * Create object for each widgets item.
-     * @param array $widgets
+     * Create object for each widgets data item.
+     * @param array $widgetsData
      * @return array
      */
-    public function composeWidgets(array $allWidgets): array
+    public function composeWidgets(array $widgetsData): array
     {
         $container = clone $this->container;
         unset($container->widgets);
@@ -210,7 +210,7 @@ class Controller extends DIObject implements ControllerInterface
         
         $widgetsResults = [];
         
-        foreach ($allWidgets as $place => $placeWidgets) {
+        foreach ($widgetsData as $place => $placeWidgets) {
             $results = [];
             
             foreach ($placeWidgets as $widget) {
