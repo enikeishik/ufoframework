@@ -87,4 +87,84 @@ class Parameter extends Struct
         $parameter->value       = $value;
         return $parameter;
     }
+    
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param string $from = ''
+     * @param bool $additional = false
+     * @param mixed $default = null
+     * @param mixed $value = null
+     * @return self
+     */
+    public static function makeBool(
+        string $name, 
+        string $prefix, 
+        string $from = 'path', 
+        bool $additional = false, 
+        $defval = null, 
+        $value = null
+    ): self {
+        return self::make($name, 'bool', $prefix, $from, $additional, $defval, $value);
+    }
+    
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param string $from = ''
+     * @param bool $additional = false
+     * @param mixed $default = null
+     * @param mixed $value = null
+     * @return self
+     */
+    public static function makeInt(
+        string $name, 
+        string $prefix, 
+        string $from = 'path', 
+        bool $additional = false, 
+        $defval = null, 
+        $value = null
+    ): self {
+        return self::make($name, 'int', $prefix, $from, $additional, $defval, $value);
+    }
+    
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param string $from = ''
+     * @param bool $additional = false
+     * @param mixed $default = null
+     * @param mixed $value = null
+     * @return self
+     */
+    public static function makeString(
+        string $name, 
+        string $prefix, 
+        string $from = 'path', 
+        bool $additional = false, 
+        $defval = null, 
+        $value = null
+    ): self {
+        return self::make($name, 'string', $prefix, $from, $additional, $defval, $value);
+    }
+    
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param string $from = ''
+     * @param bool $additional = false
+     * @param mixed $default = null
+     * @param mixed $value = null
+     * @return self
+     */
+    public static function makeDate(
+        string $name, 
+        string $prefix, 
+        string $from = 'path', 
+        bool $additional = false, 
+        $defval = null, 
+        $value = null
+    ): self {
+        return self::make($name, 'date', $prefix, $from, $additional, $defval, $value);
+    }
 }

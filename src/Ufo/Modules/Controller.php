@@ -83,6 +83,26 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
+     * @param \Ufo\Modules\Parameter $param
+     * @return void
+     */
+    protected function addParam(Parameter $param): void
+    {
+        $this->params[$param->name] = $param;
+    }
+    
+    /**
+     * @param array $params
+     * @return void
+     */
+    protected function addParams(array $params): void
+    {
+        foreach ($params as $param) {
+            $this->addParam($param);
+        }
+    }
+    
+    /**
      * Initialization of structures of module parameters with default values.
      * @return void
      */
@@ -92,16 +112,12 @@ class Controller extends DIObject implements ControllerInterface
             return;
         }
         
-        $params = [
-            Parameter::make('isRoot', 'bool', '', 'none', false, true), 
-            Parameter::make('isRss', 'bool', 'rss', 'path', false, false), 
-            Parameter::make('itemId', 'int', '', 'path', false, 0), 
-            Parameter::make('page', 'int', 'page', 'path', true, 1), 
-        ];
-        
-        foreach ($params as $param) {
-            $this->params[$param->name] = $param;
-        }
+        $this->addParams([
+            Parameter::makeBool('isRoot', '', 'none', false, true), 
+            Parameter::makeBool('isRss', 'rss', 'path', false, false), 
+            Parameter::makeInt('itemId', '', 'path', false, 0), 
+            Parameter::makeInt('page', 'page', 'path', true, 1), 
+        ]);
     }
     
     /**

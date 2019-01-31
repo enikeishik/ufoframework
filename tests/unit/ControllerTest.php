@@ -169,7 +169,7 @@ EOD;
         $paramName = 'test01';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'bool', 'test01', 'path', false, false);
+        $controller->params[$paramName] = Parameter::makeBool($paramName, 'test01', 'path', false, false);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['test01']);
         $this->assertTrue($controller->params[$paramName]->value);
@@ -177,7 +177,7 @@ EOD;
         $paramName = 'test02';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'int', 'intprefix', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeInt($paramName, 'intprefix', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['intprefix123']);
         $this->assertEquals(123, $controller->params[$paramName]->value);
@@ -185,7 +185,7 @@ EOD;
         $paramName = 'test03';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'int', '', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeInt($paramName, '', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['456']);
         $this->assertEquals(456, $controller->params[$paramName]->value);
@@ -193,7 +193,7 @@ EOD;
         $paramName = 'test04';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'date', 'dateprefix', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeDate($paramName, 'dateprefix', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['dateprefix1970-02-03']);
         $this->assertEquals(
@@ -204,7 +204,7 @@ EOD;
         $paramName = 'test05';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'date', '', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeDate($paramName, '', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['1970-02-03']);
         $this->assertEquals(
@@ -215,7 +215,7 @@ EOD;
         $paramName = 'test06';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'string', 'strprefix', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeString($paramName, 'strprefix', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['strprefixval456']);
         $this->assertEquals('val456', $controller->params[$paramName]->value);
@@ -223,7 +223,7 @@ EOD;
         $paramName = 'test07';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'string', '', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeString($paramName, '', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $controller->setParamsFromPath(['val789']);
         $this->assertEquals('val789', $controller->params[$paramName]->value);
@@ -231,7 +231,7 @@ EOD;
         $paramName = 'test08';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'int', '', 'path', false, 0);
+        $controller->params[$paramName] = Parameter::makeInt($paramName, '', 'path', false, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $this->expectedException(
             \Ufo\Core\ModuleParameterUnknownException::class, 
@@ -241,7 +241,7 @@ EOD;
         $paramName = 'test09';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'int', '', 'path', true, 0);
+        $controller->params[$paramName] = Parameter::makeInt($paramName, '', 'path', true, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $this->expectedException(
             \Ufo\Core\ModuleParameterUnknownException::class, 
@@ -251,7 +251,7 @@ EOD;
         $paramName = 'test10';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'date', '', 'path', true, 0);
+        $controller->params[$paramName] = Parameter::makeDate($paramName, '', 'path', true, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $this->expectedException(
             \Ufo\Core\ModuleParameterUnknownException::class, 
@@ -261,7 +261,7 @@ EOD;
         $paramName = 'test11';
         $controller->params = [];
         $controller->paramsAssigned = [];
-        $controller->params[$paramName] = Parameter::make($paramName, 'date', 'dt', 'path', true, 0);
+        $controller->params[$paramName] = Parameter::makeDate($paramName, 'dt', 'path', true, 0);
         $this->assertNull($controller->params[$paramName]->value);
         $this->expectedException(
             \Ufo\Core\ModuleParameterFormatException::class, 
