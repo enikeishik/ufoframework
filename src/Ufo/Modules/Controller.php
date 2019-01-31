@@ -63,6 +63,8 @@ class Controller extends DIObject implements ControllerInterface
      * Main controller method, compose all content.
      * @param \Ufo\Core\Section $section = null
      * @return \Ufo\Core\Result
+     * @throws \Ufo\Core\ModuleParameterConflictException
+     * @throws \Ufo\Core\ModuleParameterFormatException;
      * @throws \Ufo\Core\ModuleParameterUnknownException
      */
     public function compose(Section $section = null): Result
@@ -77,9 +79,7 @@ class Controller extends DIObject implements ControllerInterface
         
         $this->setData($section);
         
-        $view = $this->getView();
-        
-        return new Result($view);
+        return new Result($this->getView());
     }
     
     /**
