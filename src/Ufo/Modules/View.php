@@ -57,10 +57,10 @@ class View extends DIObject implements ViewInterface
     protected $extension = '.php';
     
     /**
-     * @param string $template
+     * @param string $template = ''
      * @param array $data = []
      */
-    public function __construct(string $template, array $data = [])
+    public function __construct(string $template = '', array $data = [])
     {
         $this->template = $template;
         $this->data = $data;

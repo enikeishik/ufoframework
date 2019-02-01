@@ -13,6 +13,7 @@ use Ufo\Core\Config;
 use Ufo\Core\ContainerInterface;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
+use Ufo\Core\DIObjectInterface;
 use Ufo\Core\ModuleParameterConflictException;
 use Ufo\Core\ModuleParameterFormatException;
 use Ufo\Core\ModuleParameterUnknownException;
@@ -178,12 +179,32 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
+     * Must be overridden in child class to gets object from child NS.
+     * @return \Ufo\Modules\ModelInterface
+     */
+    protected function getModelObject(): ModelInterface
+    {
+        return new Model();
+    }
+    
+    /**
+     * Must be overridden in child class to gets object from child NS.
+     * @return \Ufo\Modules\ViewInterface
+     */
+    protected function getViewObject(): ViewInterface
+    {
+        return new View();
+    }
+    
+    /**
      * @return \Ufo\Modules\ModelInterface
      */
     protected function getModel(): ModelInterface
     {
-        $model = new Model();
-        $model->inject($this->container);
+        $model = $this->getModelObject();
+        if ($model instanceof DIObjectInterface) {
+            $model->inject($this->container);
+        }
         return $model;
     }
     
@@ -192,8 +213,16 @@ class Controller extends DIObject implements ControllerInterface
      */
     protected function getView(): ViewInterface
     {
-        $view = new View($this->config->templateDefault, $this->data);
-        $view->inject($this->container);
+        $view = $this->getViewObject();
+        if ('' == $view->getTemplate()) {
+            $view->setTemplate($this->config->templateDefault);
+        }
+        if (0 == count($view->getData())) {
+            $view->setData($this->data);
+        }
+        if ($view instanceof DIObjectInterface) {
+            $view->inject($this->container);
+        }
         return $view;
     }
     
@@ -237,7 +266,9 @@ class Controller extends DIObject implements ControllerInterface
                 
                 if (class_exists($widgetControllerClass)) {
                     $widgetController = new $widgetControllerClass();
-                    $widgetController->inject($container);
+                    if ($widgetController instanceof DIObjectInterface) {
+                        $widgetController->inject($container);
+                    }
                     $results[] = $widgetController->compose();
                     
                 } else {
