@@ -122,6 +122,27 @@ class Controller extends DIObject implements ControllerInterface
     }
     
     /**
+     * Moves all (path) params without prefix to the end.
+     * This implementation faster than uasort.
+     * @return void
+     */
+    protected function sortParams(): void
+    {
+        $sorted = [];
+        foreach ($this->params as $paramName => $paramSet) {
+            if (0 != strlen($paramSet->prefix)) {
+                $sorted[$paramName] = $paramSet;
+            }
+        }
+        foreach ($this->params as $paramName => $paramSet) {
+            if (0 == strlen($paramSet->prefix)) {
+                $sorted[$paramName] = $paramSet;
+            }
+        }
+        $this->params = $sorted;
+    }
+    
+    /**
      * @param array $pathParams
      * @return void
      * @throws \Ufo\Core\ModuleParameterConflictException
@@ -133,6 +154,8 @@ class Controller extends DIObject implements ControllerInterface
         if (0 != count($this->paramsAssigned)) {
             return;
         }
+        
+        $this->sortParams();
         
         $this->setParamsFromPath($pathParams);
         
@@ -368,8 +391,10 @@ class Controller extends DIObject implements ControllerInterface
                 continue;
             }
             
-            if ('' != $paramSet->prefix 
-            && 0 === strpos($pathParam, $paramSet->prefix)) { //for named params
+            if ('' != $paramSet->prefix) { //for named params
+                if (0 !== strpos($pathParam, $paramSet->prefix)) {
+                    continue;
+                }
                 if ($this->isParamAssigned($paramSet)) {
                     throw new ModuleParameterConflictException();
                 }
