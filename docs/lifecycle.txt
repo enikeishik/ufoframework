@@ -1,23 +1,66 @@
-Application gets requested path [App::getPath] and find section corresponding it [App::parse - routing analogy].
-Each section handled by module, so application gets (from section) module info and call its controller, passing section as parameter (module can handle many sections) [App::compose].
-Module controller generate some data and wrap it into Result object, returning Result back to application.
-Result object contains (array of) headers and View object, wich implements RenderableInterface and can be rendered by application.
-Application send (to client) headers [App::sendHeaders] and render View [App::render].
+Application gets requested path [App::getPath] and find section 
+corresponding it [App::parse - routing analogy].
+
+Each section handled by module, so application gets (from section) 
+module info and call its controller method [Controller::compose], 
+passing section as parameter (module can handle many sections) 
+[App::compose].
+
+Module controller's compose method initialise module parameters, 
+generates some data (by self or using module Model), put data to module 
+(or global) View and wrap it into Result object, returning Result back 
+to the application.
+
+Result object contains (array of) headers and View object, 
+wich implements RenderableInterface and can be rendered by application.
+
+Application send (to client) headers [App::sendHeaders] 
+and render View [App::render].
+
 
     \Ufo\Core\App::__construct(\Ufo\Core\Config, \Ufo\Core\Debug)
-        ::execute
-            ::parse
-                ::getPath
-                ::getRouteStorage
-                Route::parse: \Ufo\Core\Section
-            ::compose(\Ufo\Core\Section): \Ufo\Core\Result
-                ?::setDb
-                ::getModuleController
-                    \Ufo\Modules\Controller::__construct
+    
+    \Ufo\Core\App::execute
+        \Ufo\Core\App::getPath
+        
+        \Ufo\Core\App::parse
+            \Ufo\Core\App::getRouteStorage
+            \Ufo\Routing\Route::parse: \Ufo\Core\Section
+        
+        \Ufo\Core\App::compose(\Ufo\Core\Section): \Ufo\Core\Result
+            ?\Ufo\Core\App::setDb
+            
+            \Ufo\Core\App::getModuleController
+                \Ufo\Modules\Controller::__construct
+            
+            ?\Ufo\Modules\Controller::inject(\Ufo\Core\App::getContainer)
+            
+            \Ufo\Modules\Controller::compose(\Ufo\Core\Section): \Ufo\Core\Result
+                \Ufo\Modules\Controller::initParams //define module level params
+                \Ufo\Modules\Controller::setParams //fill params with data from request
+                
+                \Ufo\Modules\Controller::setData //data for view
+                    \Ufo\Modules\Model::__construct
+                    \Ufo\Modules\Controller::setDataFromModel
+                        ?\Ufo\Modules\Model::... //model methods call
+                
+                \Ufo\Modules\View::__construct
+                    \Ufo\Modules\View::setTemplate //set view template
+                    \Ufo\Modules\View::setData //put data into view
+            
+            ?\Ufo\Core\App::composeWidgets:(\Ufo\Core\Section, \Ufo\Core\Result) \Ufo\Core\Result
+                \Ufo\Core\Result::getView //get view from result
+                
+                \Ufo\Core\App::getDefaultController //controller for widgets
                 \Ufo\Modules\Controller::inject(::getContainer)
-                \Ufo\Modules\Controller::compose(\Ufo\Core\Section): \Ufo\Core\Result
-                    ?\Ufo\Modules\Model::__construct
-                    \Ufo\Modules\View::__construct
-            ::sendHeaders(\Ufo\Core\Result::getHeaders)
-            ::render(\Ufo\Core\Result::getView)
-                \Ufo\Modules\View::render
+                
+                \Ufo\Modules\View::setWidgets //put widgets into view
+                    \Ufo\Modules\Controller::composeWidgets //compose widgets
+                        \Ufo\Core\App::getWidgetsData //gets widgets data from storage
+                
+                \Ufo\Core\Result::setView //put view into result
+        
+        \Ufo\Core\App::sendHeaders(\Ufo\Core\Result::getHeaders)
+        
+        \Ufo\Core\App::render(\Ufo\Core\Result::getView)
+            \Ufo\Modules\View::render
