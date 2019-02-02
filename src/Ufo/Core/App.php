@@ -287,7 +287,17 @@ class App
         $controller = $this->getDefaultController();
         $controller->inject($this->getContainer());
         
-        $view->setWidgets($controller->composeWidgets($this->getWidgetsData($section)));
+        $widgetsData = $this->getWidgetsData($section);
+        foreach ($widgetsData as $place => $placeWidgets) {
+            foreach ($placeWidgets as $widget) {
+                if (isset($widget->dbless) && !$widget->dbless) {
+                    $this->setDb();
+                    break 2;
+                }
+            }
+        }
+        
+        $view->setWidgets($controller->composeWidgets($widgetsData));
         
         $result->setView($view);
         

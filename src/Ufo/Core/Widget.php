@@ -30,6 +30,12 @@ class Widget extends Struct
     public $name = '';
     
     /**
+     * Widget NOT require db connection.
+     * @var bool
+     */
+    public $dbless = true;
+    
+    /**
      * Source sections (ids), if widget gets content from sections.
      * @var array
      */

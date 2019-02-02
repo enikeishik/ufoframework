@@ -8,6 +8,7 @@ use \Ufo\Core\Widget;
 use \Ufo\Modules\Controller;
 use \Ufo\Modules\Parameter;
 use \Ufo\Modules\Renderable;
+use \Ufo\Modules\View;
  
 class AppTest extends BaseUnitTest
 {
@@ -508,5 +509,29 @@ EOD;
         $widgets = $app->getWidgetsData(new Section(['path' => '/document']));
         $this->assertTrue(is_array($widgets));
         $this->assertCount(3, $widgets);
+        
+        $config = new Config();
+        $config->projectPath = '';
+        $config->widgetsStorageType = Config::STORAGE_TYPE_ARRAY;
+        $config->widgetsStoragePath = '';
+        $config->widgetsStorageData = [
+            '/document' => [
+                'left col top' => [
+                    [
+                        'vendor' => 'ufo', 
+                        'module' => '', 
+                        'name' => '', 
+                        'title' => '', 
+                        'text' => '', 
+                        'dbless' => false, 
+                    ]
+                ], 
+            ], 
+        ];
+        $app = new App($config);
+        $result = $app->composeWidgets(
+            new Section(['path' => '/document']), 
+            new Result(new View())
+        );
     }
 }
