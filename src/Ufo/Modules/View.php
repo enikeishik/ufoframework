@@ -37,6 +37,11 @@ class View extends DIObject implements ViewInterface
     protected $section;
     
     /**
+     * @var \Ufo\Core\Widget
+     */
+    protected $widget;
+    
+    /**
      * @var string
      */
     protected $template = '';
@@ -128,14 +133,20 @@ class View extends DIObject implements ViewInterface
         
         extract($this->data);
         
-        $modulePackage = '';
+        $package = '';
         if (!empty($this->section->module)) {
-            $modulePackage = $this->section->module->vendor . '/' . $this->section->module->name;
+            $package = $this->section->module->vendor . '/' . $this->section->module->name;
+        } elseif (!empty($this->widget->vendor)) {
+            if (!empty($this->widget->module)) {
+                $package = $this->widget->vendor . '/' . $this->widget->module . '/widget' . $this->widget->name;
+            } else {
+                $package = $this->widget->vendor . '/' . '/widgets/' . $this->widget->name;
+            }
         }
         try {
             include $this->findTemplate(
                 $this->config->projectPath . $this->config->templatesPath, 
-                $modulePackage, 
+                $package, 
                 $this->template
             );
         } catch (\Throwable $e) {
@@ -170,18 +181,18 @@ class View extends DIObject implements ViewInterface
     /**
      * Find full path for requested template. Returned path may not exists.
      * @param string $templatesPath
-     * @param string $modulePackage
+     * @param string $package
      * @param string $templateName
      * @return string
      */
-    protected function findTemplate(string $templatesPath, string $modulePackage, string $templateName): string
+    protected function findTemplate(string $templatesPath, string $package, string $templateName): string
     {
-        if (!empty($modulePackage)) {
+        if (!empty($package)) {
             // /templates/default/vendor/module/template.php
             $templatePath = 
                 $templatesPath . 
                 $this->config->templatesDefault . 
-                '/' . strtolower($modulePackage) . 
+                '/' . strtolower($package) . 
                 '/' . str_replace('.', '/', $templateName) . $this->extension;
             if (file_exists($templatePath)) {
                 return $templatePath;

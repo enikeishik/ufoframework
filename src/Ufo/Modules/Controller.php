@@ -257,6 +257,7 @@ class Controller extends DIObject implements ControllerInterface
     public function composeWidgets(array $widgetsData): array
     {
         $container = clone $this->container;
+        unset($container->widget);
         unset($container->widgets);
         unset($container->model);
         
@@ -266,7 +267,11 @@ class Controller extends DIObject implements ControllerInterface
             $results = [];
             
             foreach ($placeWidgets as $widget) {
-                if (!($widget instanceof Widget) || empty($widget->vendor)) {
+                if (
+                    !($widget instanceof Widget) 
+                    || empty($widget->vendor) 
+                    || (empty($widget->module) && empty($widget->name))
+                ) {
                     continue;
                 }
                 
@@ -285,6 +290,7 @@ class Controller extends DIObject implements ControllerInterface
                         '\Widget' . ucfirst($widget->name) . 'Controller';
                 }
                 
+                $container->set('widget', $widget);
                 $container->set('data', get_object_vars($widget));
                 
                 if (class_exists($widgetControllerClass)) {
