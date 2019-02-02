@@ -41,6 +41,10 @@ class Section extends Struct
      */
     public $disabled = false;
     
+    /**
+     * @param $vars = null
+     * @param bool $cast = true
+     */
     public function __construct($vars = null, bool $cast = true)
     {
         parent::__construct($vars, $cast);
