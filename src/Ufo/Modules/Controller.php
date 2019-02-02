@@ -244,7 +244,13 @@ class Controller extends DIObject implements ControllerInterface
             $view->setData($this->data);
         }
         if ($view instanceof DIObjectInterface) {
-            $view->inject($this->container);
+            if ($this->container->has('data')) {
+                $container = clone $this->container;
+                unset($container->data);
+                $view->inject($container);
+            } else {
+                $view->inject($this->container);
+            }
         }
         return $view;
     }
