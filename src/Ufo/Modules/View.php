@@ -133,22 +133,28 @@ class View extends DIObject implements ViewInterface
         
         extract($this->data);
         
+        $templatesPath = $this->config->projectPath . $this->config->templatesPath;
         $package = '';
+        $template = $this->template;
         if (!empty($this->section->module)) {
             $package = $this->section->module->vendor . '/' . $this->section->module->name;
         } elseif (!empty($this->widget->vendor)) {
             if (!empty($this->widget->module)) {
-                $package = $this->widget->vendor . '/' . $this->widget->module . '/widget' . $this->widget->name;
+                $package = $this->widget->vendor . '/' . $this->widget->module;
+                $template = 'widget' . $this->widget->name;
             } else {
-                $package = $this->widget->vendor . '/' . '/widgets/' . $this->widget->name;
+                $package = $this->widget->vendor . '/widgets';
+                $template = $this->widget->name;
             }
         }
+        
+        $templatePath = $this->findTemplate($templatesPath, $package, $template);
+        if (!file_exists($templatePath)) {
+            $templatePath = $this->findTemplate($templatesPath, '', $this->template);
+        }
+        
         try {
-            include $this->findTemplate(
-                $this->config->projectPath . $this->config->templatesPath, 
-                $package, 
-                $this->template
-            );
+            include $templatePath;
         } catch (\Throwable $e) {
             $this->handleRenderException($e, $obLevel);
         }
