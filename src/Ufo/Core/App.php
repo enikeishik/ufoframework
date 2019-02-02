@@ -285,7 +285,6 @@ class App
         $view = $result->getView();
         
         $controller = $this->getDefaultController();
-        $controller->inject($this->getContainer());
         
         $widgetsData = $this->getWidgetsData($section);
         foreach ($widgetsData as $place => $placeWidgets) {
@@ -296,6 +295,8 @@ class App
                 }
             }
         }
+        
+        $controller->inject($this->getContainer());
         
         $view->setWidgets($controller->composeWidgets($widgetsData));
         
