@@ -39,6 +39,10 @@ abstract class RouteStorage implements RouteStorageInterface
         return $paths;
     }
     
+    /**
+     * @param array $moduleData
+     * @return \Ufo\Core\Module
+     */
     protected function getModule(array $moduleData): Module
     {
         return new Module($moduleData);

@@ -34,7 +34,9 @@ class Debug implements DebugInterface
      */
     protected static $buffErr = array();
     
-    
+    /**
+     * Sets start time.
+     */
     public function __construct()
     {
         $this->debugStartTime = microtime(true);

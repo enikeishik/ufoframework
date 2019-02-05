@@ -10,7 +10,7 @@
 namespace Ufo\Core;
 
 /**
- * Класс конфигурации.
+ * Configuration class.
  */
 class Config extends Struct implements ConfigInterface
 {

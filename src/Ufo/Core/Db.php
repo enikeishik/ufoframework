@@ -267,6 +267,9 @@ class Db extends \mysqli
         return $this->real_escape_string($str);
     }
     
+    /**
+     * @return string
+     */
     public function getError(): string
     {
         return '' != $this->error ? $this->error : $this->generatedError;
