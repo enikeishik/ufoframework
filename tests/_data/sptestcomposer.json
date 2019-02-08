@@ -1,0 +1,5 @@
+{
+    "name": "sptestvendor/sptestname",
+    "type": "library",
+    "description": "Service provider test stub."
+}
