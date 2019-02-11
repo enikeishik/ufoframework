@@ -18,6 +18,12 @@ use Ufo\Core\Widget;
 abstract class ServiceProvider implements ServiceProviderInterface
 {
     /**
+     * Must be defined in child class to gets it's own __DIR__.
+     * @var string
+     */
+    protected static $dir = __DIR__;
+    
+    /**
      * @var object
      */
     protected $schema = null;
@@ -147,6 +153,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
      */
     protected function getRootPath(): string
     {
-        return __DIR__ . '/..';
+        return static::$dir . '/..';
     }
 }
