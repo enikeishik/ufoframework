@@ -75,6 +75,19 @@ class DbTest extends BaseUnitTest
         $this->assertEquals('', $db->getError());
     }
     
+    public function testQueryEx()
+    {
+        $db = $this->getDb();
+        $this->assertNotFalse($db->queryEx('SHOW TABLES'));
+        
+        $this->expectedException(
+            Ufo\Core\DbQueryException::class, 
+            function() use($db) { $db->queryEx('SNOW TABLES'); }
+        );
+        
+        $db->close();
+    }
+    
     public function testGetItem()
     {
         $db = $this->getDb();

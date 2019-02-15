@@ -95,7 +95,7 @@ class Db extends \mysqli
     /**
      * @see parent
      */
-    public function query($query, $resultmode = null)
+    public function query($query, $resultmode = MYSQLI_STORE_RESULT)
     {
         $query = str_replace('#__', $this->config->dbTablePrefix, $query);
         
@@ -112,15 +112,29 @@ class Db extends \mysqli
         }
         
         if (null === $this->debug) {
-            return parent::query($query);
+            return parent::query($query, $resultmode);
         }
         
         $this->debug->trace($query);
-        $result = parent::query($query);
+        $result = parent::query($query, $resultmode);
         if (0 == $this->errno) {
             $this->debug->traceClose();
         } else {
             $this->debug->traceClose(null, $this->errno, $this->error);
+        }
+        return $result;
+    }
+    
+    /**
+     * @param string $query
+     * @return mixed
+     * @throws \Ufo\Core\DbQueryException
+     */
+    public function queryEx(string $query)
+    {
+        $result = $this->query($query);
+        if (false === $result) {
+            throw new DbQueryException($this->error, $this->errno);
         }
         return $result;
     }
