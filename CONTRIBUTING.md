@@ -2,9 +2,9 @@
 
 ## Pull Requests
 
-1. Fork the UFO Framework repository.
-2. Create a new branch for each feature or fix.
-3. Send a pull request.
+ 1. Fork the UFO Framework repository.
+ 2. Create a new branch for each feature or fix.
+ 3. Send a pull request.
 
 ## Style Guide
 
