@@ -1,6 +1,7 @@
 <?php
 use \Ufo\Core\Debug;
 use \Ufo\Core\DebugIndexNotExistsException;
+use \Ufo\Core\DebugStopExecutionException;
  
 class DebugTest extends BaseUnitTest
 {
@@ -85,8 +86,23 @@ class DebugTest extends BaseUnitTest
     public function testVarDump()
     {
         ob_start();
-        Debug::vd('test', false, false);
+        Debug::vd('test vd 1', false, false);
         $content = ob_get_clean();
-        $this->assertContains('test', $content);
+        $this->assertContains('test vd 1', $content);
+        
+        $_SERVER['DOCUMENT_ROOT'] = __DIR__;
+        ob_start();
+        Debug::vd('test vd 2', false, false);
+        $content = ob_get_clean();
+        $this->assertContains('test vd 2', $content);
+        unset($_SERVER['DOCUMENT_ROOT']);
+        
+        ob_start();
+        $this->expectedException(
+            DebugStopExecutionException::class, 
+            function() {
+                Debug::vd('test vd 3', true, true, ob_get_level() - 1);
+            }
+        );
     }
 }

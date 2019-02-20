@@ -144,37 +144,30 @@ class Debug implements DebugInterface
      * Show variable debug info.
      * @param mixed $var
      * @param bool $dump = true
-     * @param bool $exit = true
-     * @param bool $float = false
+     * @param bool $stop = true
      * @return void
      */
-    public static function vd($var, bool $dump = true, bool $exit = true, bool $float = false): void
+    public static function vd($var, bool $dump = true, bool $stop = true, int $obLevel = 0): void
     {
-        // @codeCoverageIgnoreStart
-        if ($exit) {
-            while (ob_get_level() > 0) {
+        if ($stop) {
+            while (ob_get_level() > $obLevel) {
                 ob_end_clean();
             }
         }
-        // @codeCoverageIgnoreEnd
         
         ob_start();
         if (empty($_SERVER['DOCUMENT_ROOT'])) {
             $dump ? var_dump($var) : print_r($var);
             echo PHP_EOL . str_replace("=>\n", '  =>', ob_get_clean());
         } else {
-            // @codeCoverageIgnoreStart
-            echo '<pre' . ($float ? ' class="debugfloat"' : '') . '>';
+            echo '<pre>';
             $dump ? var_dump($var) : print_r($var);
             echo htmlspecialchars(str_replace("=>\n", '  =>', ob_get_clean()));
             echo '</pre>';
-            // @codeCoverageIgnoreEnd
         }
         
-        // @codeCoverageIgnoreStart
-        if ($exit) {
-            exit();
+        if ($stop) {
+            throw new DebugStopExecutionException();
         }
-        // @codeCoverageIgnoreEnd
     }
 }
