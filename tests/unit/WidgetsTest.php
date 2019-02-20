@@ -66,7 +66,7 @@ class WidgetsTest extends BaseUnitTest
     {
         $config = new Config();
         $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
-        $db = Db::getInstance($config);
+        $db = new Db($config);
         $storage = new WidgetsDbStorage($db);
         $this->assertEquals([], $storage->getWidgets(new Section()));
         $this->assertEquals([], $storage->getWidgets(new Section(['path' => "'"]))); //to get null result

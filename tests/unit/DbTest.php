@@ -19,7 +19,7 @@ class DbTest extends BaseUnitTest
     {
         $config = new Config();
         $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
-        return Db::getInstance($config, $withDebug ? new Debug() : null);
+        return new Db($config, $withDebug ? new Debug() : null);
     }
     
     protected function _after()
@@ -33,12 +33,12 @@ class DbTest extends BaseUnitTest
         $config = new Config();
         $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
         
-        $db1 = Db::getInstance($config);
-        $db2 = Db::getInstance($config);
-        $db3 = Db::getInstance($config, new Debug());
+        $db1 = new Db($config);
+        $db2 = new Db($config);
+        $db3 = new Db($config, new Debug());
         
-        $this->assertSame($db1, $db2);
-        $this->assertSame($db1, $db3);
+        $this->assertEquals($db1, $db2);
+        $this->assertNotEquals($db1, $db3);
     }
     
     public function testDb()
@@ -48,11 +48,11 @@ class DbTest extends BaseUnitTest
         $config->dbServer = 'non-existence-host';
         $this->expectedException(
             Ufo\Core\DbConnectException::class, 
-            function() use($config) { $db = Db::getInstance($config); }
+            function() use($config) { $db = new Db($config); }
         );
         $this->expectedException(
             Ufo\Core\DbConnectException::class, 
-            function() use($config) { $db = Db::getInstance($config, new Debug()); }
+            function() use($config) { $db = new Db($config, new Debug()); }
         );
     }
     
@@ -65,12 +65,12 @@ class DbTest extends BaseUnitTest
         $config = new Config();
         $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
         $config->dbReadonly = true;
-        $db = Db::getInstance($config);
+        $db = new Db($config);
         $this->assertFalse($db->query('UPDATE `test_items_table` SET `id`=1 WHERE `id`=1'));
         $this->assertEquals('Readonly mode for database is on', $db->getError());
         $db->close();
         
-        $db = Db::getInstance($config, new Debug());
+        $db = new Db($config, new Debug());
         $this->assertFalse($db->query('UPDATE `test_items_table` SET `id`=1 WHERE `id`=1'));
         $this->assertEquals('', $db->getError());
     }

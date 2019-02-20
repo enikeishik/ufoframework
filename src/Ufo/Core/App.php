@@ -445,7 +445,7 @@ class App
         if (null !== $this->db) {
             return;
         }
-        $this->db = Db::getInstance($this->config, $this->debug);
+        $this->db = new Db($this->config, $this->debug);
     }
     
     /**

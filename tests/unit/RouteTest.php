@@ -31,7 +31,7 @@ class RouteTest extends BaseUnitTest
     {
         $config = new Config();
         $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
-        $db = Db::getInstance($config);
+        $db = new Db($config);
         
         $this->expectedException(
             \Ufo\Routing\RouteStorageEmptyException::class, 

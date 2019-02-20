@@ -61,7 +61,7 @@ class Cache implements CacheInterface
             case $this->config::CACHE_TYPE_MYSQL:
                 $this->storage = new CacheMysqlStorage(
                     $this->config, 
-                    Db::getInstance($this->config, $this->debug), 
+                    new Db($this->config, $this->debug), 
                     $this->debug
                 );
                 break;

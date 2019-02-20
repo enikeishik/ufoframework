@@ -15,11 +15,6 @@ namespace Ufo\Core;
 class Db extends \mysqli
 {
     /**
-     * @var \Ufo\Core\Db
-     */
-    protected static $instance = null;
-    
-    /**
      * @var \Ufo\Core\ConfigInterface
      */
     protected $config = null;
@@ -35,39 +30,15 @@ class Db extends \mysqli
     protected $generatedError = '';
     
     /**
-     * Implementation of singleton pattern.
-     * @param \Ufo\Core\ConfigInterface $config
-     * @param \Ufo\Core\DebugInterface $debug = null
-     * @return \Ufo\Core\Db
-     */
-    public static function getInstance(ConfigInterface $config, DebugInterface $debug = null): self
-    {
-        if (null === static::$instance) {
-            static::$instance = new static($config, $debug);
-        }
-        
-        return static::$instance;
-    }
-    
-    /**
-     * Close current connection and unset instance.
-     * @return bool
-     */
-    public function close(): bool
-    {
-        static::$instance = null;
-        return parent::close();
-    }
-    
-    /**
      * @param \Ufo\Core\ConfigInterface $config
      * @param \Ufo\Core\DebugInterface $debug = null
      * @throws \Ufo\Core\DbConnectException
      */
-    protected function __construct(ConfigInterface $config, DebugInterface $debug = null)
+    public function __construct(ConfigInterface $config, DebugInterface $debug = null)
     {
         $this->config = $config;
         $this->debug = $debug;
+        
         if (null !== $this->debug) {
             $this->debug->trace(__METHOD__);
         }
@@ -85,12 +56,23 @@ class Db extends \mysqli
             }
             throw new DbConnectException(preg_replace('/[^a-z0-1\s\.\-;:,_~]+/i', '', $this->connect_error));
         }
-        if ('' != $this->config->dbCharset) {
+        
+        if (!empty($this->config->dbCharset)) {
             $this->query('SET NAMES ' . $this->config->dbCharset);
         }
+        
         if (null !== $this->debug) {
             $this->debug->traceClose();
         }
+    }
+    
+    /**
+     * Close current connection and unset instance.
+     * @return bool
+     */
+    public function close(): bool
+    {
+        return parent::close();
     }
     
     /**
@@ -288,19 +270,5 @@ class Db extends \mysqli
     public function getError(): string
     {
         return '' != $this->error ? $this->error : $this->generatedError;
-    }
-    
-    /**
-     * @codeCoverageIgnore
-     */
-    protected function __clone()
-    {
-    }
-    
-    /**
-     * @codeCoverageIgnore
-     */
-    private function __wakeup()
-    {
     }
 }
