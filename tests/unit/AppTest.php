@@ -511,6 +511,7 @@ EOD;
         $this->assertCount(3, $widgets);
         
         $config = new Config();
+        $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
         $config->projectPath = '';
         $config->widgetsStorageType = Config::STORAGE_TYPE_ARRAY;
         $config->widgetsStoragePath = '';
