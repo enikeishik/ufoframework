@@ -287,7 +287,7 @@ class App
         $controller = $this->getDefaultController();
         
         $widgetsData = $this->getWidgetsData($section);
-        foreach ($widgetsData as $place => $placeWidgets) {
+        foreach ($widgetsData as $placeWidgets) {
             foreach ($placeWidgets as $widget) {
                 if (isset($widget->dbless) && !$widget->dbless) {
                     $this->setDb();
