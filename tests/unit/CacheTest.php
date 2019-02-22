@@ -7,7 +7,7 @@ use \Ufo\Cache\Cache;
 class CacheTest extends BaseUnitTest
 {
     // tests
-    protected function testCacheCases($cache)
+    protected function testCacheCases($cache, $deleteOutdated = true)
     {
         $cache->clear();
         
@@ -66,15 +66,17 @@ class CacheTest extends BaseUnitTest
             function() use($cache) { $cache->expired('key1', new DateInterval('PT0S')); }
         );
         
-        $this->assertTrue($cache->deleteOutdated(100));
-        $this->assertTrue($cache->has('key1'));
-        $this->assertTrue($cache->deleteOutdated(0));
-        $this->assertFalse($cache->has('key1'));
-        
-        $this->expectedException(
-            \Ufo\Core\TypeNotSupportedException::class, 
-            function() use($cache) { $cache->deleteOutdated(new DateInterval('PT0S')); }
-        );
+        if ($deleteOutdated) {
+            $this->assertTrue($cache->deleteOutdated(100));
+            $this->assertTrue($cache->has('key1'));
+            $this->assertTrue($cache->deleteOutdated(0));
+            $this->assertFalse($cache->has('key1'));
+            
+            $this->expectedException(
+                \Ufo\Core\TypeNotSupportedException::class, 
+                function() use($cache) { $cache->deleteOutdated(new DateInterval('PT0S')); }
+            );
+        }
         
         $cache->clear();
     }
@@ -183,6 +185,14 @@ class CacheTest extends BaseUnitTest
         $config->cacheDir = '/tmp/unexistence-ufo-cache-test-dir';
         $cache = new Cache($config, new Debug());
         $this->testCacheCasesFail($cache);
+    }
+    
+    public function testCacheMemcachedStorage()
+    {
+        $config = new Config();
+        $config->cacheType = Config::CACHE_TYPE_MEMCACHED;
+        $cache = new Cache($config, new Debug());
+        $this->testCacheCases($cache, false);
     }
     
     public function testCacheSqliteStorage()
