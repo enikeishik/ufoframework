@@ -77,11 +77,7 @@ class CacheMemcachedStorage implements CacheStorageInterface
      */
     public function has(string $key): bool
     {
-        try {
-            return false !== $this->db->get($key);
-        } catch (\Throwable $e) {
-            return false;
-        }
+        return false !== $this->db->get($key);
     }
     
     /**
@@ -91,15 +87,11 @@ class CacheMemcachedStorage implements CacheStorageInterface
      */
     public function get(string $key)
     {
-        try {
-            $packet = $this->db->get($key);
-            if (false === $packet || !($packet instanceof CacheMemcachedPacket)) {
-                return null;
-            }
-            return $this->getPacketValue($packet);
-        } catch (\Throwable $e) {
+        $packet = $this->db->get($key);
+        if (false === $packet || !($packet instanceof CacheMemcachedPacket)) {
             return null;
         }
+        return $this->getPacketValue($packet);
     }
     
     /**
@@ -109,15 +101,7 @@ class CacheMemcachedStorage implements CacheStorageInterface
      */
     public function getAge(string $key): int
     {
-        try {
-            $packet = $this->db->get($key);
-            if (false === $packet || !($packet instanceof CacheMemcachedPacket)) {
-                return PHP_INT_MAX;
-            }
-            return time() - $this->getPacketTimestamp($packet);
-        } catch (\Throwable $e) {
-            return PHP_INT_MAX;
-        }
+        return time() - $this->getPacketTimestamp($this->db->get($key));
     }
     
     /**
@@ -134,11 +118,7 @@ class CacheMemcachedStorage implements CacheStorageInterface
             throw new TypeNotSupportedException();
         }
         
-        try {
-            return $this->db->set($key, $this->getPacket($value), 0, $tts ?? 0);
-        } catch (\Throwable $e) {
-            return false;
-        }
+        return $this->db->set($key, $this->getPacket($value), 0, $tts ?? 0);
     }
     
     /**
@@ -148,11 +128,7 @@ class CacheMemcachedStorage implements CacheStorageInterface
      */
     public function delete(string $key): bool
     {
-        try {
-            return $this->db->delete($key);
-        } catch (\Throwable $e) {
-            return false;
-        }
+        return $this->db->delete($key);
     }
     
     /**
@@ -161,11 +137,7 @@ class CacheMemcachedStorage implements CacheStorageInterface
      */
     public function clear(): bool
     {
-        try {
-            return $this->db->flush();
-        } catch (\Throwable $e) {
-            return false;
-        }
+        return $this->db->flush();
     }
     
     /**
