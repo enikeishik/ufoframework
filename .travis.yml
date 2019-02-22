@@ -10,7 +10,7 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE ufmtestsdb;'
 before_script:
-  - pecl install memcache
+  - echo 'y' | pecl install memcache
   - composer install
 script:
   - php -v
