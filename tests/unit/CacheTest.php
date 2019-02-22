@@ -191,8 +191,11 @@ class CacheTest extends BaseUnitTest
     {
         $config = new Config();
         $config->cacheType = Config::CACHE_TYPE_MEMCACHED;
+        $config->cacheMemcachedHost = 'localhost';
+        $config->cacheMemcachedPort = 11211;
         $cache = new Cache($config, new Debug());
         $this->testCacheCases($cache, false);
+        $this->assertTrue($cache->deleteOutdated(0));
     }
     
     public function testCacheSqliteStorage()
