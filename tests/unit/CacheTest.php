@@ -189,6 +189,9 @@ class CacheTest extends BaseUnitTest
     
     public function testCacheMemcachedStorage()
     {
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            return;
+        }
         $config = new Config();
         $config->cacheType = Config::CACHE_TYPE_MEMCACHED;
         $config->cacheMemcachedHost = 'localhost';
