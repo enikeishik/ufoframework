@@ -10,7 +10,8 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE ufmtestsdb;'
 before_script:
-  - echo 'y' | pecl install memcached
+  - echo "extension=memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer install
 script:
   - php -v
