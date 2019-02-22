@@ -15,7 +15,7 @@ use Ufo\Core\DebugInterface;
 use Ufo\Core\TypeNotSupportedException;
 
 /**
- * Cache database based storage.
+ * Cache storage based on project MySQL database.
  */
 class CacheMysqlStorage implements CacheStorageInterface
 {

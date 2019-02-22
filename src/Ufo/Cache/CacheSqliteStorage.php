@@ -15,7 +15,7 @@ use Ufo\Core\DebugInterface;
 use Ufo\Core\TypeNotSupportedException;
 
 /**
- * Cache database based storage.
+ * Cache storage based on standalone SQLite database.
  */
 class CacheSqliteStorage implements CacheStorageInterface
 {
