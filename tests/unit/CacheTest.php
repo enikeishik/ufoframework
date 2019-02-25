@@ -188,6 +188,9 @@ class CacheTest extends BaseUnitTest
         $this->testCacheCasesFail($cache);
     }
     
+    /**
+     * @group memcache
+     */
     public function testCacheMemcachedStorage()
     {
         //disable tests if extension not enabled (on travis-ci)
@@ -206,6 +209,37 @@ class CacheTest extends BaseUnitTest
         }
         $this->testCacheCases($cache, false);
         $this->assertTrue($cache->deleteOutdated(0));
+    }
+    
+    /**
+     * @group redis
+     */
+    public function testCacheRedisStorage()
+    {
+        //disable tests if extension not enabled
+        if (!class_exists('\Redis')) {
+            return;
+        }
+        $config = new Config();
+        $config->cacheType = Config::CACHE_TYPE_REDIS;
+        $config->cacheRedisHost = 'localhost';
+        $config->cacheRedisPort = 6379;
+        try {
+            $cache = new Cache($config, new Debug());
+        } catch (CacheStorageConnectException $e) {
+            //disable tests if redis service is not running
+            return;
+        }
+        $this->testCacheCases($cache);
+        
+        $config = new Config();
+        $config->cacheType = Config::CACHE_TYPE_REDIS;
+        $config->cacheRedisHost = 'localhost';
+        $config->cacheRedisPort = 16379;
+        $this->expectedException(
+            \Ufo\Cache\CacheStorageConnectException::class, 
+            function() use($config) { $cache = new Cache($config, new Debug()); }
+        );
     }
     
     public function testCacheSqliteStorage()
