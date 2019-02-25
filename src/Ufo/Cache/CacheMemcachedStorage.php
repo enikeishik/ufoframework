@@ -61,10 +61,10 @@ class CacheMemcachedStorage implements CacheStorageInterface
         $this->config = $config;
         $this->debug = $debug;
         if (isset($this->config->cacheMemcachedHost)) {
-            $this->host =  $this->config->cacheMemcachedHost;
+            $this->host = $this->config->cacheMemcachedHost;
         }
         if (isset($this->config->cacheMemcachedPort)) {
-            $this->port =  $this->config->cacheMemcachedPort;
+            $this->port = $this->config->cacheMemcachedPort;
         }
         
         $this->db = new \Memcache();
@@ -102,7 +102,7 @@ class CacheMemcachedStorage implements CacheStorageInterface
     public function get(string $key)
     {
         $packet = $this->db->get($key);
-        if (false === $packet || !($packet instanceof CacheMemcachedPacket)) {
+        if (false === $packet || !($packet instanceof CachePacket)) {
             return null;
         }
         return $this->getPacketValue($packet);
@@ -168,27 +168,27 @@ class CacheMemcachedStorage implements CacheStorageInterface
     
     /**
      * @param mixed $value
-     * @return \Ufo\Cache\CacheMemcachedPacket
+     * @return \Ufo\Cache\CachePacket
      */
-    protected function getPacket($value): CacheMemcachedPacket
+    protected function getPacket($value): CachePacket
     {
-        return new CacheMemcachedPacket($value);
+        return new CachePacket($value);
     }
     
     /**
-     * @param \Ufo\Cache\CacheMemcachedPacket $packet
+     * @param \Ufo\Cache\CachePacket $packet
      * @return mixed
      */
-    protected function getPacketValue(CacheMemcachedPacket $packet)
+    protected function getPacketValue(CachePacket $packet)
     {
         return $packet->getValue();
     }
     
     /**
-     * @param \Ufo\Cache\CacheMemcachedPacket $packet
+     * @param \Ufo\Cache\CachePacket $packet
      * @return int
      */
-    protected function getPacketTimestamp(CacheMemcachedPacket $packet): int
+    protected function getPacketTimestamp(CachePacket $packet): int
     {
         return $packet->getTimestamp();
     }

@@ -11,11 +11,9 @@ namespace Ufo\Cache;
 
 
 /**
- * Cache storage based on Memcached service.
- * Memcache extension not available on travis-ci and requires manually start mamcached service on local.
- * @codeCoverageIgnore
+ * Incapsilating timestamp/value pair for cache item.
  */
-class CacheMemcachedPacket
+class CachePacket
 {
     /**
      * @var mixed
