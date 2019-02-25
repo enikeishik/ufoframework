@@ -42,7 +42,7 @@ class CacheRedisStorage implements CacheStorageInterface
     /**
      * @var string
      */
-    protected $host = '127.0.0.1';
+    protected $host = 'localhost';
     
     /**
      * @var int
