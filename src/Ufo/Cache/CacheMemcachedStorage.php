@@ -16,6 +16,8 @@ use Ufo\Core\TypeNotSupportedException;
 
 /**
  * Cache storage based on Memcached service.
+ * Memcache extension not available on travis-ci and requires manually start mamcached service on local.
+ * @codeCoverageIgnore
  */
 class CacheMemcachedStorage implements CacheStorageInterface
 {
@@ -47,9 +49,15 @@ class CacheMemcachedStorage implements CacheStorageInterface
     /**
      * @param \Ufo\Core\Config $config
      * @param \Ufo\Core\DebugInterface $debug = null
+     * @throws \Ufo\Cache\CacheStorageNotSupportedException
+     * @throws \Ufo\Cache\CacheStorageConnectException
      */
     public function __construct(Config $config, DebugInterface $debug = null)
     {
+        if (!class_exists('\Memcache')) {
+            throw new CacheStorageNotSupportedException();
+        }
+        
         $this->config = $config;
         $this->debug = $debug;
         if (isset($this->config->cacheMemcachedHost)) {
@@ -60,7 +68,13 @@ class CacheMemcachedStorage implements CacheStorageInterface
         }
         
         $this->db = new \Memcache();
-        $this->db->connect($this->host, $this->port);
+        try {
+            if (false === $this->db->connect($this->host, $this->port)) {
+                throw new CacheStorageConnectException();
+            }
+        } catch (\Throwable $e) {
+            throw new CacheStorageConnectException();
+        }
     }
     
     public function __destruct()
