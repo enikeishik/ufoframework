@@ -68,16 +68,16 @@ class CacheSqliteStorage implements CacheStorageInterface
         $this->config = $config;
         $this->debug = $debug;
         if (isset($this->config->cacheSqliteTable)) {
-            $this->table =  $this->config->cacheSqliteTable;
+            $this->table = $this->config->cacheSqliteTable;
         }
         if (isset($this->config->cacheSqliteKeyField)) {
-            $this->keyField =  $this->config->cacheSqliteKeyField;
+            $this->keyField = $this->config->cacheSqliteKeyField;
         }
         if (isset($this->config->cacheSqliteValueField)) {
-            $this->valueField =  $this->config->cacheSqliteValueField;
+            $this->valueField = $this->config->cacheSqliteValueField;
         }
         if (isset($this->config->cacheSqliteTimeField)) {
-            $this->timeField =  $this->config->cacheSqliteTimeField;
+            $this->timeField = $this->config->cacheSqliteTimeField;
         }
         
         $this->db = new \SQLite3($this->config->projectPath . $this->config->cacheDir . '/' . $this->base);

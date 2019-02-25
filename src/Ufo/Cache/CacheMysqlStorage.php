@@ -65,16 +65,16 @@ class CacheMysqlStorage implements CacheStorageInterface
         $this->debug = $debug;
         $this->db = $db;
         if (isset($this->config->cacheMysqlTable)) {
-            $this->table =  $this->config->cacheMysqlTable;
+            $this->table = $this->config->cacheMysqlTable;
         }
         if (isset($this->config->cacheMysqlKeyField)) {
-            $this->keyField =  $this->config->cacheMysqlKeyField;
+            $this->keyField = $this->config->cacheMysqlKeyField;
         }
         if (isset($this->config->cacheMysqlValueField)) {
-            $this->valueField =  $this->config->cacheMysqlValueField;
+            $this->valueField = $this->config->cacheMysqlValueField;
         }
         if (isset($this->config->cacheMysqlTimeField)) {
-            $this->timeField =  $this->config->cacheMysqlTimeField;
+            $this->timeField = $this->config->cacheMysqlTimeField;
         }
     }
     
