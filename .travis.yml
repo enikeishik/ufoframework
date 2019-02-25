@@ -6,7 +6,7 @@ php:
   - '7.3'
 services:
   - mysql
-  - memcached
+  - redis-server
 before_install:
   - mysql -e 'CREATE DATABASE ufmtestsdb;'
 before_script:
