@@ -3,6 +3,7 @@ use \Ufo\Core\Config;
 use \Ufo\Core\Db;
 use \Ufo\Core\Debug;
 use \Ufo\Cache\Cache;
+use \Ufo\Cache\CacheStorageConnectException;
  
 class CacheTest extends BaseUnitTest
 {
@@ -189,14 +190,20 @@ class CacheTest extends BaseUnitTest
     
     public function testCacheMemcachedStorage()
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        //disable tests if extension not enabled (on travis-ci)
+        if (!class_exists('\Memcache')) {
             return;
         }
         $config = new Config();
         $config->cacheType = Config::CACHE_TYPE_MEMCACHED;
         $config->cacheMemcachedHost = 'localhost';
         $config->cacheMemcachedPort = 11211;
-        $cache = new Cache($config, new Debug());
+        try {
+            $cache = new Cache($config, new Debug());
+        } catch (CacheStorageConnectException $e) {
+            //disable tests if memcached service is not running
+            return;
+        }
         $this->testCacheCases($cache, false);
         $this->assertTrue($cache->deleteOutdated(0));
     }
