@@ -9,7 +9,7 @@
 
 namespace Ufo\StorableCache;
 
-class StorageConnectException extends Exception
+class StorageConnectException extends StorableCacheException
 {
     //
 }

@@ -56,42 +56,45 @@ class StorableCache implements StorableCacheInterface
     {
         $this->config = $config;
         $this->debug = $debug;
-        
+        $this->storage = $this->getStorage();
+    }
+    
+    /**
+     * @return \Ufo\StorableCache\StorageInterface
+     * @throws \Ufo\StorableCache\StorageNotSupportedException
+     * @throws \Ufo\StorableCache\StorageConnectException
+     */
+    protected function getStorage(): StorageInterface
+    {
         switch ($this->config->cacheType) {
             
             case $this->config::CACHE_TYPE_FILES:
-                $this->storage = new FilesStorage($this->config, $this->debug);
-                break;
+                return new FilesStorage($this->config, $this->debug);
             
             case $this->config::CACHE_TYPE_SQLITE:
-                $this->storage = new SqliteStorage($this->config, $this->debug);
-                break;
+                return new SqliteStorage($this->config, $this->debug);
             
             // @codeCoverageIgnoreStart
             case $this->config::CACHE_TYPE_MEMCACHED:
-                $this->storage = new MemcachedStorage($this->config, $this->debug);
-                break;
+                return new MemcachedStorage($this->config, $this->debug);
             // @codeCoverageIgnoreEnd
             
             case $this->config::CACHE_TYPE_REDIS:
-                $this->storage = new RedisStorage($this->config, $this->debug);
-                break;
+                return new RedisStorage($this->config, $this->debug);
             
             case $this->config::CACHE_TYPE_MYSQL:
-                $this->storage = new MysqlStorage(
+                return new MysqlStorage(
                     $this->config, 
                     new Db($this->config, $this->debug), 
                     $this->debug
                 );
-                break;
             
             case $this->config::CACHE_TYPE_ARRAY:
-                $this->storage = new ArrayStorage();
-                break;
+                return new ArrayStorage();
             
-            default:
-                throw new StorageNotSupportedException();
         }
+        
+        throw new StorageNotSupportedException();
     }
     
     /**
@@ -116,7 +119,11 @@ class StorableCache implements StorableCacheInterface
      */
     public function get(string $key, string $default = ''): string
     {
-        return $this->storage->get($key) ?: $default;
+        try {
+            return $this->storage->get($key);
+        } catch (BadPacketException $e) {
+            return $default;
+        }
     }
     
     /**
@@ -133,6 +140,13 @@ class StorableCache implements StorableCacheInterface
      */
     public function set(string $key, string $value, int $lifetime = 0, int $savetime = 0): bool
     {
+        if (0 == $lifetime) {
+            $lifetime = static::LIFETIME;
+        }
+        if (0 == $savetime) {
+            $savetime = static::SAVETIME;
+        }
+        
         return $this->storage->set($key, $value, $lifetime, $savetime);
     }
     
@@ -167,7 +181,11 @@ class StorableCache implements StorableCacheInterface
      */
     public function expired(string $key): bool
     {
-        
+        try {
+            return $this->storage->expired($key);
+        } catch (BadPacketException $e) {
+            return true;
+        }
     }
     
     /**
@@ -177,6 +195,6 @@ class StorableCache implements StorableCacheInterface
      */
     public function deleteOutdated(): bool
     {
-        
+        return $this->storage->deleteOutdated();
     }
 }

@@ -9,7 +9,7 @@
 
 namespace Ufo\StorableCache;
 
-class StorageNotSupportedException extends Exception
+class StorageNotSupportedException extends StorableCacheException
 {
     //
 }
