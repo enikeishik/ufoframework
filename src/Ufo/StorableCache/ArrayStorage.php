@@ -37,7 +37,7 @@ class ArrayStorage implements StorageInterface
      */
     public function getPacket(string $key): Packet
     {
-        return new Packet('', 0, 0);
+        throw new BadPacketException();
     }
     
     /**
@@ -51,7 +51,7 @@ class ArrayStorage implements StorageInterface
      */
     public function getValue(string $key): string
     {
-        return '';
+        return $this->getPacket($key)->getValue();
     }
     
     /**
@@ -65,7 +65,7 @@ class ArrayStorage implements StorageInterface
      */
     public function expired(string $key): bool
     {
-        return true;
+        return $this->getPacket($key)->expired();
     }
     
     /**

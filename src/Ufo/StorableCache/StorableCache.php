@@ -120,7 +120,7 @@ class StorableCache implements StorableCacheInterface
     public function get(string $key, string $default = ''): string
     {
         try {
-            return $this->storage->get($key);
+            return $this->storage->get($key) ?? $default;
         } catch (BadPacketException $e) {
             return $default;
         }
@@ -138,12 +138,12 @@ class StorableCache implements StorableCacheInterface
      * 
      * @return bool True on success and false on failure.
      */
-    public function set(string $key, string $value, int $lifetime = 0, int $savetime = 0): bool
+    public function set(string $key, string $value, int $lifetime = null, int $savetime = null): bool
     {
-        if (0 == $lifetime) {
+        if (null === $lifetime || 0 > $lifetime) {
             $lifetime = static::LIFETIME;
         }
-        if (0 == $savetime) {
+        if (null === $savetime || 0 > $savetime) {
             $savetime = static::SAVETIME;
         }
         

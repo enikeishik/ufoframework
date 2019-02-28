@@ -126,8 +126,8 @@ class MysqlStorage implements StorageInterface
         $sql =  'SELECT '
                 . '`' . $this->valueField . '`, `' . $this->timestampField . '`,'
                 . '`' . $this->lifetimeField . '`, `' . $this->savetimeField . '`'
-                . ' FROM "' . $this->table . '"'
-                . ' WHERE "' . $this->keyField . '"=' . "'" . $this->db->addEscape($key) . "'";
+                . ' FROM `' . $this->table . '`'
+                . ' WHERE `' . $this->keyField . '`=' . "'" . $this->db->addEscape($key) . "'";
         try {
             $row = $this->db->getItem($sql);
             return new Packet(
@@ -203,8 +203,8 @@ class MysqlStorage implements StorageInterface
                     . '`' . $this->keyField . '`, '
                     . '`' . $this->valueField . '`, '
                     . '`' . $this->timestampField . '`,'
-                    . '`' . $this->timestampField . '`,'
-                    . '`' . $this->timestampField . '`'
+                    . '`' . $this->lifetimeField . '`,'
+                    . '`' . $this->savetimeField . '`'
                     . ')'
                     . ' VALUES('
                     . "'" . $this->db->addEscape($key) . "',"
@@ -248,7 +248,7 @@ class MysqlStorage implements StorageInterface
      */
     public function deleteOutdated(): bool
     {
-        $sql =  'DELETE FROM "' . $this->table . '"'
+        $sql =  'DELETE FROM `' . $this->table . '`'
                 . ' WHERE `' . $this->savetimeField . '`<'
                 . '(' . time() . '-`' . $this->timestampField . '`)';
         return $this->db->query($sql);

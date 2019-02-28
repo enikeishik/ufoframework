@@ -33,11 +33,6 @@ class FilesStorage implements StorageInterface
     protected $cacheDir = '/cache';
     
     /**
-     * @var string
-     */
-    protected $cashFilePath = '';
-    
-    /**
      * @param \Ufo\Core\Config $config
      * @param \Ufo\Core\DebugInterface $debug = null
      * @throws \Ufo\Cache\StorageConnectException
@@ -262,11 +257,7 @@ class FilesStorage implements StorageInterface
      */
     protected function getCashFilePath(string $key): string
     {
-        if ('' != $this->cashFilePath) {
-            return $this->cashFilePath;
-        }
-        $this->cashFilePath = $this->cacheDir . '/' . $this->getHash($key);
-        return $this->cashFilePath;
+        return $this->cacheDir . '/' . $this->getHash($key);
     }
     
     /**

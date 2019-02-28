@@ -44,7 +44,7 @@ class Packet
         $this->value = $value;
         $this->lifetime = $lifetime;
         $this->savetime = $savetime;
-        if (null == $timestamp || 0 > $timestamp) {
+        if (null === $timestamp || 0 > $timestamp) {
             $this->timestamp = time();
         } else {
             $this->timestamp = $timestamp;
