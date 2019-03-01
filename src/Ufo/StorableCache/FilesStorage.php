@@ -35,7 +35,7 @@ class FilesStorage implements StorageInterface
     /**
      * @param \Ufo\Core\Config $config
      * @param \Ufo\Core\DebugInterface $debug = null
-     * @throws \Ufo\Cache\StorageConnectException
+     * @throws \Ufo\StorableCache\StorageConnectException
      */
     public function __construct(Config $config, DebugInterface $debug = null)
     {

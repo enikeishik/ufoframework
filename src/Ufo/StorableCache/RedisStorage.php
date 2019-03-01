@@ -45,8 +45,8 @@ class RedisStorage implements StorageInterface
     /**
      * @param \Ufo\Core\Config $config
      * @param \Ufo\Core\DebugInterface $debug = null
-     * @throws \Ufo\Cache\CacheStorageNotSupportedException
-     * @throws \Ufo\Cache\CacheStorageConnectException
+     * @throws \Ufo\StorableCache\StorageNotSupportedException
+     * @throws \Ufo\StorableCache\StorageConnectException
      */
     public function __construct(Config $config, DebugInterface $debug = null)
     {

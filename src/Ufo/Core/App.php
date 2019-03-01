@@ -55,7 +55,7 @@ class App
     protected $debugStack = [];
     
     /**
-     * @var \Ufo\Cache\Cache
+     * @var \Ufo\StorableCache\StorableCache
      */
     protected $cache = null;
     
@@ -453,7 +453,7 @@ class App
     
     /**
      * @return void
-     * @throws \Ufo\Cache\CacheStorageNotSupportedException
+     * @throws \Ufo\StorableCache\StorageNotSupportedException
      */
     protected function setCache(): void
     {
