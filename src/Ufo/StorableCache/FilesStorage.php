@@ -15,7 +15,7 @@ use Ufo\Core\DebugInterface;
 /**
  * Files-based storage.
  */
-class FilesStorage implements StorageInterface
+class FilesStorage extends AbstractStorage
 {
     /**
      * @var \Ufo\Core\Config
@@ -76,48 +76,6 @@ class FilesStorage implements StorageInterface
     public function getPacket(string $key): Packet
     {
         return $this->getPacketFromFile($this->getCashFilePath($key));
-    }
-    
-    /**
-     * Fetches an item value from the cache.
-     * 
-     * @param string $key
-     * 
-     * @return string
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function getValue(string $key): string
-    {
-        return $this->getPacket($key)->getValue();
-    }
-    
-    /**
-     * Determines whether an item is present in the cache and life time expired.
-     * 
-     * @param string $key The unique cache key of the item to check for expiring.
-     * 
-     * @return bool True if the item was expired. False if not.
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function expired(string $key): bool
-    {
-        return $this->getPacket($key)->expired();
-    }
-    
-    /**
-     * Fetches an item value from the cache. Synonym for getValue method.
-     * 
-     * @param string $key
-     * 
-     * @return string
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function get(string $key): string
-    {
-        return $this->getValue($key);
     }
     
     /**

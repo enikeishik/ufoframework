@@ -17,7 +17,7 @@ use Ufo\Core\DebugInterface;
  * Memcache extension not available on travis-ci and requires manually start mamcached service on local.
  * @codeCoverageIgnore
  */
-class MemcachedStorage implements StorageInterface
+class MemcachedStorage extends AbstractStorage
 {
     /**
      * @var \Ufo\Core\Config
@@ -110,48 +110,6 @@ class MemcachedStorage implements StorageInterface
             throw new BadPacketException();
         }
         return $packet;
-    }
-    
-    /**
-     * Fetches an item value from the cache.
-     * 
-     * @param string $key
-     * 
-     * @return string
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function getValue(string $key): string
-    {
-        return $this->getPacket($key)->getValue();
-    }
-    
-    /**
-     * Determines whether an item is present in the cache and life time expired.
-     * 
-     * @param string $key The unique cache key of the item to check for expiring.
-     * 
-     * @return bool True if the item was expired. False if not.
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function expired(string $key): bool
-    {
-        return $this->getPacket($key)->expired();
-    }
-    
-    /**
-     * Fetches an item value from the cache. Synonym for getValue method.
-     * 
-     * @param string $key
-     * 
-     * @return string
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function get(string $key): string
-    {
-        return $this->getValue($key);
     }
     
     /**

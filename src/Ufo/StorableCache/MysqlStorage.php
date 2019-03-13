@@ -16,7 +16,7 @@ use Ufo\Core\DebugInterface;
 /**
  * Cache storage based on project MySQL database.
  */
-class MysqlStorage implements StorageInterface
+class MysqlStorage extends AbstractStorage
 {
     /**
      * @var \Ufo\Core\Config
@@ -139,48 +139,6 @@ class MysqlStorage implements StorageInterface
         } catch (\Throwable $e) {
             throw new BadPacketException($e->getMessage(), $e->getCode(), $e);
         }
-    }
-    
-    /**
-     * Fetches an item value from the cache.
-     * 
-     * @param string $key
-     * 
-     * @return string
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function getValue(string $key): string
-    {
-        return $this->getPacket($key)->getValue();
-    }
-    
-    /**
-     * Determines whether an item is present in the cache and life time expired.
-     * 
-     * @param string $key The unique cache key of the item to check for expiring.
-     * 
-     * @return bool True if the item was expired. False if not.
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function expired(string $key): bool
-    {
-        return $this->getPacket($key)->expired();
-    }
-    
-    /**
-     * Fetches an item value from the cache. Synonym for getValue method.
-     * 
-     * @param string $key
-     * 
-     * @return string
-     * 
-     * @throws \Ufo\StorableCache\BadPacketException
-     */
-    public function get(string $key): string
-    {
-        return $this->getValue($key);
     }
     
     /**
