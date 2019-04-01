@@ -187,7 +187,7 @@ class StorableCacheTest extends BaseUnitTest
         $config->cacheMemcachedPort = 11211;
         try {
             $cache = new StorableCache($config, new Debug());
-        } catch (CacheStorageConnectException $e) {
+        } catch (StorageConnectException $e) {
             //disable tests if memcached service is not running
             return;
         }
