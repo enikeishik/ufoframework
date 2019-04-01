@@ -28,7 +28,7 @@ class RedisStorage extends AbstractStorage
     protected $debug = null;
     
     /**
-     * @var \Memcache
+     * @var \Redis
      */
     protected $db = null;
     
