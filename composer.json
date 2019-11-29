@@ -13,7 +13,10 @@
         }
     ],
     "require": {
-        "php": "^7.2"
+        "php": "^7.2",
+        "php-strict/config": "dev-master",
+        "php-strict/container": "dev-master",
+        "php-strict/struct": "dev-master"
     },
     "require-dev": {
         "codeception/codeception": "^2.5.1",
