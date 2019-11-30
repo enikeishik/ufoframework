@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": "^7.2",
-        "php-strict/config": "dev-master",
-        "php-strict/container": "dev-master",
-        "php-strict/struct": "dev-master"
+        "php-strict/config": "~1.0",
+        "php-strict/container": "~1.0",
+        "php-strict/struct": "~1.0"
     },
     "require-dev": {
         "codeception/codeception": "^2.5.1",
