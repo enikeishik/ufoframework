@@ -9,6 +9,8 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Struct\Struct;
+
 /**
  * Configuration class.
  */

@@ -1,7 +1,7 @@
 <?php
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
-use \Ufo\Core\Struct;
+use PhpStrict\Struct\Struct;
  
 class StructTest extends \Codeception\Test\Unit
 {

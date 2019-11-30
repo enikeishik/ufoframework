@@ -9,6 +9,8 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Struct\Struct;
+
 class Module extends Struct
 {
     /**

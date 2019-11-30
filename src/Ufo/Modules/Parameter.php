@@ -9,7 +9,7 @@
 
 namespace Ufo\Modules;
 
-use Ufo\Core\Struct;
+use PhpStrict\Struct\Struct;
 
 /**
  * Module level parameter structure class.

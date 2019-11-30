@@ -9,6 +9,9 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Struct\Struct;
+use PhpStrict\Struct\StructInterface;
+
 /**
  * Configuration interface.
  */
