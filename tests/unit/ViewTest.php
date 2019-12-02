@@ -1,6 +1,6 @@
 <?php
+use \PhpStrict\Container\Container;
 use \Ufo\Core\Config;
-use \Ufo\Core\Container;
 use \Ufo\Core\Module;
 use \Ufo\Core\Section;
 use \Ufo\Modules\View;

@@ -9,18 +9,20 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Container\ContainerInterface;
+
 /**
  * Dependency injection base object.
  */
 abstract class DIObject implements DIObjectInterface
 {
     /**
-     * @var \Ufo\Core\ContainerInterface
+     * @var \PhpStrict\Container\ContainerInterface
      */
     protected $container = null;
     
     /**
-     * @param \Ufo\Core\ContainerInterface $container
+     * @param \PhpStrict\Container\ContainerInterface $container
      * @param bool $dontUnpack = false
      * @return void
      */

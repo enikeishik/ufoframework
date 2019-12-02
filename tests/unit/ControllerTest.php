@@ -1,8 +1,8 @@
 <?php
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
+use \PhpStrict\Container\Container;
 use \Ufo\Core\Config;
-use \Ufo\Core\Container;
 use \Ufo\Core\ModuleParameterConflictException;
 use \Ufo\Core\ModuleParameterFormatException;
 use \Ufo\Core\ModuleParameterUnknownException;

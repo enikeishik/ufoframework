@@ -9,6 +9,8 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Container\Container;
+use PhpStrict\Container\ContainerInterface;
 use Ufo\Modules\Controller;
 use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
@@ -475,7 +477,7 @@ class App
     
     /**
      * @param array $options = []
-     * @return \Ufo\Core\ContainerInterface
+     * @return \PhpStrict\Container\ContainerInterface
      */
     protected function getContainer(array $options = []): ContainerInterface
     {

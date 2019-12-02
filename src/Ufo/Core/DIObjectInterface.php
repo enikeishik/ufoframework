@@ -9,13 +9,15 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Container\ContainerInterface;
+
 /**
  * Dependency injection object interface.
  */
 interface DIObjectInterface
 {
     /**
-     * @param \Ufo\Core\ContainerInterface $container
+     * @param \PhpStrict\Container\ContainerInterface $container
      * @return void
      */
     public function inject(ContainerInterface $container): void;

@@ -1,7 +1,7 @@
 <?php
 require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
-use \Ufo\Core\Container;
+use PhpStrict\Container\Container;
  
 class ContainerTest extends \Codeception\Test\Unit
 {

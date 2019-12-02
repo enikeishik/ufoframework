@@ -10,7 +10,6 @@
 namespace Ufo\Modules;
 
 use Ufo\Core\Config;
-use Ufo\Core\ContainerInterface;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
 use Ufo\Core\DIObjectInterface;

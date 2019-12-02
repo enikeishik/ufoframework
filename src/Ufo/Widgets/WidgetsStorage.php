@@ -9,9 +9,7 @@
 
 namespace Ufo\Widgets;
 
-use Ufo\Core\ContainerInterface;
 use Ufo\Core\DIObject;
-use Ufo\Core\Section;
 
 abstract class WidgetsStorage extends DIObject implements WidgetsStorageInterface
 {

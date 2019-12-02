@@ -12,7 +12,6 @@ namespace Ufo\Modules;
 use Ufo\Core\Config;
 use Ufo\Core\DebugInterface;
 use Ufo\Core\DIObject;
-use Ufo\Core\ContainerInterface;
 use Ufo\Core\Section;
 use Ufo\Core\Result;
 
