@@ -11,6 +11,7 @@ namespace Ufo\Core;
 
 use PhpStrict\Container\Container;
 use PhpStrict\Container\ContainerInterface;
+use PhpStrict\Config\ConfigInterface;
 use Ufo\Modules\Controller;
 use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
@@ -42,7 +43,7 @@ use Ufo\Widgets\WidgetsDbStorage;
 class App
 {
     /**
-     * @var \Ufo\Core\ConfigInterface
+     * @var \PhpStrict\Config\ConfigInterface
      */
     protected $config = null;
     
@@ -72,7 +73,7 @@ class App
     protected $path = '';
     
     /**
-     * @param \Ufo\Core\ConfigInterface $config
+     * @param \PhpStrict\Config\ConfigInterface $config
      * @param \Ufo\Core\DebugInterface $debug = null
      */
     public function __construct(ConfigInterface $config, DebugInterface $debug = null)

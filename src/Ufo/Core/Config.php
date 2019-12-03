@@ -9,12 +9,12 @@
 
 namespace Ufo\Core;
 
-use PhpStrict\Struct\Struct;
+use PhpStrict\Config\Config as AbstractConfig;
 
 /**
  * Configuration class.
  */
-class Config extends Struct implements ConfigInterface
+class Config extends AbstractConfig
 {
     public const STORAGE_TYPE_ARRAY = 'array';
     public const STORAGE_TYPE_DB = 'db';
@@ -148,93 +148,11 @@ class Config extends Struct implements ConfigInterface
     /**
      * @see parent
      */
-    public function __construct($vars = null, bool $cast = true)
+    public function __construct(array $config = [])
     {
         $this->rootUrl = $this->rootPath;
         $this->rootPath = $_SERVER['DOCUMENT_ROOT'] . $this->rootPath;
         $this->projectPath = dirname($_SERVER['DOCUMENT_ROOT']);
-        parent::__construct($vars, $cast);
-    }
-    
-    /**
-     * Loads configuration from configuration file.
-     * @param string $configPath
-     * @param bool $overwrite = false
-     */
-    public function load(string $configPath, $overwrite = false): void
-    {
-        if (!file_exists($configPath)) {
-            return;
-        }
-        $config = include $configPath;
-        if (!is_array($config) && !is_object($config)) {
-            return;
-        }
-        if (is_object($config)) {
-            $config = get_object_vars($config);
-        }
-        $this->loadArray($config, $overwrite);
-    }
-    
-    /**
-     * Loads configuration from configuration file, and from default configuration file.
-     * @param string $configPath
-     * @param string $defaultConfigPath
-     */
-    public function loadWithDefault(string $configPath, string $defaultConfigPath): void
-    {
-        if (!file_exists($configPath)) {
-            return;
-        }
-        $configDefault = include $defaultConfigPath;
-        $config = include $configPath;
-        if (!is_array($configDefault) && !is_array($config)) {
-            return;
-        }
-        $this->loadArray(array_merge($configDefault, $config));
-    }
-    
-    /**
-     * Loads configuration from array.
-     * @param array $config
-     * @param bool $overwrite = false
-     */
-    public function loadArray(array $config, $overwrite = false): void
-    {
-        foreach ($config as $name => $value) {
-            if (!$overwrite && property_exists($this, $name)) {
-                continue;
-            }
-            $this->$name = $value;
-        }
-    }
-    
-    /**
-     * Loads configuration from INI file.
-     * @param string $iniPath
-     * @param bool $overwrite = false
-     */
-    public function loadFromIni(string $iniPath, bool $overwrite = false): void
-    {
-        if (!file_exists($iniPath)) {
-            return;
-        }
-        
-        $iniArr = null;
-        try {
-            $iniArr = parse_ini_file($iniPath, false, INI_SCANNER_TYPED);
-        } catch (\Throwable $e) {
-        }
-        if (!is_array($iniArr)) {
-            return;
-        }
-        $iniArr = array_change_key_case($iniArr, CASE_LOWER);
-        
-        $arr = [];
-        foreach ($iniArr as $name => $value) {
-            $arr[lcfirst(str_replace('_', '', ucwords(str_replace('.', '_', $name), '_')))] = $value;
-        }
-        
-        $this->loadArray($arr, $overwrite);
+        parent::__construct($config);
     }
 }

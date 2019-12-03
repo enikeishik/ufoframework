@@ -9,13 +9,15 @@
 
 namespace Ufo\Core;
 
+use PhpStrict\Config\ConfigInterface;
+
 /**
  * Db wrap.
  */
 class Db extends \mysqli
 {
     /**
-     * @var \Ufo\Core\ConfigInterface
+     * @var \PhpStrict\Config\ConfigInterface
      */
     protected $config = null;
     
@@ -30,7 +32,7 @@ class Db extends \mysqli
     protected $generatedError = '';
     
     /**
-     * @param \Ufo\Core\ConfigInterface $config
+     * @param \PhpStrict\Config\ConfigInterface $config
      * @param \Ufo\Core\DebugInterface $debug = null
      * @throws \Ufo\Core\DbConnectException
      */
