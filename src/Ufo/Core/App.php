@@ -12,6 +12,9 @@ namespace Ufo\Core;
 use PhpStrict\Container\Container;
 use PhpStrict\Container\ContainerInterface;
 use PhpStrict\Config\ConfigInterface;
+use PhpStrict\StorableCache\StorableCache;
+use PhpStrict\StorableCache\StorageConnectException;
+use PhpStrict\StorableCache\StorageNotSupportedException;
 use Ufo\Modules\Controller;
 use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
@@ -23,9 +26,6 @@ use Ufo\Routing\RouteArrayStorage;
 use Ufo\Routing\RouteDbStorage;
 use Ufo\Routing\RouteStorageInterface;
 use Ufo\Routing\RouteStorageEmptyException;
-use Ufo\StorableCache\StorableCache;
-use Ufo\StorableCache\StorageConnectException;
-use Ufo\StorableCache\StorageNotSupportedException;
 use Ufo\Widgets\WidgetsArrayStorage;
 use Ufo\Widgets\WidgetsDbStorage;
 
@@ -58,7 +58,7 @@ class App
     protected $debugStack = [];
     
     /**
-     * @var \Ufo\StorableCache\StorableCache
+     * @var \PhpStrict\StorableCache\StorableCache
      */
     protected $cache = null;
     
@@ -456,7 +456,7 @@ class App
     
     /**
      * @return void
-     * @throws \Ufo\StorableCache\StorageNotSupportedException
+     * @throws \PhpStrict\StorableCache\StorageNotSupportedException
      */
     protected function setCache(): void
     {
@@ -464,7 +464,7 @@ class App
         // if (null !== $this->cache) {
             // return;
         // }
-        $this->cache = new StorableCache($this->config, $this->debug);
+        $this->cache = new StorableCache($this->config);
     }
     
     /**

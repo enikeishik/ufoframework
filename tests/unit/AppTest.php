@@ -96,7 +96,7 @@ class AppTest extends BaseUnitTest
         $config->cache = true;
         $config->cacheType = Config::CACHE_TYPE_SQLITE;
         $config->rootPath = '';
-        $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->cacheSqliteBase = dirname(__DIR__) . '/_data/cache.db';
         $config->cacheTtlWholePage = 0;
         $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
@@ -109,7 +109,9 @@ class AppTest extends BaseUnitTest
             }
             public function cacheClear()
             {
-                $this->cache->clear();
+                if ($this->cache !== null) {
+                    $this->cache->clear();
+                }
             }
         };
         $app->execute();
@@ -121,7 +123,7 @@ class AppTest extends BaseUnitTest
         $config->cache = true;
         $config->cacheType = Config::CACHE_TYPE_SQLITE;
         $config->rootPath = '';
-        $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->cacheSqliteBase = dirname(__DIR__) . '/_data/cache.db';
         $config->cacheTtlWholePage = 0;
         $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
@@ -262,7 +264,7 @@ class AppTest extends BaseUnitTest
         $config->cache = true;
         $config->cacheType = Config::CACHE_TYPE_SQLITE;
         $config->rootPath = '';
-        $config->cacheDir = dirname(__DIR__) . '/_data';
+        $config->cacheSqliteBase = dirname(__DIR__) . '/_data/cache.db';
         $config->routeStorageData = require dirname(__DIR__) . '/_data/routes.php';
         $config->widgetsStorageData = require dirname(__DIR__) . '/_data/widgets.php';
         $config->templatesPath = dirname(__DIR__) . '/integration/templates';
@@ -275,7 +277,9 @@ class AppTest extends BaseUnitTest
             }
             public function cacheClear()
             {
-                $this->cache->clear();
+                if ($this->cache !== null) {
+                    $this->cache->clear();
+                }
             }
         };
         $app->execute();
