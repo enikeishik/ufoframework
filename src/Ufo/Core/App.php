@@ -13,8 +13,8 @@ use PhpStrict\Container\Container;
 use PhpStrict\Container\ContainerInterface;
 use PhpStrict\Config\ConfigInterface;
 use PhpStrict\StorableCache\StorableCache;
-use PhpStrict\StorableCache\StorageConnectException;
-use PhpStrict\StorableCache\StorageNotSupportedException;
+use PhpStrict\StorableCache\StorageConnectException as CacheStorageConnectException;
+use PhpStrict\StorableCache\StorageNotSupportedException as CacheStorageNotSupportedException;
 use Ufo\Modules\Controller;
 use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
@@ -96,9 +96,9 @@ class App
             if ($this->config->cache) {
                 try {
                     $this->setCache();
-                } catch (StorageNotSupportedException $e) {
+                } catch (CacheStorageNotSupportedException $e) {
                     $this->cache = null;
-                } catch (StorageConnectException $e) {
+                } catch (CacheStorageConnectException $e) {
                     $this->cache = null;
                 }
             }
