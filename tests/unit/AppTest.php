@@ -202,9 +202,12 @@ class AppTest extends BaseUnitTest
         $this->assertArrayContentContains('Module parameter unknown');
     }
     
+    /**
+     * @group mysql
+     */
     public function testExecuteWithDb()
     {
-        $this->assertDbContentContains('Route storage empty');
+        $this->assertDbContentContains('Section not exists');
         
         $this->tester->haveInDatabase(
             'sections', 
