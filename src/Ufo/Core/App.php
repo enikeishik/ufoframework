@@ -15,19 +15,19 @@ use PhpStrict\Config\ConfigInterface;
 use PhpStrict\StorableCache\StorableCache;
 use PhpStrict\StorableCache\StorageConnectException as CacheStorageConnectException;
 use PhpStrict\StorableCache\StorageNotSupportedException as CacheStorageNotSupportedException;
+use PhpStrict\SimpleRoute\Route;
+use PhpStrict\SimpleRoute\ArrayStorage as RouteArrayStorage;
+use PhpStrict\SimpleRoute\MysqlStorage as RouteMysqlStorage;
+use PhpStrict\SimpleRoute\StorageInterface as RouteStorageInterface;
+use Ufo\Widgets\WidgetsArrayStorage;
+use Ufo\Widgets\WidgetsDbStorage;
+
 use Ufo\Modules\Controller;
 use Ufo\Modules\ControllerInterface;
 use Ufo\Modules\Renderable;
 use Ufo\Modules\RenderableInterface;
 use Ufo\Modules\View;
 use Ufo\Modules\ViewInterface;
-use Ufo\Routing\Route;
-use Ufo\Routing\RouteArrayStorage;
-use Ufo\Routing\RouteDbStorage;
-use Ufo\Routing\RouteStorageInterface;
-use Ufo\Routing\RouteStorageEmptyException;
-use Ufo\Widgets\WidgetsArrayStorage;
-use Ufo\Widgets\WidgetsDbStorage;
 
 /**
  * Main application class.
@@ -116,8 +116,8 @@ class App
         } catch (RouteStorageNotSetException $e) {
             $result = $this->getError(500, 'Route storage not set');
             
-        } catch (RouteStorageEmptyException $e) {
-            $result = $this->getError(500, 'Route storage empty');
+        } catch (RouteModuleNotSetException $e) {
+            $result = $this->getError(500, 'Module for current section not set');
             
         } catch (DbConnectException $e) {
             if (null !== $this->cache && $this->cache->has($path)) {
@@ -188,7 +188,7 @@ class App
      * @throws \Ufo\Core\DbConnectException
      * @throws \Ufo\Core\SectionNotExistsException
      * @throws \Ufo\Core\RouteStorageNotSetException
-     * @throws \Ufo\Routing\RouteStorageEmptyException
+     * @todo check module
      */
     public function parse(string $path): Section
     {
@@ -198,9 +198,33 @@ class App
             $this->setDb();
         }
         
-        $section = Route::parse($path, $this->getRouteStorage());
-        if (null === $section) {
+        $result = Route::find($path, $this->getRouteStorage());
+        if (null === $result) {
             throw new SectionNotExistsException();
+        }
+        
+        if ($this->config->routeStorageType == $this->config::STORAGE_TYPE_DB) {
+            $section = new Section(
+                array_merge(
+                    ['path' => $path], 
+                    $result->entry->data, 
+                    [
+                        'module' => new Module(
+                            $this->getModuleData($result->entry->data['module'])
+                        )
+                    ], 
+                    ['params' => $result->params]
+                )
+            );
+            
+        } else {
+            $section = new Section(
+                array_merge(
+                    ['path' => $path], 
+                    $result->entry->data, 
+                    ['params' => $result->params]
+                )
+            );
         }
         
         $this->debugTrace();
@@ -420,15 +444,15 @@ class App
     }
     
     /**
-     * @return \Ufo\Core\RouteStorageInterface
+     * @return \PhpStrict\SimpleRoute\StorageInterface
      * @throws \Ufo\Core\RouteStorageNotSetException
-     * @throws \Ufo\Routing\RouteStorageEmptyException
+     * @todo replace string with config data
      */
     protected function getRouteStorage(): RouteStorageInterface
     {
         switch ($this->config->routeStorageType) {
             case $this->config::STORAGE_TYPE_DB:
-                return new RouteDbStorage($this->db);
+                return new RouteMysqlStorage($this->db, '#__sections', 'path', '*');
             case $this->config::STORAGE_TYPE_ARRAY:
                 if (!empty($this->config->routeStoragePath) 
                 && file_exists($this->config->projectPath . $this->config->routeStoragePath)) {
@@ -440,6 +464,21 @@ class App
         }
         
         throw new RouteStorageNotSetException();
+    }
+    
+    /**
+     * @param string $module
+     * @return array
+     * @todo refactor
+     */
+    protected function getModuleData(string $module): array
+    {
+        $sql = 'SELECT * FROM #__modules'
+             . " WHERE package='" . $module . "'";
+        if (null === $data = $this->db->getItem($sql)) {
+            throw new RouteModuleNotSetException();
+        }
+        return $data;
     }
     
     /**
