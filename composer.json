@@ -17,7 +17,8 @@
         "php-strict/struct": "~1.0",
         "php-strict/container": "~1.0",
         "php-strict/config": "~1.0",
-        "php-strict/storable-cache": "~1.0"
+        "php-strict/storable-cache": "~1.0",
+        "php-strict/simple-route": "~1.0"
     },
     "require-dev": {
         "codeception/codeception": "^2.5.1",
