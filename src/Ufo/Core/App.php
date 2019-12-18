@@ -188,7 +188,7 @@ class App
      * @throws \Ufo\Core\DbConnectException
      * @throws \Ufo\Core\SectionNotExistsException
      * @throws \Ufo\Core\RouteStorageNotSetException
-     * @todo check module
+     * @throws \Ufo\Core\RouteModuleNotSetException
      */
     public function parse(string $path): Section
     {
@@ -201,6 +201,10 @@ class App
         $result = Route::find($path, $this->getRouteStorage());
         if (null === $result) {
             throw new SectionNotExistsException();
+        }
+        
+        if (!isset($result->entry->data['module'])) {
+            throw new RouteModuleNotSetException();
         }
         
         if ($this->config->routeStorageType == $this->config::STORAGE_TYPE_DB) {
