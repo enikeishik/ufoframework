@@ -212,11 +212,10 @@ class App
                 array_merge(
                     ['path' => $path], 
                     $result->entry->data, 
-                    [
-                        'module' => new Module(
-                            $this->getModuleData($result->entry->data['module'])
-                        )
-                    ], 
+                    ['module' => new Module(array_merge(
+                        $this->getModuleData($result->entry->data['module']), 
+                        ['callback' => '', 'dbless' => false] //to prevent hack by SQL injection
+                    ))], 
                     ['params' => $result->params]
                 )
             );
@@ -473,6 +472,7 @@ class App
     /**
      * @param string $module
      * @return array
+     * @todo escape module
      * @todo refactor
      */
     protected function getModuleData(string $module): array
