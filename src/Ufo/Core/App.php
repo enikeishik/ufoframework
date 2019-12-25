@@ -472,13 +472,12 @@ class App
     /**
      * @param string $module
      * @return array
-     * @todo escape module
      * @todo refactor
      */
     protected function getModuleData(string $module): array
     {
         $sql = 'SELECT * FROM #__modules'
-             . " WHERE package='" . $module . "'";
+             . " WHERE package='" . $this->db->addEscape($module) . "'";
         if (null === $data = $this->db->getItem($sql)) {
             throw new RouteModuleNotSetException();
         }
