@@ -472,7 +472,8 @@ class App
     /**
      * @param string $module
      * @return array
-     * @todo refactor
+     * @throws \Ufo\Core\RouteModuleNotSetException
+     * @todo replace * with fields list
      */
     protected function getModuleData(string $module): array
     {
