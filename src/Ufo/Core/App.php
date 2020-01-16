@@ -449,13 +449,17 @@ class App
     /**
      * @return \PhpStrict\SimpleRoute\StorageInterface
      * @throws \Ufo\Core\RouteStorageNotSetException
-     * @todo replace string with config data
      */
     protected function getRouteStorage(): RouteStorageInterface
     {
         switch ($this->config->routeStorageType) {
             case $this->config::STORAGE_TYPE_DB:
-                return new RouteMysqlStorage($this->db, '#__sections', 'path', '*');
+                return new RouteMysqlStorage(
+                    $this->db, 
+                    $this->config->routeStorageTable, 
+                    $this->config->routeStorageKeyField, 
+                    $this->config->routeStorageDataField
+                );
             case $this->config::STORAGE_TYPE_ARRAY:
                 if (!empty($this->config->routeStoragePath) 
                 && file_exists($this->config->projectPath . $this->config->routeStoragePath)) {

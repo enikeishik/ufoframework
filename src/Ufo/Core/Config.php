@@ -45,6 +45,24 @@ class Config extends AbstractConfig
     public $routeStorageData = [];
     
     /**
+     * Routes table name (for DB type storage).
+     * @var array
+     */
+    public $routeStorageTable = 'routes';
+    
+    /**
+     * Routes table key field (for DB type storage).
+     * @var array
+     */
+    public $routeStorageKeyField = 'key';
+    
+    /**
+     * Routes table data field (for DB type storage).
+     * @var array
+     */
+    public $routeStorageDataField = 'data';
+    
+    /**
      * Type of widgets storage.
      * @var string STORAGE_TYPE_*
      */
