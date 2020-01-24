@@ -36,6 +36,9 @@ class AppTest extends BaseUnitTest
         $config = new Config();
         $config->loadFromIni(dirname(__DIR__) . '/_data/.config', true);
         $config->routeStorageType = Config::STORAGE_TYPE_DB;
+        $config->routeStorageTable = '#__sections';
+        $config->routeStorageKeyField = 'path';
+        $config->routeStorageDataField = '*';
         $config->widgetsStorageType = Config::STORAGE_TYPE_DB;
         $config->templatesPath = dirname(__DIR__) . '/integration/templates';
         $config->templatesDefault = '';
