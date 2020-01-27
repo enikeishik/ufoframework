@@ -79,6 +79,7 @@ class Db extends \mysqli
     
     /**
      * @see parent
+     * @todo replace '#__' to config
      */
     public function query($query, $resultmode = MYSQLI_STORE_RESULT)
     {
