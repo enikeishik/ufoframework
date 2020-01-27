@@ -98,6 +98,9 @@ class DbTest extends BaseUnitTest
         
         $item = $db->getItem('SELECT `id` FROM `test_items_table` WHERE `id`=0');
         $this->assertNull($item);
+        
+        $item = $db->getItem('SELECT `id` FROM `test_unexists_table` WHERE `id`=1');
+        $this->assertNull($item);
     }
     
     public function testGetItemObject()
