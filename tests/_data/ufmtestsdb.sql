@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `sections` (
   `id` int(11) NOT NULL auto_increment,
   `path` varchar(255) NOT NULL default '',
   `title` varchar(255) NOT NULL default '',
-  `module` varchar(255) NOT NULL default '',
+  `module` varchar(255) default NULL, /* skip NOT NULL for tests */
   `system` tinyint(1) NOT NULL default '0',
   `disabled` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`id`)

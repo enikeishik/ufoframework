@@ -251,6 +251,40 @@ class AppTest extends BaseUnitTest
         $this->assertDbContentContains('gismeteo db widget title');
     }
     
+    /**
+     * @group mysql
+     */
+    public function testExecuteWithDbWithNullModule()
+    {
+        $this->tester->haveInDatabase(
+            'sections', 
+            [
+                'id'        => 1000, 
+                'path'      => '/', 
+                'title'     => 'Main page', 
+                'module'    => null, 
+            ]
+        );
+        $this->assertDbContentContains('Module for current section not set');
+    }
+    
+    /**
+     * @group mysql
+     */
+    public function testExecuteWithDbWithModuleNotExists()
+    {
+        $this->tester->haveInDatabase(
+            'sections', 
+            [
+                'id'        => 1000, 
+                'path'      => '/', 
+                'title'     => 'Main page', 
+                'module'    => 'UfoMainpage', 
+            ]
+        );
+        $this->assertDbContentContains('Module for current section not set');
+    }
+    
     public function testExecuteWithCache()
     {
         $config = new Config();
