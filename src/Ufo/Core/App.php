@@ -208,26 +208,24 @@ class App
         }
         
         if ($this->config->routeStorageType == $this->config::STORAGE_TYPE_DB) {
-            $section = new Section(
-                array_merge(
-                    ['path' => $path], 
-                    $result->entry->data, 
-                    ['module' => new Module(array_merge(
+            $section = new Section(array_merge(
+                ['path' => $path], 
+                $result->entry->data, 
+                [
+                    'module' => new Module(array_merge(
                         $this->getModuleData($result->entry->data['module']), 
                         ['callback' => '', 'dbless' => false] //to prevent hack by SQL injection
-                    ))], 
-                    ['params' => $result->params]
-                )
-            );
+                    ))
+                ], 
+                ['params' => $result->params]
+            ));
             
         } else {
-            $section = new Section(
-                array_merge(
+            $section = new Section(array_merge(
                     ['path' => $path], 
                     $result->entry->data, 
                     ['params' => $result->params]
-                )
-            );
+            ));
         }
         
         $this->debugTrace();
