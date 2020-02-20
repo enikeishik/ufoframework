@@ -16,7 +16,7 @@ before_script:
   - composer install
 script:
   - php -v
-  - phpunit --version
+  # - phpunit --version #error on php 7.2
   - vendor/bin/codecept --version
   - vendor/bin/codecept run unit --coverage --coverage-xml
 after_success:
