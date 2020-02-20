@@ -59,13 +59,20 @@ class Parameter extends Struct
     public $value = null;
     
     /**
+     * Validator for user defined type parameter.
+     * @var callable
+     */
+    public $validator = null;
+    
+    /**
      * @param string $name
      * @param string $type
      * @param string $prefix
-     * @param string $from = ''
+     * @param string $from = 'path'
      * @param bool $additional = false
      * @param mixed $default = null
      * @param mixed $value = null
+     * @param callable $validator = null
      * @return self
      */
     public static function make(
@@ -75,7 +82,8 @@ class Parameter extends Struct
         string $from = 'path', 
         bool $additional = false, 
         $defval = null, 
-        $value = null
+        $value = null, 
+        callable $validator = null
     ): self {
         $parameter = new self();
         $parameter->name        = $name;
@@ -85,13 +93,14 @@ class Parameter extends Struct
         $parameter->additional  = $additional;
         $parameter->defval      = $defval;
         $parameter->value       = $value;
+        $parameter->validator   = $validator;
         return $parameter;
     }
     
     /**
      * @param string $name
      * @param string $prefix
-     * @param string $from = ''
+     * @param string $from = 'path'
      * @param bool $additional = false
      * @param mixed $default = null
      * @param mixed $value = null
@@ -111,7 +120,7 @@ class Parameter extends Struct
     /**
      * @param string $name
      * @param string $prefix
-     * @param string $from = ''
+     * @param string $from = 'path'
      * @param bool $additional = false
      * @param mixed $default = null
      * @param mixed $value = null
@@ -131,7 +140,7 @@ class Parameter extends Struct
     /**
      * @param string $name
      * @param string $prefix
-     * @param string $from = ''
+     * @param string $from = 'path'
      * @param bool $additional = false
      * @param mixed $default = null
      * @param mixed $value = null
@@ -151,7 +160,7 @@ class Parameter extends Struct
     /**
      * @param string $name
      * @param string $prefix
-     * @param string $from = ''
+     * @param string $from = 'path'
      * @param bool $additional = false
      * @param mixed $default = null
      * @param mixed $value = null
@@ -166,5 +175,27 @@ class Parameter extends Struct
         $value = null
     ): self {
         return self::make($name, 'date', $prefix, $from, $additional, $defval, $value);
+    }
+    
+    /**
+     * @param string $name
+     * @param string $prefix
+     * @param string $from = 'path'
+     * @param bool $additional = false
+     * @param mixed $default = null
+     * @param mixed $value = null
+     * @param callable $validator = null
+     * @return self
+     */
+    public function makeUserType(
+        string $name, 
+        string $prefix, 
+        string $from = 'path', 
+        bool $additional = false, 
+        $defval = null, 
+        $value = null, 
+        callable $validator = null
+    ): self {
+        return self::make($name, 'date', $prefix, $from, $additional, $defval, $value, $validator);
     }
 }
