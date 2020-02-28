@@ -16,3 +16,8 @@ modules:
             dump: 'tests/_data/ufmtestsdb.sql'
             populate: true
             cleanup: false
+env:
+    nodb:
+        modules:
+            disabled:
+                - Db
