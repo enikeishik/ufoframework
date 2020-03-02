@@ -59,4 +59,50 @@ class ParameterTest extends \Codeception\Test\Unit
         $this->assertEquals($parameter->value, 2);
         $this->assertNull($parameter->validator);
     }
+    
+    public function testParameterMakeWithCallback()
+    {
+        $parameter = Parameter::make(
+            'param3', 
+            'usertype', 
+            'p3', 
+            'get', 
+            true, 
+            'value-0', 
+            'value-3', 
+            function($value) {
+                $chunks = explode('-', $value);
+                if (2 > count($chunks)) {
+                    return 'value-0';
+                }
+                return 'value-' . (string) (int) $chunks[1];
+            }
+        );
+        $this->assertEquals($parameter->name, 'param3');
+        $this->assertEquals($parameter->type, 'usertype');
+        $this->assertEquals($parameter->from, 'get');
+        $this->assertEquals($parameter->prefix, 'p3');
+        $this->assertTrue($parameter->additional);
+        $this->assertEquals($parameter->defval, 'value-0');
+        $this->assertEquals($parameter->value, 'value-3');
+        $this->assertNotNull($parameter->validator);
+
+        $parameter = Parameter::make(
+            'param4', 
+            'usertype', 
+            'p4', 
+            'get', 
+            true, 
+            'value-0', 
+            'value4', 
+            function($value, $default) {
+                $chunks = explode('-', $value);
+                if (2 > count($chunks)) {
+                    return $default;
+                }
+                return 'value-' . (string) (int) $chunks[1];
+            }
+        );
+        $this->assertEquals($parameter->value, 'value-0');
+    }
 }
