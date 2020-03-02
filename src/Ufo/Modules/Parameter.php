@@ -94,6 +94,9 @@ class Parameter extends Struct
         $parameter->defval      = $defval;
         $parameter->value       = $value;
         $parameter->validator   = $validator;
+        if (null !== $parameter->validator) {
+            $parameter->value = $validator($parameter->value, $parameter->defval);
+        }
         return $parameter;
     }
     
@@ -196,6 +199,6 @@ class Parameter extends Struct
         $value = null, 
         callable $validator = null
     ): self {
-        return self::make($name, 'date', $prefix, $from, $additional, $defval, $value, $validator);
+        return self::make($name, 'usertype', $prefix, $from, $additional, $defval, $value, $validator);
     }
 }
