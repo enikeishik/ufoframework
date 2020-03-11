@@ -105,4 +105,21 @@ class ParameterTest extends \Codeception\Test\Unit
         );
         $this->assertEquals($parameter->value, 'value-0');
     }
+    
+    public function testParameterMakeBool()
+    {
+        $parameter = Parameter::makeBool('param41', 'p41');
+        $this->assertNull($parameter->value);
+        
+        $parameter = Parameter::makeBool('param42', 'p42', 'path', false, true, null);
+        $this->assertNull($parameter->value);
+        
+        $parameter = Parameter::makeBool('param43', 'p43', 'path', false, true, false);
+        $this->assertNotNull($parameter->value);
+        $this->assertFalse($parameter->value);
+        
+        $parameter = Parameter::makeBool('param43', 'p43', 'path', false, false, true);
+        $this->assertNotNull($parameter->value);
+        $this->assertTrue($parameter->value);
+    }
 }
