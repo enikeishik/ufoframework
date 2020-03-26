@@ -143,4 +143,25 @@ class ParameterTest extends \Codeception\Test\Unit
         $this->assertNotNull($parameter->value);
         $this->assertEquals($parameter->value, 999999);
     }
+    
+    public function testParameterMakeString()
+    {
+        $parameter = Parameter::makeString('param61', 'p61');
+        $this->assertNull($parameter->value);
+        
+        $parameter = Parameter::makeString('param62', 'p62', 'path', false, 'default', null);
+        $this->assertNull($parameter->value);
+        
+        $parameter = Parameter::makeString('param63', 'p63', 'path', false, 'defval', '');
+        $this->assertNotNull($parameter->value);
+        $this->assertEquals($parameter->value, '');
+        
+        $parameter = Parameter::makeString('param64', 'p64', 'path', false, '', '!');
+        $this->assertNotNull($parameter->value);
+        $this->assertEquals($parameter->value, '!');
+        
+        $parameter = Parameter::makeString('param65', 'p65', 'path', false, '', '! @ # $ % ^ & * ( ) _ +');
+        $this->assertNotNull($parameter->value);
+        $this->assertEquals($parameter->value, '! @ # $ % ^ & * ( ) _ +');
+    }
 }
